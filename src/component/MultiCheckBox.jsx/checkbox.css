@@ -1,0 +1,86 @@
+.checkboxmainD1{
+    display: flex;
+    flex-direction: column;
+    
+    padding: 0px;
+    
+    
+    
+}
+.checkboxmainD1C{
+    display: flex;
+   flex-direction: column;
+    justify-content: space-between;
+    /* box-shadow: 1px 1px 3px 3px rgba(0, 0, 0, 0.5); */
+    padding:2px 2px 2px 2px;
+    margin-top: 14px;
+    
+}
+.CCNPCompanySearchBoxM{
+    display: flex;
+    flex-direction: row;
+    
+   justify-content: right;
+   
+    margin-bottom: 2%;
+    margin-right: 0%;
+  
+  
+  }
+  .CCNPCompanySearchBoxMS {
+    /* Fixed width */
+   
+     flex-direction: column;
+     
+     
+     /* height: 100px; */
+     overflow: auto;
+     border-radius: 5px;
+     border: 1px solid #969999;
+     padding:0 10px;
+    
+     box-sizing: border-box; /* Include padding and border in the width */
+   }
+   #checkboxmainD1CI1{
+    font-size: 12px;
+    margin-bottom: 5px;
+    margin-left: 5px;
+    margin-top: 5px;
+   }
+   #inputwrapperSB{
+    align-items: center;
+    
+    border: none;
+    gap: 10px;
+ 
+    position: sticky;
+    top:0;
+    z-index: 2;
+   
+   
+    border-radius: 4px;
+    padding: 1px;
+    display: flex;
+    flex-wrap: wrap;
+  
+   
+  
+ 
+  
+ 
+}
+.IpWD1{
+ 
+    align-items: center;
+    display: flex;
+    z-index: 9;
+    background-color: white;
+    
+}
+#searchIconSB{
+    font-size: 18px;
+   
+}
+#IpWSB{
+  font-size: 12px;
+}
