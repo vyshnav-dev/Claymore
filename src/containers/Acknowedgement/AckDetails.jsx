@@ -42,6 +42,7 @@ import UserAutoComplete from "../../component/AutoComplete/UserAutoComplete";
 // import MasterProductConfirmation from "./MasterProductConfirmation";
 import { Info } from "@mui/icons-material";
 import MultiCheckBox from "../../component/MultiCheckBox.jsx/MultiCheckBox";
+import { inspectionApis } from "../../service/Inspection/inspection";
 const currentDate = new Date().toISOString().split("T")[0];
 function CustomTabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -90,7 +91,7 @@ CustomTabPanel.propTypes = {
     value: PropTypes.number.isRequired,
 };
 
-function BasicBreadcrumbs({ group }) {
+function BasicBreadcrumbs() {
     const style = {
         display: "flex",
         alignItems: "center",
@@ -143,7 +144,7 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction }) => {
                 scrollbarWidth: "thin",
             }}
         >
-            {userAction.some(
+            {/* {userAction.some(
                 (action) => action.Action === "New" && detailPageId !== 0
             ) && (
                     <ActionButton
@@ -152,7 +153,7 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction }) => {
                         caption={"New"}
                         iconName={"new"}
                     />
-                )}
+                )} */}
             {userAction.some(
                 (action) =>
                     (action.Action === "New" && detailPageId === 0) ||
@@ -178,18 +179,7 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction }) => {
                 </>
             )}
 
-            {userAction.some((action) => action.Action === "Property") && (
-                <>
-                    {detailPageId !== 0 && (
-                        <ActionButton
-                            iconsClick={iconsClick}
-                            icon={"fa-solid fa-gears"}
-                            caption={"Property"}
-                            iconName={"property"}
-                        />
-                    )}
-                </>
-            )}
+            
 
             <ActionButton
                 iconsClick={iconsClick}
@@ -208,31 +198,21 @@ export default function AckDetails({
     detailPageId: summaryId,
     userAction,
     disabledDetailed,
-    group,
-    groupSelection,
 }) {
     const [mainDetails, setMainDetails] = useState({});
-    const [companyList, setCompanyList] = useState([]);
-    const [unitInfo, setUnitInfo] = useState([]);
     const [detailPageId, setDetailPageId] = useState(summaryId);
     const [confirmAlert, setConfirmAlert] = useState(false);
     const [confirmData, setConfirmData] = useState({});
     const [confirmType, setConfirmType] = useState(null);
-    const [baseUnit, setBaseUnit] = useState({});
-    const [property, setProperty] = useState(false);
 
 
 
     const { showAlert } = useAlert();
     const {
-        gettagdetails,
-        deletetag,
-        checkexistenceintag,
-        gettagparentlist,
-        upsertproductmaster,
-        updateproductproperties,
-        updatetagparent,
-    } = masterApis();
+        getAcknowledgemenDetails,
+        upsertAcknowledgement,
+        deleteAcknowledgement
+    } = inspectionApis();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -246,33 +226,22 @@ export default function AckDetails({
             if (detailPageId == 0) {
                 handleNew();
             } else {
-                const response = await gettagdetails({
+                const response = await getAcknowledgemenDetails({
                     id: detailPageId,
-                    tagId: 11,
                 });
                 if (response?.status === "Success") {
                     const myObject = JSON.parse(response?.result);
-                    const baseUnitArray = myObject?.UnitInfo.filter(
-                        (item) => item.Baseunit === true
-                    );
-                    const nonBaseUnitArray = myObject?.UnitInfo.filter(
-                        (item) => item.Baseunit === false
-                    );
-                    setMainDetails(myObject?.TagInfo[0]);
-                    setCompanyList([...myObject?.EntityInfo, { BE: 0, BE_Name: null }]);
-                    setUnitInfo(
-                        nonBaseUnitArray?.length
-                            ? nonBaseUnitArray
-                            : [
-                                {
-                                    Barcode: null,
-                                    Conversion: null,
-                                    Unit: null,
-                                    Unit_Name: null,
-                                },
-                            ]
-                    );
-                    setBaseUnit(baseUnitArray[0]);
+                    if (myObject) {
+                        const formattedDate = myObject[0]?.TargetDateOfClosure?.split("T")[0];
+                        console.log('format',formattedDate);
+                        
+                        // Update the main details with the formatted date
+                        setMainDetails( {
+                            ... myObject[0],
+                            TargetDateOfClosure: formattedDate,
+                        });
+                    }
+                    
                 } else {
                     handleNew();
                 }
@@ -284,59 +253,21 @@ export default function AckDetails({
 
     const handleNew = async () => {
         setMainDetails({
-            AltName: null,
-            DisableBatch: false,
-            Category: null,
-            Category_Name: null,
-            Group: false,
-            Code: null,
+            Finding: null,
+            CriticalFinding: null,
+            TargetDateOfClosure: null,
+            OtherRemarks: null,
+            JobOrderNo: null,
             Id: detailPageId,
-            Name: null,
-            Parent: null,
-            Parent_Name: null,
-            DisableSerialNo: false,
-            Type: null,
-            Type_Name: null,
+            Allocation: null,
         });
-        setCompanyList([{ BE: 0, BE_Name: null }]);
-        setUnitInfo([
-            {
-                Barcode: null,
-                Conversion: null,
-                Unit: null,
-                Unit_Name: null,
-            },
-        ]);
-        setBaseUnit({
-            Barcode: null,
-            Baseunit: true,
-            Conversion: null,
-            Id: 0,
-            Unit: null,
-            Unit_Name: null,
-        });
+        
         setDetailPageId(0);
     };
 
-    useEffect(() => {
-        if (!baseUnit?.Unit) {
-            setUnitInfo([
-                {
-                    Barcode: null,
-                    Conversion: null,
-                    Unit: null,
-                    Unit_Name: null,
-                },
-            ]);
-        }
-    }, [baseUnit?.Unit]);
+    
 
-    function hasDuplicateBarcode(data) {
-        return data.some(
-            (item, index, array) =>
-                array.findIndex((el) => el.Barcode === item.Barcode) !== index
-        );
-    }
+    
 
     const handleIconsClick = async (value) => {
         switch (value.trim()) {
@@ -348,50 +279,16 @@ export default function AckDetails({
                 break;
             case "save":
                 const emptyFields = [];
-                if (!mainDetails?.Name) emptyFields.push("Name");
-                if (!mainDetails.Code) emptyFields.push("Code");
-                if (!mainDetails.Category) emptyFields.push("Category");
-                if (!mainDetails.Type) emptyFields.push("Type");
-                if (!baseUnit?.Unit) emptyFields.push("Base Unit");
-                if (!baseUnit?.Barcode) emptyFields.push("Bar Code");
-                const filteredCompanyList = companyList
-                    .filter((item) => item.BE && item.BE !== 0) // Filter out items where BE is 0 or not present
-                    .map((item) => ({ be: item.BE }));
-                if (!filteredCompanyList?.length) emptyFields.push("Entity");
+                // if (!mainDetails?.Finding) emptyFields.push("Finding");
+                // if (!mainDetails.CriticalFinding) emptyFields.push("Critical Finding");
+                // if (!mainDetails.TargetDateOfClosure) emptyFields.push("TargetDate Of Closure");
+                // if (!mainDetails.OtherRemarks) emptyFields.push("Other Remarks");
+                
                 if (emptyFields.length > 0) {
                     showAlert("info", `Please Provide ${emptyFields[0]}`);
                     return;
                 }
-                let checkDataMissing = false;
-                if (unitInfo?.length > 1) {
-                    checkDataMissing = unitInfo.some(
-                        (item) => !item?.Unit || !item?.Conversion || !item?.Barcode
-                    );
-                } else if (unitInfo?.length === 1) {
-                    if (
-                        unitInfo.some(
-                            (item) => !item?.Unit && !item?.Conversion && !item?.Barcode
-                        )
-                    ) {
-                        checkDataMissing = false;
-                    } else {
-                        // If no completely empty items, check if all items are valid
-                        checkDataMissing = !unitInfo.some(
-                            (item) => item?.Unit && item?.Conversion && item?.Barcode
-                        );
-                    }
-                } else {
-                    checkDataMissing = false;
-                }
-
-                if (checkDataMissing) {
-                    showAlert("info", `Please fill the unit table row`);
-                    return;
-                }
-                if (hasDuplicateBarcode([...unitInfo, baseUnit])) {
-                    showAlert("info", `Please fill unique barcode`);
-                    return;
-                }
+                
                 setConfirmData({ message: "Save", type: "success" });
                 setConfirmType("save");
                 setConfirmAlert(true);
@@ -415,56 +312,19 @@ export default function AckDetails({
     };
 
     const handleSave = async () => {
-        const filteredCompanyList = companyList
-            .filter((item) => item.BE && item.BE !== 0) // Filter out items where BE is 0 or not present
-            .map((item) => ({ be: item.BE }));
-        const filteredUnitInfo = unitInfo?.map((item) => ({
-            unit: item?.Unit,
-            conversion: item?.Conversion,
-            barcode: item?.Barcode,
-            baseUnit: item?.Baseunit,
-        }));
-        const updateUnit =
-            filteredUnitInfo?.length === 1 && !filteredUnitInfo[0]?.unit
-                ? []
-                : filteredUnitInfo;
+       
         const saveData = {
             id: mainDetails?.Id,
-            name: mainDetails?.Name,
-            code: mainDetails?.Code,
-            altName: mainDetails?.AltName,
-            type: mainDetails?.Type,
-            category: mainDetails?.Category,
-            // warehouse: mainDetails?.Id,
-            parent: mainDetails?.Parent,
-            group: group !== 0 ? true : mainDetails?.Group,
-            disableBatch: mainDetails?.Type !== 3 ? mainDetails?.DisableBatch : true,
-            disableSerialNo:
-                mainDetails?.Type !== 3 ? mainDetails?.DisableSerialNo : true,
-            unitInfo: [
-                {
-                    unit: baseUnit?.Unit,
-                    conversion: null,
-                    barcode: baseUnit?.Barcode,
-                    baseUnit: baseUnit?.Baseunit,
-                },
-                ...updateUnit,
-            ],
-            entityInfo: filteredCompanyList,
+            allocation: mainDetails?.Allocation,
+            finding: mainDetails?.Finding,
+            criticalFinding: mainDetails?.CriticalFinding,
+            targetDateOfClosure: mainDetails?.TargetDateOfClosure,
+            otherRemarks: mainDetails?.OtherRemarks,
+            
         };
-        const response = await upsertproductmaster(saveData);
+        const response = await upsertAcknowledgement(saveData);
         if (response.status === "Success") {
-            if (group === 2) {
-                const parentPayload = groupSelection?.map((item) => ({
-                    id: item,
-                }));
-                const parentData = {
-                    tagId: 11,
-                    parentId: Number(response?.result),
-                    ids: parentPayload,
-                };
-                const respone2 = await updatetagparent(parentData);
-            }
+           
             showAlert("success", response?.message);
             handleNew();
             const actionExists = userAction.some((action) => action.Action === "New");
@@ -501,7 +361,7 @@ export default function AckDetails({
     //Delete alert open
     const deleteClick = async () => {
         let response;
-        response = await deletetag([{ id: detailPageId }], 11);
+        response = await deleteAcknowledgement([{ id: detailPageId }]);
         if (response?.status === "Success") {
             showAlert("success", response?.message);
             handleNew();
@@ -512,64 +372,13 @@ export default function AckDetails({
         }
     };
 
-    const handleDeleteRow = (index) => {
-        if (companyList?.length <= 1) {
-            setCompanyList([{ BE: 0, BE_Name: null }]);
-        } else {
-            setCompanyList((prev) => prev.filter((_, i) => i !== index));
-        }
-    };
+   
 
-    const handleMasterExist = async (type) => {
-        try {
-            const response = await checkexistenceintag({
-                tagId: 11,
-                id: mainDetails?.Id,
-                name: type === 1 ? mainDetails?.Name : mainDetails?.Code,
-                type: type,
-            });
-            if (response.status === "Success") {
-                return true;
-            } else {
-                return false;
-            }
-        } catch (error) {
-            return false;
-        }
-    };
+    
 
-    const handleProperty = () => {
-        setConfirmData({
-            message: `You want to Activate/Inactivate the property.`,
-            type: "info",
-            header: "Property",
-        });
-        setProperty(true);
-    };
+   
 
-    const handlePropertyConfirmation = async (status) => {
-        const propertyPayload = [
-            {
-                id: detailPageId,
-            },
-        ];
-
-        const saveData = {
-            status: status,
-            ids: propertyPayload,
-        };
-        try {
-            const response = await updateproductproperties(saveData);
-
-            if (response?.status === "Success") {
-                showAlert("success", response?.message);
-                setConfirmData({});
-            }
-        } catch (error) {
-        } finally {
-            setProperty(false);
-        }
-    };
+    
 
     return (
         <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
@@ -584,7 +393,7 @@ export default function AckDetails({
                     flexWrap: "wrap",
                 }}
             >
-                <BasicBreadcrumbs group={group} />
+                <BasicBreadcrumbs  />
                 <DefaultIcons
                     detailPageId={detailPageId}
                     iconsClick={handleIconsClick}
@@ -634,14 +443,13 @@ export default function AckDetails({
                     >
 
                         <UserInputField
-                            label={"Doc No"}
-                            name={"DocNo"}
+                            label={"JobOrder No"}
+                            name={"JobOrderNo"}
                             type={"text"}
-                            disabled={false}
+                            disabled={true}
                             mandatory={true}
                             value={mainDetails}
                             setValue={setMainDetails}
-                            onBlurAction={() => handleMasterExist(1)}
                             maxLength={100}
                         />
 
@@ -667,46 +475,42 @@ export default function AckDetails({
 
                             <UserInputField
                                 label={"Findings"}
-                                name={"findings"}
+                                name={"Finding"}
                                 type={"text"}
                                 disabled={false}
                                 mandatory={true}
                                 value={mainDetails}
                                 setValue={setMainDetails}
-                                onBlurAction={() => handleMasterExist(1)}
                                 multiline={true}
                             />
                             <UserInputField
                                 label={"Critical Finding"}
-                                name={"critical"}
+                                name={"CriticalFinding"}
                                 type={"text"}
                                 disabled={false}
                                 mandatory={true}
                                 value={mainDetails}
                                 setValue={setMainDetails}
-                                onBlurAction={() => handleMasterExist(1)}
                                 multiline={true}
                             />
                             <UserInputField
                                 label={"Other Remarks"}
-                                name={"remarks"}
+                                name={"OtherRemarks"}
                                 type={"text"}
                                 disabled={false}
                                 mandatory={true}
                                 value={mainDetails}
                                 setValue={setMainDetails}
-                                onBlurAction={() => handleMasterExist(1)}
                                 multiline={true}
                             />
                             <UserInputField
                                 label={"Target Date of Closure"}
-                                name={"closureDate"}
+                                name={"TargetDateOfClosure"}
                                 type={"date"}
                                 disabled={false}
                                 mandatory={true}
                                 value={mainDetails}
                                 setValue={setMainDetails}
-                                onBlurAction={() => handleMasterExist(2)}
                             />
 
 

@@ -1,34 +1,29 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, useTheme, Typography, Dialog, DialogTitle, DialogContent, DialogActions, Tooltip, Stack, Popover, Checkbox, FormControl, RadioGroup, FormControlLabel, Radio } from '@mui/material';
-import { MDBCardBody, MDBCol, MDBIcon } from 'mdb-react-ui-kit';
 import { useEffect } from 'react';
-import { IconButton, Menu, MenuItem } from '@mui/material';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-
 import InputCommon from '../../component/InputFields/InputCommon';
 // import ConfirmationAlert2 from '../../../component/Alerts/ConfirmationAlert2';
 import Loader from '../../component/Loader/Loader';
-import AutoComplete from '../../component/AutoComplete/AutoComplete';
 import { secondaryColor } from '../../config/config';
 import { useAlert } from '../../component/Alerts/AlertContext';
 // import { ItemSelectionPopup } from './ItemSelectionPopup';
 
 
 
-const RiskBodyTable = ({ fields, tableData, settableData, Batch, setBatch, preview = false, language = "english", languageId = 1,typeName }) => {
+const RiskBodyTable = ({ fields, tableData, settableData, preview = false, language = "english", languageId = 1, typeName }) => {
 
     const { showAlert } = useAlert();
 
     const [activeRowIndex, setActiveRowIndex] = useState(null);
     const [loading, setloading] = useState(false)
 
-   
+
 
 
     //Bifurcation states
     const [bifurcationPopupOpen, setBifurcationPopupOpen] = useState(false);
     const [selectedHeader, setSelectedHeader] = useState('');
-   
+
 
 
     const [canFocus, setCanFocus] = useState(true);
@@ -66,7 +61,7 @@ const RiskBodyTable = ({ fields, tableData, settableData, Batch, setBatch, previ
         textOverflow: "ellipsis",
     }), [cellStyle]);
 
-    
+
 
 
     const rowClick = (index) => {
@@ -85,8 +80,8 @@ const RiskBodyTable = ({ fields, tableData, settableData, Batch, setBatch, previ
 
 
     const handleRowChange = (index, field, data) => {
-        
-        
+
+
         if (preview) {
             return
         }
@@ -97,37 +92,37 @@ const RiskBodyTable = ({ fields, tableData, settableData, Batch, setBatch, previ
             const updatedRows = [...prevRows];
 
             if (field.FieldDisplayType == "risk") {
-                
-                let newArray = updatedRows.find((item)=>item.Name === typeName)
-                
-                const Data1 = [...newArray.Data]
+
+                let newArray = updatedRows.find((item) => item.Name === typeName)
+
+                const Data1 = [...newArray.items]
                 Data1[index] = {
                     ...Data1[index],
                     [field.FieldName]: data
                 };
                 newArray = {
                     ...newArray,
-                    Data:Data1
+                    items: Data1
                 }
-                let typeIndex = updatedRows.findIndex((item)=>item.Name === typeName)
+                let typeIndex = updatedRows.findIndex((item) => item.Name === typeName)
                 updatedRows[typeIndex] = {
                     ...newArray
                 };
 
             }
-            else if (field.FieldDisplayType == "level"){
-                let newArray = updatedRows.find((item)=>item.Name === typeName)
-                
-                const Data1 = [...newArray.Data]
+            else if (field.FieldDisplayType == "level") {
+                let newArray = updatedRows.find((item) => item.Name === typeName)
+
+                const Data1 = [...newArray.items]
                 Data1[index] = {
                     ...Data1[index],
                     [field.FieldName]: data
                 };
                 newArray = {
                     ...newArray,
-                    Data:Data1
+                    items: Data1
                 }
-                let typeIndex = updatedRows.findIndex((item)=>item.Name === typeName)
+                let typeIndex = updatedRows.findIndex((item) => item.Name === typeName)
                 updatedRows[typeIndex] = {
                     ...newArray
                 };
@@ -136,26 +131,26 @@ const RiskBodyTable = ({ fields, tableData, settableData, Batch, setBatch, previ
 
                 const { name, value } = data
 
-                let newArray = updatedRows.find((item)=>item.Name === typeName)
-                const Data1 = [...newArray.Data]
+                let newArray = updatedRows.find((item) => item.Name === typeName)
+                const Data1 = [...newArray.items]
                 Data1[index] = {
                     ...Data1[index],
                     [name]: value
                 };
                 newArray = {
                     ...newArray,
-                    Data:Data1
+                    items: Data1
                 }
-                
-                let typeIndex = updatedRows.findIndex((item)=>item.Name === typeName)
+
+                let typeIndex = updatedRows.findIndex((item) => item.Name === typeName)
                 updatedRows[typeIndex] = {
                     ...newArray
                 };
 
             }
             return updatedRows;
-            
-            
+
+
         });
     };
     const validateFormData = () => {
@@ -200,11 +195,11 @@ const RiskBodyTable = ({ fields, tableData, settableData, Batch, setBatch, previ
     };
 
 
-    
 
 
 
-    
+
+
 
     // After selecting items from popup
     // const handleItemsSelected = (selectedItems) => {
@@ -223,7 +218,7 @@ const RiskBodyTable = ({ fields, tableData, settableData, Batch, setBatch, previ
     //   });
     // };
 
-    
+
 
     useEffect(() => {
 
@@ -235,15 +230,16 @@ const RiskBodyTable = ({ fields, tableData, settableData, Batch, setBatch, previ
         }
     }, [document.activeElement])
 
-  
+
     const sortedFields = useMemo(() => {
         return fields.slice().sort((a, b) => a.FieldOrder - b.FieldOrder);
     }, [fields]);
     return (
 
         <Box sx={{
-            opacity: preview ? 0.5 : 1,
-            pointerEvents: preview ? 'none' : 'auto', width: "fit-Content", maxWidth: "100%"
+            // opacity: preview ? 0.5 : 1,
+            pointerEvents: preview ? 'none' : 'auto',
+            overflowY: 'auto'
         }}>
 
 
@@ -264,13 +260,15 @@ const RiskBodyTable = ({ fields, tableData, settableData, Batch, setBatch, previ
                     sx={{
                         maxHeight: "320px",
                         // minHeight: "200px",
-                        overflow: "auto",
+                        overflowY: "auto",
                         boxShadow: "0px 8px 16px rgba(0, 0, 0, 0.2)", // More pronounced shadow for light mode
                         "&:hover": {
                             boxShadow: "0px 8px 16px rgba(0, 0, 0, 0.2)", // Stronger shadow on hover for light mode
                         },
                         scrollbarWidth: "thin",
                         width: "auto",
+
+                        // maxWidth: "200vh",
 
                     }}
 
@@ -282,7 +280,7 @@ const RiskBodyTable = ({ fields, tableData, settableData, Batch, setBatch, previ
                             // minHeight: "200px",
                             scrollbarWidth: "thin",
                             padding: "0px",
-                            width: "fit-content",
+                            // maxWidth: "195vh",
                             overflowY: "auto",
 
                         }}
@@ -291,7 +289,7 @@ const RiskBodyTable = ({ fields, tableData, settableData, Batch, setBatch, previ
                         <Table stickyHeader >
                             <TableHead >
                                 <TableRow >
-                                   
+
                                     {!preview && <TableCell sx={{ ...headerCellStyle, minWidth: "50px" }}> SI no</TableCell>}
                                     {sortedFields.map((field, idx) => {
                                         // const isClickable = inputConfig?.bBifurcation? field.FieldName=="AddCharge" : false;
@@ -341,13 +339,13 @@ const RiskBodyTable = ({ fields, tableData, settableData, Batch, setBatch, previ
 };
 export default RiskBodyTable;
 
-const MemoizedTableRow = ({ row, index,rowClick, handleRowChange, bodyCell,  fields, language, Batch, showAlert,}) => {
+const MemoizedTableRow = ({ row, index, rowClick, handleRowChange, bodyCell, fields, language, Batch, showAlert, }) => {
 
 
     const radioButtonStyle = {
         "& .MuiSvgIcon-root": {
             fontSize: 14,
-            color:'#26668b'
+            color: '#26668b'
         },
         "& .MuiFormControlLabel-label": {
             fontSize: 12, // Adjust the label font size as needed
@@ -357,12 +355,6 @@ const MemoizedTableRow = ({ row, index,rowClick, handleRowChange, bodyCell,  fie
     const [anchorEl, setAnchorEl] = useState(null);
     const [showIcons, setShowIcons] = useState(false);
 
-    //Batch
-    const [batchPopupOpen, setBatchPopupOpen] = useState(false);
-    const [currentRowIndex, setCurrentRowIndex] = useState(null);
-    const [selectedBatchData, setSelectedBatchData] = useState([])
-    const [selectedQuantity, setSelectedQuantity] = useState(null)
-    const [selectedIsino, setselectedIsino] = useState(null)
 
 
 
@@ -384,36 +376,7 @@ const MemoizedTableRow = ({ row, index,rowClick, handleRowChange, bodyCell,  fie
 
     const isMenuOpen = Boolean(anchorEl);
 
-    //#region batch row
-    const handleBatchClick = (rowIndex) => {
-        if (!row.Quantity > 0) {
-
-
-            showAlert("info", "Enter quntity")
-
-            return
-
-        }
-
-
-        const selectedBatch = Batch.filter(batch => batch.iSiNo === row.iSiNo);
-        setCurrentRowIndex(rowIndex);
-        setBatchPopupOpen(true);
-        setSelectedBatchData(selectedBatch);
-        setSelectedQuantity(row.fQty);
-        setselectedIsino(row.iSiNo)
-    };
-
-
-
-
-
-
-
-
-
-
-
+    
 
     const handleBlur = () => {
         setTimeout(() => {
@@ -422,51 +385,51 @@ const MemoizedTableRow = ({ row, index,rowClick, handleRowChange, bodyCell,  fie
             }
         }, 0);
     };
-    const handleChange = (e) => {
-        const updatedValue = { ...value }; // Ensure `value` is treated as an object
-        updatedValue[fieldName] = e.target.checked; // Update the specific field
-        changeValue(updatedValue); // Pass the updated object to the parent
-    };
+    // const handleChange = (e) => {
+    //     const updatedValue = { ...value }; // Ensure `value` is treated as an object
+    //     updatedValue[fieldName] = e.target.checked; // Update the specific field
+    //     changeValue(updatedValue); // Pass the updated object to the parent
+    // };
 
     const renderCellContent = (field, index) => {
         const fieldValue = row[field.FieldName];
-        
-            switch ((field?.FieldDisplayType)?.toLowerCase()) {
-                case 'text box':
-                    return (
-                        <InputCommon
-                            value={fieldValue}
-                            name={field.FieldName}
-                            setValue={(data) => handleRowChange(index, field, data)}
-                            languageName={language}
-                            key={field?.FieldName}
-                            mandatory={field?.Mandatory}
 
-                            // disabled={disabledDetailed || field?.ReadOnly || false}
-                            type={field?.FieldType.toLowerCase()}
-                            maxLength={field?.MaxSize}
-                            AllowNegative={field?.Negative ?? true}
-                            DefaultValue={field?.DefaultValue}
-                            ErrorMessage={field?.ErrorMessage}
-                            // onBlur={(data) => handleOnBlur(field?.FieldName, data)}
-                            ColumnSpan={field?.ColumnSpan}
-                            RowSpan={field?.RowSpan}
-                            multiline={field?.RowSpan > 1 ? true : null}
-                            CharacterCasing={field?.CharacterCasing ?? 0}
-                            RegularExpression={field?.RegularExpression}
-                            dateType={field?.AllowDate}
-                            DonotAllowSpecialChar={field?.DonotAllowSpecialChar}
-                            tableField={true}
+        switch ((field?.FieldDisplayType)?.toLowerCase()) {
+            case 'text box':
+                return (
+                    <InputCommon
+                        value={fieldValue}
+                        name={field.FieldName}
+                        setValue={(data) => handleRowChange(index, field, data)}
+                        languageName={language}
+                        key={field?.FieldName}
+                        mandatory={field?.Mandatory}
+
+                        // disabled={disabledDetailed || field?.ReadOnly || false}
+                        type={field?.FieldType.toLowerCase()}
+                        maxLength={field?.MaxSize}
+                        AllowNegative={field?.Negative ?? true}
+                        DefaultValue={field?.DefaultValue}
+                        ErrorMessage={field?.ErrorMessage}
+                        // onBlur={(data) => handleOnBlur(field?.FieldName, data)}
+                        ColumnSpan={field?.ColumnSpan}
+                        RowSpan={field?.RowSpan}
+                        multiline={field?.RowSpan > 1 ? true : null}
+                        CharacterCasing={field?.CharacterCasing ?? 0}
+                        RegularExpression={field?.RegularExpression}
+                        dateType={field?.AllowDate}
+                        DonotAllowSpecialChar={field?.DonotAllowSpecialChar}
+                        tableField={true}
+                        fullwidth={'100%'}
 
 
+                    />
+                );
 
-                        />
-                    );
-                
 
-                case "risk":
-                    if (field.FieldName === "Risk") {
-                        
+            case "risk":
+                if (field.FieldName === "RiskData") {
+
                     return (
                         <Box
                             sx={{
@@ -476,7 +439,8 @@ const MemoizedTableRow = ({ row, index,rowClick, handleRowChange, bodyCell,  fie
                                 borderRadius: "4px",
                                 display: 'flex',
                                 justifyContent: 'center',
-                                width: field.RowSpan ? `${250 * field.RowSpan}px` : "250px",
+                                width: field.RowSpan ? `${250 * field.RowSpan}px` : "100%",
+                                minWidth: field.RowSpan ? `${250 * field.RowSpan}px` : "120px"
                             }}
                         >
                             <FormControl>
@@ -486,20 +450,20 @@ const MemoizedTableRow = ({ row, index,rowClick, handleRowChange, bodyCell,  fie
                                     name={`${field.FieldName}-radio-group`}
                                 >
                                     <FormControlLabel
-                                        value={1}
+                                        value={true}
                                         control={<Radio />}
                                         label="Yes"
                                         sx={radioButtonStyle}
-                                        checked={row[field.FieldName] === 1}
-                                        onChange={() => handleRowChange(index, field, 1)} // Pass updated value
+                                        checked={row[field.FieldName] === true}
+                                        onChange={() => handleRowChange(index, field, true)} // Pass updated value
                                     />
                                     <FormControlLabel
-                                        value={2}
+                                        value={false}
                                         control={<Radio />}
                                         label="No"
                                         sx={radioButtonStyle}
-                                        checked={row[field.FieldName] === 2}
-                                        onChange={() => handleRowChange(index, field, 2)} // Pass updated value
+                                        checked={row[field.FieldName] === false}
+                                        onChange={() => handleRowChange(index, field, false)} // Pass updated value
                                     />
                                 </RadioGroup>
                             </FormControl>
@@ -507,78 +471,80 @@ const MemoizedTableRow = ({ row, index,rowClick, handleRowChange, bodyCell,  fie
                     );
                 }
 
-                    case "level":
-                        return (
-                          <Box
-                            sx={{
-                              cursor: "pointer",
-                              border: "1px solid #ccc",
-                              padding: "0px",
-                              borderRadius: "4px",
-                              display:'flex',
-                              justifyContent:'center',
-                              width: field.RowSpan ? `${250 * field.RowSpan}px` : "250px",
-                            }}
-                          >
-                            <FormControl>
-                              <RadioGroup
+            case "level":
+                return (
+                    <Box
+                        sx={{
+                            cursor: "pointer",
+                            border: "1px solid #ccc",
+                            padding: "0px",
+                            borderRadius: "4px",
+                            display: 'flex',
+                            justifyContent: 'center',
+                            width: field.RowSpan ? `${250 * field.RowSpan}px` : "100%",
+                            minWidth: field.RowSpan ? `${250 * field.RowSpan}px` : "250px"
+                        }}
+                    >
+                        <FormControl>
+                            <RadioGroup
                                 row
                                 aria-labelledby="risk-radio-group-label"
                                 name={`${field.FieldName}-radio-group`}
-                              >
+                            >
                                 <FormControlLabel
-                                  value="high"
-                                  control={<Radio />}
-                                  label="High"
-                                  sx={radioButtonStyle}
-                                  checked={row[field.FieldName] === 1}
-                                  onChange={() => handleRowChange(index, field, 1)} // Pass updated value
+                                    value="high"
+                                    control={<Radio />}
+                                    label="High"
+                                    sx={radioButtonStyle}
+                                    checked={row[field.FieldName] === 1}
+                                    onChange={() => handleRowChange(index, field, 1)} // Pass updated value
                                 />
                                 <FormControlLabel
-                                  value="medium"
-                                  control={<Radio />}
-                                  label="Medium"
-                                  sx={radioButtonStyle}
-                                  checked={row[field.FieldName] === 2}
-                                  onChange={() => handleRowChange(index, field, 2)} // Pass updated value
+                                    value="medium"
+                                    control={<Radio />}
+                                    label="Medium"
+                                    sx={radioButtonStyle}
+                                    checked={row[field.FieldName] === 2}
+                                    onChange={() => handleRowChange(index, field, 2)} // Pass updated value
                                 />
                                 <FormControlLabel
-                                  value="low"
-                                  control={<Radio />}
-                                  label="Low"
-                                  sx={radioButtonStyle}
-                                  checked={row[field.FieldName] === 3}
-                                  onChange={() => handleRowChange(index, field, 3)} // Pass updated value
+                                    value="low"
+                                    control={<Radio />}
+                                    label="Low"
+                                    sx={radioButtonStyle}
+                                    checked={row[field.FieldName] === 3}
+                                    onChange={() => handleRowChange(index, field, 3)} // Pass updated value
                                 />
-                              </RadioGroup>
-                            </FormControl>
-                          </Box>
-                        );
+                            </RadioGroup>
+                        </FormControl>
+                    </Box>
+                );
 
-                case 'cell':
+            case 'cell':
 
-                return(
+                return (
                     <Box
-                            sx={{
-                              
-                              border: "1px solid #ccc",
-                              padding: "5px",
-                              borderRadius: "4px",
-                              display:'flex',
-                              justifyContent:'center',
-                              width: field.RowSpan ? `${250 * field.RowSpan}px` : "250px",
-                            }}
-                          >
-                           <Typography sx={{fontSize:'14px'}}>{row.Type}</Typography>
-                            
-                          </Box>
+                        sx={{
+
+                            border: "1px solid #ccc",
+                            padding: "5px",
+                            borderRadius: "4px",
+                            display: 'flex',
+                            justifyContent: 'start',
+                            width: field.RowSpan ? `${250 * field.RowSpan}px` : "100%",
+                            overflowY: 'auto'
+                        }}
+                    >
+                        <Typography sx={{ fontSize: '14px' }}>{row.Data_Description}</Typography>
+
+                    </Box>
                 )
 
-                default:
-                    return null;
-            }
-         
-        
+            default:
+                return null;
+        }
+
+
     };
 
 
@@ -609,12 +575,12 @@ const MemoizedTableRow = ({ row, index,rowClick, handleRowChange, bodyCell,  fie
                     color="default" />
             </TableCell> */}
             <TableCell
-                sx={{ ...bodyCell, minWidth: "30px", textAlign: "left", paddingLeft: "10px", width: "50px", position: "relative" }}
+                sx={{ ...bodyCell, minWidth: "fit-Content", textAlign: "left", paddingLeft: "10px", width: "50px", position: "relative" }}
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
             >
                 {index + 1}
-                
+
             </TableCell>
 
             {fields.map((field, idx) => (

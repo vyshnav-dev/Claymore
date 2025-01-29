@@ -4,62 +4,80 @@ import {
     DialogContent,
     DialogTitle,
 } from "@mui/material";
-import React, { useState } from "react";
-//   import { tagSettingsApis } from "../../../services/settings/TagSettings/tagSettings";
-//   import TagSettingsMenuInput from "../../../components/Settings/TagSettings/TagSettingsMenuInput";
+import React, { useEffect, useState } from "react";
 import UserInputField from "../../../component/InputFields/UserInputField";
 import NormalButton from "../../../component/Buttons/NormalButton";
 import { useAlert } from "../../../component/Alerts/AlertContext";
 import UserAutoComplete from "../../../component/AutoComplete/UserAutoComplete";
 
-export default function FormBodyModal({ handleCloseModal, selected, submitAction, treeRefresh }) {
-    const [formData, setFormData] = useState({
-        id: 0,
-        name: null,
-        caption: null,
-        moduleId: 1,
-        menuIndex: 0,
-        shortcutKey: null,
-        description: null,
-        toolTip: null,
-        isGroup: true,
-        parentId: selected,
-        accessibilityLevel: 0,
-        iconPath: null,
-        url: null,
-        typeId: 1,
-        externalLink: null,
-        screenTypeId: 1,
-    });
+export default function FormBodyModal({ handleCloseModal, upsertSubcategorytmaster, getcategorylist, getproductlist, formData, setFormData,id,getSubCategorydetails }) {
+
     const { showAlert } = useAlert();
-    // const {upsertmenu} = tagSettingsApis()
 
-    // const handleSave = async () => {
-    //   const update = {...formData}
-    //   update.caption = formData.name
-    //   setFormData[update]
-    //   const emptyFields = [];
-    //   if (!formData.name) emptyFields.push("name");
-    //   if (emptyFields.length > 0) {
-    //     showAlert('info', `Please Provide ${emptyFields[0]}`);
-    //     return;
-    //   }
-    //   const response = await upsertmenu(formData)
-    //   if(response?.status === "Success" ){
-    //     submitAction()
-    //     treeRefresh()
-    //     handleCloseModal()
-    //     showAlert('success', `Menu Added Successfully`);
-    //     return;
-    //   }
+    const handleEdit = async () => {
+        try {
+          if (id == 0) {
+            setFormData({
+              id: 0,
+              description: null,
+              code: null,
+              category: 0,
+              Product_Name: null,
+              CategoryName: null,
+              Product: null
+            })
+          } else {
+            const response = await getSubCategorydetails({
+              Id: id,
+            });
+            if (response?.status === "Success") {
+              const myObject = JSON.parse(response?.result);
+              if (myObject) {
+                setFormData({
+                  ...myObject[0],
+                });
+              }
+            }
+          }
+        } catch (error) {
+          throw error;
+        }
+      }
+    
+      useEffect(() => {
+        handleEdit();
+      },[id])
+    
+      console.log('form',formData);
+      
 
-    // };
+    const handleSave = async () => {
+      const update = {...formData}
+      setFormData[update]
+      const emptyFields = [];
+      if (!formData.Product) emptyFields.push("Product");
+      if (!formData.Category) emptyFields.push("Category");
+      if (!formData.Name) emptyFields.push("Description)");
+      if (!formData.Code) emptyFields.push("Sl No");
+      if (emptyFields.length > 0) {
+        showAlert('info', `Please Provide ${emptyFields[0]}`);
+        return;
+      }
+      const response = await upsertSubcategorytmaster(formData)
+      if(response?.status === "Success" ){
+        handleCloseModal()
+        setFormData({})
+        showAlert('success', `Description Added Successfully`);
+        return;
+      }
+
+    };
     return (
         <>
             <DialogContent>
-                <Box sx={{ display: 'flex',gap:2 }}>
+                <Box sx={{ display: 'flex', gap: 2 }}>
                     <UserAutoComplete
-                        //   apiKey={gettaglist}
+                        apiKey={getproductlist}
                         formData={formData}
                         setFormData={setFormData}
                         label={"Product"}
@@ -67,25 +85,24 @@ export default function FormBodyModal({ handleCloseModal, selected, submitAction
                         required={true}
                         formDataName={"Product_Name"}
                         formDataiId={"Product"}
-                        tagId={12}
                     />
                     <UserAutoComplete
-                        //   apiKey={gettaglist}
+                        apiKey={getcategorylist}
                         formData={formData}
                         setFormData={setFormData}
                         label={"Category"}
                         autoId={"category"}
                         required={true}
-                        formDataName={"Category_Name"}
+                        formDataName={"CategoryName"}
                         formDataiId={"Category"}
-                        tagId={12}
+                        Product={formData?.Product}
                     />
                 </Box>
-                <Box sx={{ display: 'flex',gap:2 }}>
+                <Box sx={{ display: 'flex', gap: 2 }}>
                     <UserInputField
                         label={"Sl No"}
-                        name={"Name"}
-                        type={"number"}
+                        name={"Code"}
+                        type={"text"}
                         disabled={false}
                         mandatory={true}
                         value={formData}
@@ -95,13 +112,12 @@ export default function FormBodyModal({ handleCloseModal, selected, submitAction
                     />
                     <UserInputField
                         label={"Description"}
-                        name={"Name1"}
+                        name={"Name"}
                         type={"text"}
                         disabled={false}
                         mandatory={true}
                         value={formData}
                         setValue={setFormData}
-                        //   onBlurAction={() => handleMasterExist(2)}
                         maxLength={100}
                         multiline={true}
                     />
@@ -113,7 +129,7 @@ export default function FormBodyModal({ handleCloseModal, selected, submitAction
             </DialogContent>
             <DialogActions>
                 <NormalButton action={handleCloseModal} label="Cancel" />
-                <NormalButton label="Ok" />
+                <NormalButton action={handleSave} label="Ok" />
             </DialogActions>
 
         </>

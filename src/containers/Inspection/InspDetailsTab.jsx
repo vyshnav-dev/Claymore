@@ -2,7 +2,7 @@ import { Box } from '@mui/material'
 import React from 'react'
 import UserInputField from '../../component/InputFields/UserInputField'
 
-export default function InspDetailsTab({mainDetails,setMainDetails}) {
+export default function InspDetailsTab({formData,setFormData}) {
   return (
     
     <Box sx={{
@@ -23,34 +23,34 @@ export default function InspDetailsTab({mainDetails,setMainDetails}) {
     }} >
         <UserInputField
             label={"Date of Inspection"}
-            name={"doi"}
+            name={"DateOfInspection"}
             type={"date"}
             disabled={false}
             mandatory={true}
-            value={mainDetails}
-            setValue={setMainDetails}
+            value={formData}
+            setValue={setFormData}
             // onBlurAction={() => handleMasterExist(2)}
             maxLength={100}
         />
         <UserInputField
             label={"Previous Inspection Report"}
-            name={"iReport"}
+            name={"PreviousInspectionReport"}
             type={"text"}
             disabled={false}
             mandatory={true}
-            value={mainDetails}
-            setValue={setMainDetails}
+            value={formData}
+            setValue={setFormData}
             // onBlurAction={() => handleMasterExist(2)}
             maxLength={100}
         />
         <UserInputField
             label={"Test Method"}
-            name={"testMethod"}
+            name={"TestMethod"}
             type={"text"}
             disabled={false}
             mandatory={true}
-            value={mainDetails}
-            setValue={setMainDetails}
+            value={formData}
+            setValue={setFormData}
             // onBlurAction={() => handleMasterExist(2)}
             maxLength={100}
         />
@@ -60,8 +60,8 @@ export default function InspDetailsTab({mainDetails,setMainDetails}) {
             type={"date"}
             disabled={false}
             mandatory={true}
-            value={mainDetails}
-            setValue={setMainDetails}
+            value={formData}
+            setValue={setFormData}
             // onBlurAction={() => handleMasterExist(2)}
             maxLength={100}
         />
@@ -71,8 +71,8 @@ export default function InspDetailsTab({mainDetails,setMainDetails}) {
             type={"text"}
             disabled={false}
             mandatory={true}
-            value={mainDetails}
-            setValue={setMainDetails}
+            value={formData}
+            setValue={setFormData}
             // onBlurAction={() => handleMasterExist(2)}
             maxLength={100}
         />
@@ -82,8 +82,8 @@ export default function InspDetailsTab({mainDetails,setMainDetails}) {
             type={"text"}
             disabled={false}
             mandatory={true}
-            value={mainDetails}
-            setValue={setMainDetails}
+            value={formData}
+            setValue={setFormData}
             // onBlurAction={() => handleMasterExist(2)}
             maxLength={100}
         />
@@ -93,8 +93,8 @@ export default function InspDetailsTab({mainDetails,setMainDetails}) {
             type={"text"}
             disabled={false}
             mandatory={true}
-            value={mainDetails}
-            setValue={setMainDetails}
+            value={formData}
+            setValue={setFormData}
             // onBlurAction={() => handleMasterExist(2)}
             maxLength={100}
         />

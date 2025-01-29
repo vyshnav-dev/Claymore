@@ -33,6 +33,9 @@ import AutoSelect from "../../../component/AutoComplete/AutoSelect";
 import AutoComplete from "../../../component/AutoComplete/AutoComplete";
 import InputCommon from "../../../component/InputFields/InputCommon";
 
+import { encrypt } from "../../../service/Security/encryptionUtils";
+import { allocationApis } from "../../../service/Allocation/allocation";
+
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
 
@@ -169,6 +172,9 @@ export default function UserDetails({
   userAction,
   disabledDetailed,
 }) {
+
+  const userData = JSON.parse(localStorage.getItem("ClaymoreUserData"))[0];
+
   const [mainDetails, setMainDetails] = useState({});
   const [detailPageId, setDetailPageId] = useState(summaryId);
   const [confirmAlert, setConfirmAlert] = useState(false);
@@ -186,6 +192,9 @@ export default function UserDetails({
     uploaduserfile,
     deleteuserfile,
   } = securityApis();
+  const {
+    GetTechnicianList
+  } = allocationApis();
   const { showAlert } = useAlert();
 
   useEffect(() => {
@@ -233,13 +242,14 @@ export default function UserDetails({
       Mobile: "",
       Phone: "",
       Photo: "",
-      RoleId: 0,
-      RoleName: "",
+      Role: 0,
+      Name: "",
       Timezone: 0,
       Type: "",
       UserType: 0,
       UserTypeName: "",
       ImagePath: "",
+      Inspector:''
     });
     setDetailPageId(0);
     setImageUpload(null);
@@ -259,12 +269,12 @@ export default function UserDetails({
       case "save":
         const emptyFields = [];
         if (!mainDetails.LoginName) emptyFields.push("Login Name");
-        const result = await handleUserExist();
-        if (!result) {
-          return; // If the user exists, stop further execution
-        }
+        // const result = await handleUserExist();
+        // if (!result) {
+        //   return; // If the user exists, stop further execution
+        // }
         if (!mainDetails.Employee) emptyFields.push("Employee Name");
-        if (!mainDetails.RoleId) emptyFields.push("Role");
+        if (!mainDetails.Role) emptyFields.push("Role");
         if (!mainDetails.Email) emptyFields.push("Email");
         if (!emailRegex.test(mainDetails?.Email))
           emptyFields.push("Valid Email");
@@ -273,6 +283,8 @@ export default function UserDetails({
         if (!mainDetails.CPassword && detailPageId === 0)
           emptyFields.push("Confirm Password");
         if (!mainDetails.UserType) emptyFields.push("User Type");
+        if (!mainDetails.Mobile) emptyFields.push("Mobile No");
+        if (!mainDetails.Phone) emptyFields.push("Phone No");
         if (mainDetails.Mobile && !/^[0-9]{10,15}$/.test(mainDetails.Mobile))
           emptyFields.push("Valid Mobile Number");
         if (mainDetails.Phone && !/^[0-9]{10,15}$/.test(mainDetails.Phone))
@@ -322,8 +334,11 @@ export default function UserDetails({
 
 
   const handleSave = async () => {
+
+    const encryptedPassword = await encrypt(mainDetails.Password);
+
     const saveData = {
-      id: mainDetails?.Id,
+      Id: mainDetails?.Id,
       loginName: mainDetails?.LoginName,
       employee: mainDetails?.Employee,
       photo: mainDetails?.Photo,
@@ -332,8 +347,9 @@ export default function UserDetails({
       phone: mainDetails?.Phone,
       mobile: mainDetails?.Mobile,
       userType: mainDetails?.UserType,
-      roleId: mainDetails?.RoleId,
-      password: detailPageId === 0 ? mainDetails?.Password : "",
+      role: mainDetails?.Role,
+      inspector:mainDetails?.Inspector,
+      password: detailPageId === 0 ? encryptedPassword : "",
     };
 
     const response = await upsertuser(saveData);
@@ -347,6 +363,9 @@ export default function UserDetails({
       if (!actionExists) {
         setPageRender(1);
       }
+    }
+    else {
+      showAlert("info", response?.message);
     }
   };
 
@@ -434,6 +453,9 @@ export default function UserDetails({
   const deleteUploadImage = async (id) => {
     const response = await deleteuserfile(id, mainDetails?.Photo);
   }
+
+  console.log('main dtail', mainDetails);
+
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
@@ -536,7 +558,7 @@ export default function UserDetails({
               }}
               maxLength={50}
             /> */}
-            <AutoComplete
+            {/* <AutoComplete
               apiKey={getroleslist}
               formData={mainDetails}
               setFormData={setMainDetails}
@@ -545,17 +567,20 @@ export default function UserDetails({
               required={true}
               formDataName={"RoleName"}
               formDataiId={"RoleId"}
-            />
-            {/* <AutoComplete
+
+            /> */}
+
+            <UserAutoComplete
               apiKey={getroleslist}
               formData={mainDetails}
               setFormData={setMainDetails}
-              label={"Sales Man"}
-              autoId={"SalesMan"}
+              label={"Role"}
+              autoId={"Role"}
               required={true}
-              formDataName={"SalesMan"}
-              formDataiId={"SalesManId"}
-            /> */}
+              formDataName={"Role_Name"}
+              formDataiId={"Role"}
+            />
+            
             <InputCommon
               label={"Email Id"}
               name={"Email"}
@@ -567,6 +592,18 @@ export default function UserDetails({
                 const { name, value } = data
                 setMainDetails({ ...mainDetails, [name]: value })
               }}
+            />
+
+            <UserAutoComplete
+              apiKey={GetTechnicianList}
+              formData={mainDetails}
+              setFormData={setMainDetails}
+              label={"Technicians"}
+              autoId={"Inspector"}
+              required={false}
+              formDataName={"Inspector_Name"}
+              formDataiId={"Inspector"}
+              User={userData?.UserId}
             />
             {detailPageId === 0 && (
               <>
@@ -607,27 +644,19 @@ export default function UserDetails({
               formData={mainDetails}
               setFormData={setMainDetails}
               label={"Time Zone"}
-              autoId={"timeZone"}
-              formDataName={"TimezoneName"}
+              autoId={"TimeZone"}
+              formDataName={"Timezone_Name"}
               formDataiId={"Timezone"}
             />
 
-            {/* <UserAutoCompleteManual
-              formData={mainDetails}
-              setFormData={setMainDetails}
-              label={"User Type"}
-              autoId={"userType"}
-              required={true}
-              suggestion={suggestionUserType}
-              formDataId={"UserType"}
-            /> */}
+
             <AutoSelect
               key={"userType"}
               formData={mainDetails}
               setFormData={setMainDetails}
               autoId={"userType"}
-              formDataName={`userType_Name`}
-              formDataiId={"userType"}
+              formDataName={`UserType_Name`}
+              formDataiId={"UserType"}
               required={true}
               label={"User Type"}
               languageName={"english"}
@@ -637,15 +666,15 @@ export default function UserDetails({
 
             />
 
-            {/* <UserInputField
+            <UserInputField
               label={"Mobile"}
               name={"Mobile"}
               type={"text"}
               disabled={false}
               value={mainDetails}
               setValue={setMainDetails}
-            /> */}
-            <InputCommon
+            />
+            {/* <InputCommon
               key={"Mobile"}
               label={"Mobile"}
               value={mainDetails.Mobile}
@@ -663,16 +692,16 @@ export default function UserDetails({
 
 
 
-            />
+            /> */}
 
-            {/* <UserInputField
+            <UserInputField
               label={"Phone"}
               name={"Phone"}
               type={"text"}
               disabled={false}
               value={mainDetails}
               setValue={setMainDetails}
-            /> */}
+            />
 
             <Box
               sx={{

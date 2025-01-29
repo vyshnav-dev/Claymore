@@ -7,7 +7,7 @@ const securityApis = ()=>{
         try {
           const response = await makeAuthorizedRequestBase(
             "get",
-            "Master/GetScreen",
+            "user/getscreens",
             {},
             true
           );
@@ -21,7 +21,7 @@ const securityApis = ()=>{
         try {
           const response = await makeAuthorizedRequestBase(
             "get",
-            "Master/GetUserAction",
+            "user/getuseraction",
             payload,
             true
           );
@@ -49,7 +49,7 @@ const securityApis = ()=>{
         try {
           const response = await makeAuthorizedRequestBase(
             "delete",
-            "user/deleteuser",
+            "User/DeleteUser",
             payload,
             true
           );
@@ -63,7 +63,7 @@ const securityApis = ()=>{
         try {
           const response = await makeAuthorizedRequestBase(
             "get",
-            "user/getuserdetails",
+            "User/GetUserDetails",
             payload,
             true
           );
@@ -77,7 +77,7 @@ const securityApis = ()=>{
         try {
           const response = await makeAuthorizedRequestBase(
             "get",
-            "timezone/gettimezonelist",
+            "User/GetTimeZone",
             payload,
             false
           );
@@ -91,7 +91,7 @@ const securityApis = ()=>{
         try {
           const response = await makeAuthorizedRequestBase(
             "get",
-            "role/getroleslist",
+            "User/GetRole",
             payload,
             false
           );
@@ -105,7 +105,7 @@ const securityApis = ()=>{
         try {
           const response = await makeAuthorizedRequestBase(
             "post",
-            "user/upsertuser",
+            "User/UpsertUser",
             payload,
             true
           );
@@ -119,7 +119,7 @@ const securityApis = ()=>{
         try {
           const response = await makeAuthorizedRequestBase(
             "get",
-            "role/getroledetails",
+            "Role/GetRoleDetails",
             payload,
             true
           );
@@ -175,7 +175,7 @@ const securityApis = ()=>{
         try {
           const response = await makeAuthorizedRequestBase(
             "delete",
-            "role/deleterole",
+            "Role/DeleteRole",
             payload,
             true
           );
@@ -189,7 +189,7 @@ const securityApis = ()=>{
         try {
           const response = await makeAuthorizedRequestBase(
             "get",
-            "role/getactions",
+            "Role/GetActionList",
             payload,
             false
           );

@@ -1,15 +1,18 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Box, Typography, Stack, useTheme } from "@mui/material";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
-import ActionButton from "../../../component/Buttons/ActionButton";
-import { useAlert } from "../../../component/Alerts/AlertContext";
-import SummaryTable from "../../../component/Table/SummaryTable";
-import { primaryColor } from "../../../config/config";
-import ConfirmationAlert from "../../../component/Alerts/ConfirmationAlert";
-import { masterApis } from "../../../service/Master/master";
-import ConfirmationAlertContent from "../../../component/Alerts/ConfirmationAlertContent";
-import ExcelExport from "../../../component/Excel/Excel";
+import ActionButton from "../../component/Buttons/ActionButton";
+import { useAlert } from "../../component/Alerts/AlertContext";
+import SummaryTable from "../../component/Table/SummaryTable";
+import { primaryColor } from "../../config/config";
+import ConfirmationAlert from "../../component/Alerts/ConfirmationAlert";
+import { masterApis } from "../../service/Master/master";
+// import MasterProductConfirmation from "./MasterProductConfirmation";
+import ExcelExport from "../../component/Excel/Excel";
+import { identity } from "lodash";
+import { summaryData } from "../../config";
+import ApproveConfirmation from "./ApproveConfirmation";
 
 function BasicBreadcrumbs() {
   const style = {
@@ -46,7 +49,7 @@ function BasicBreadcrumbs() {
           aria-label="breadcrumb"
         >
           <Typography underline="hover" sx={style} key="1">
-            Bin Summary
+            Approve Summary
           </Typography>
         </Breadcrumbs>
       </Stack>
@@ -67,7 +70,7 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
         scrollbarWidth: "thin",
       }}
     >
-      {userAction.some((action) => action.Action === "New") && (
+      {/* {userAction.some((action) => action.Action === "New") && (
         <ActionButton
           iconsClick={iconsClick}
           icon={"fa-solid fa-plus"}
@@ -117,6 +120,35 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
         />
       )}
 
+      {userAction.some((action) => action.Action === "Group") && (
+        <ActionButton
+          iconsClick={iconsClick}
+          icon={"fa-solid fa-user-group"}
+          caption={"Group"}
+          iconName={"group"}
+        />
+      )}
+
+      {userAction.some((action) => action.Action === "Add Group") && (
+        <ActionButton
+          iconsClick={iconsClick}
+          icon={"fa-solid fa-user-plus"}
+          caption={"Add Group"}
+          iconName={"addGroup"}
+        />
+      )} */}
+      <ActionButton
+        iconsClick={iconsClick}
+        icon={"fa-solid fa-thumbs-up"}
+        caption={"Approve"}
+        iconName={"approve"}
+      />
+      <ActionButton
+        iconsClick={iconsClick}
+        icon={"fa-solid fa-ban"}
+        caption={"Reject"}
+        iconName={"reject"}
+      />
       <ActionButton
         iconsClick={iconsClick}
         icon={"fa-solid fa-xmark"}
@@ -127,7 +159,13 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
   );
 };
 
-export default function MasterBinSummary({ setPageRender, setId, userAction }) {
+export default function ApproveSummary({
+  setPageRender,
+  setId,
+  userAction,
+  setGroup,
+  setGroupSelection,
+}) {
   const [rows, setRows] = React.useState([]); //To Pass in Table
   const [displayLength, setdisplayLength] = React.useState(25); // Show Entries
   const [pageNumber, setpageNumber] = React.useState(1); //Table current page number
@@ -140,40 +178,59 @@ export default function MasterBinSummary({ setPageRender, setId, userAction }) {
   const { showAlert } = useAlert();
   const [confirmAlert, setConfirmAlert] = useState(false); //To handle alert open
   const [confirmData, setConfirmData] = useState({}); //To pass alert data
-  const [property, setProperty] = useState(false);
   const latestSearchKeyRef = useRef(searchKey);
-  const { gettagsummary, deletetag, updatetagproperties } = masterApis();
+  const [property, setProperty] = useState(false);
+  const [itemLabel, setItemLabel] = useState('');
+  const { gettagsummary, deletetag, updateproductproperties, gettagurl } =
+    masterApis();
+  const [groupId, setGroupId] = useState(0);
+  const [parentList, setParentList] = useState([]);
+  const longPressTriggeredRef = useRef(false); // Persist flag
+  const longPressTimerRef = useRef(null); // Persist timer
+
+  const longPressThreshold = 500;
+
 
   //Role Summary
   const fetchRoleSummary = async () => {
     setselectedDatas([]);
-
+    setGroup(0);
     const currentSearchKey = latestSearchKeyRef.current;
-
+    
     try {
-      const response = await gettagsummary({
-        tagId: 17,
-        refreshFlag: refreshFlag,
-        pageNumber: pageNumber,
-        pageSize: displayLength,
-        searchString: currentSearchKey,
-      });
+      // const response = await gettagsummary({
+      //   tagId: 11,
+      //   refreshFlag: refreshFlag,
+      //   pageNumber: pageNumber,
+      //   pageSize: displayLength,
+      //   searchString: currentSearchKey,
+      //   groupId: groupId,
+      // });
 
       setrefreshFlag(false);
-      if (
-        response?.status === "Success" &&
-        currentSearchKey === latestSearchKeyRef.current
-      ) {
-        const myObject = JSON.parse(response?.result);
+      // if (
+      //   response?.status === "Success" &&
+      //   currentSearchKey === latestSearchKeyRef.current
+      // ) {
+      //   const myObject = JSON.parse(response?.result);
 
-        setRows(myObject?.Data);
+      //   setRows(myObject?.Data );
 
-        const totalRows = myObject?.PageSummary[0].TotalRows;
-        const totalPages = myObject?.PageSummary[0].TotalPages;
+      //   const totalRows = myObject?.PageSummary[0].TotalRows;
+      //   const totalPages = myObject?.PageSummary[0].TotalPages;
 
-        settotalRows(totalRows);
-        setTotalPages(totalPages);
-      } else {
+      //   settotalRows(totalRows);
+      //   setTotalPages(totalPages);
+      // }
+      if(summaryData)
+      {
+        
+        setRows(summaryData)
+        settotalRows(summaryData.length);
+        setTotalPages(1);
+      }
+      
+      else {
         setRows([]);
       }
     } catch (error) {
@@ -181,6 +238,7 @@ export default function MasterBinSummary({ setPageRender, setId, userAction }) {
         setRows([]);
         settotalRows(null);
         setTotalPages(null);
+    
       }
     } finally {
     }
@@ -188,7 +246,12 @@ export default function MasterBinSummary({ setPageRender, setId, userAction }) {
 
   React.useEffect(() => {
     fetchRoleSummary(); // Initial data fetch
-  }, [pageNumber, displayLength, searchKey, changesTriggered]);
+  }, [pageNumber, displayLength, searchKey, changesTriggered, groupId]);
+
+
+  useEffect(()=>{
+    handleParentGroup(0) 
+  },[])
 
   const handleRowDoubleClick = (rowiId) => {
     if (rowiId > 0) {
@@ -206,6 +269,7 @@ export default function MasterBinSummary({ setPageRender, setId, userAction }) {
     setselectedDatas(selectedRowsData);
   };
   const resetChangesTrigger = () => {
+    setGroupId(0);
     setchangesTriggered(false);
   };
   const handleDisplayLengthChange = (newDisplayLength) => {
@@ -236,8 +300,18 @@ export default function MasterBinSummary({ setPageRender, setId, userAction }) {
       case "view":
         handleAdd("edit");
         break;
-      case "property":
-        handleProperty();
+      case "approve":
+        handleProperty(value);
+        break;
+      case "reject":
+        handleProperty(value);
+        break;
+      case "group":
+        if (!selectedDatas?.length) {
+          showAlert("info", "Please Select row for Group");
+          return;
+        }
+        handleAddGroup(2);
         break;
       case "excel":
         handleExcelExport();
@@ -253,8 +327,20 @@ export default function MasterBinSummary({ setPageRender, setId, userAction }) {
     window.history.back();
   };
 
+  const handleAddGroup = (type) => {
+    if (type === 2) {
+      setGroupSelection(selectedDatas);
+    } else {
+      setGroupSelection([]);
+    }
+    setGroup(type);
+    setId(0);
+    setPageRender(2);
+  };
+
   // Handlers for your icons
   const handleAdd = (value) => {
+    setGroup(0);
     if (value === "edit") {
       if (selectedDatas.length !== 1) {
         showAlert(
@@ -272,15 +358,26 @@ export default function MasterBinSummary({ setPageRender, setId, userAction }) {
     setPageRender(2);
   };
 
-  const handleProperty = () => {
+  //Delete alert open
+  const deleteClick = async () => {
     if (selectedDatas.length === 0) {
-      showAlert("info", "Select rows to Active/Inactive");
+      showAlert("info", "Select row to Delete");
       return;
     }
+    setConfirmData({ message: "Delete", type: "danger" });
+    handleConfrimOpen();
+  };
+
+  const handleProperty = (value) => {
+    if (selectedDatas.length === 0) {
+      showAlert("info", "Select rows to Approve/Reject");
+      return;
+    }
+    setItemLabel(value)
     setConfirmData({
-      message: `You want to Activate/Inactivate the property.`,
+      message: `You want to Approve.`,
       type: "info",
-      header: "Property",
+      header: "Approve/Reject",
     });
     setProperty(true);
   };
@@ -298,15 +395,12 @@ export default function MasterBinSummary({ setPageRender, setId, userAction }) {
         id: item,
       }));
     }
-
     const saveData = {
-      tagId: 17,
       status: status,
       ids: propertyPayload,
     };
     try {
-      const response = await updatetagproperties(saveData);
-
+      const response = await updateproductproperties(saveData);
       if (response?.status === "Success") {
         showAlert("success", response?.message);
       }
@@ -319,16 +413,6 @@ export default function MasterBinSummary({ setPageRender, setId, userAction }) {
     }
   };
 
-  //Delete alert open
-  const deleteClick = async () => {
-    if (selectedDatas.length === 0) {
-      showAlert("info", "Select row to Delete");
-      return;
-    }
-    setConfirmData({ message: "Delete", type: "danger" });
-    handleConfrimOpen();
-  };
-
   //To delete
   const handledeleteRole = async () => {
     const deletePayload = selectedDatas.map((item) => ({
@@ -336,7 +420,7 @@ export default function MasterBinSummary({ setPageRender, setId, userAction }) {
     }));
 
     try {
-      let response = await deletetag(deletePayload, 17);
+      let response = await deletetag(deletePayload, 11);
 
       if (response?.status === "Success") {
         showAlert("success", response?.message);
@@ -361,7 +445,7 @@ export default function MasterBinSummary({ setPageRender, setId, userAction }) {
   const handleExcelExport = async () => {
     try {
       const response = await gettagsummary({
-        tagId: 17,
+        tagId: 11,
         refreshFlag: true,
         pageNumber: 0,
         pageSize: 0,
@@ -378,8 +462,43 @@ export default function MasterBinSummary({ setPageRender, setId, userAction }) {
     } catch (error) {}
   };
 
-  const handleLongPressStart = ()=>{}
+  const handleLongPressStart = (event, row) => {
+    longPressTriggeredRef.current = false;
+    longPressTimerRef.current = setTimeout(() => {
+      longPressTriggeredRef.current = true;
+      const isHighlighted = row.Group;
+      if (isHighlighted) {
+        setGroupId(row?.Id);
+        setPageRender(1);
+        handleParentGroup(row?.Id)
+      } else {
+        setGroupId(0);
+      }
+    }, longPressThreshold);
+  };
 
+  // Function to handle the end of long press (mouse up or leave)
+  const handleLongPressEnd = () => {
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
+  };
+ 
+  const handleParentGroup = async (id) => {
+    const response = await gettagurl({
+      id: id,
+      tagId: 11,
+    });
+    setGroupId(id)
+   if(response?.status === "Success"){
+     const myObject = JSON.parse(response?.result)
+     setParentList(myObject)
+   }else{
+    setParentList([])
+   }
+  };
+  
   return (
     <>
       <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
@@ -412,6 +531,9 @@ export default function MasterBinSummary({ setPageRender, setId, userAction }) {
             totalRows={totalRows}
             //   currentTheme={currentTheme}
             handleLongPressStart={handleLongPressStart}
+            handleLongPressEnd={handleLongPressEnd}
+            handleParentGroup={handleParentGroup}
+            parentList={parentList}
             totalPages={totalPages}
             hardRefresh={hardRefresh}
             IdName={"Id"}
@@ -423,15 +545,17 @@ export default function MasterBinSummary({ setPageRender, setId, userAction }) {
           data={confirmData}
           submite={handledeleteRole}
         />
-        <ConfirmationAlertContent
+        <ApproveConfirmation
           handleClose={() => setProperty(false)}
           open={property}
           data={confirmData}
-          submite={handlePropertyConfirmation}
-          tagId={17}
+        //   submite={handlePropertyConfirmation}
           selectedDatas={selectedDatas?.length === 1 ? selectedDatas[0] : null}
+          itemLabel={itemLabel}
         />
       </Box>
     </>
   );
 }
+
+

@@ -8,7 +8,6 @@ import SummaryTable from "../../../component/Table/SummaryTable";
 import { primaryColor } from "../../../config/config";
 import ConfirmationAlert from "../../../component/Alerts/ConfirmationAlert";
 import { masterApis } from "../../../service/Master/master";
-import MasterProductConfirmation from "./MasterProductConfirmation";
 import ExcelExport from "../../../component/Excel/Excel";
 import { identity } from "lodash";
 
@@ -166,7 +165,7 @@ export default function MasterProductSummary({
   const [confirmData, setConfirmData] = useState({}); //To pass alert data
   const latestSearchKeyRef = useRef(searchKey);
   const [property, setProperty] = useState(false);
-  const { gettagsummary, deletetag, updateproductproperties, gettagurl } =
+  const { GetProductSummary, deleteProduct, updateproductproperties, gettagurl } =
     masterApis();
   const [groupId, setGroupId] = useState(0);
   const [parentList, setParentList] = useState([]);
@@ -182,13 +181,10 @@ export default function MasterProductSummary({
     const currentSearchKey = latestSearchKeyRef.current;
 
     try {
-      const response = await gettagsummary({
-        tagId: 11,
-        refreshFlag: refreshFlag,
-        pageNumber: pageNumber,
-        pageSize: displayLength,
-        searchString: currentSearchKey,
-        groupId: groupId,
+      const response = await GetProductSummary({
+        PageNo: pageNumber,
+        PageSize: displayLength,
+        Search: currentSearchKey,
       });
 
       setrefreshFlag(false);
@@ -200,8 +196,8 @@ export default function MasterProductSummary({
 
         setRows(myObject?.Data);
 
-        const totalRows = myObject?.PageSummary[0].TotalRows;
-        const totalPages = myObject?.PageSummary[0].TotalPages;
+        const totalRows = myObject?.Metadata?.TotalRows;
+        const totalPages = myObject?.Metadata?.TotalPages;
 
         settotalRows(totalRows);
         setTotalPages(totalPages);
@@ -224,9 +220,9 @@ export default function MasterProductSummary({
   }, [pageNumber, displayLength, searchKey, changesTriggered, groupId]);
 
 
-  useEffect(()=>{
-    handleParentGroup(0) 
-  },[])
+  // useEffect(()=>{
+  //   handleParentGroup(0) 
+  // },[])
 
   const handleRowDoubleClick = (rowiId) => {
     if (rowiId > 0) {
@@ -302,16 +298,7 @@ export default function MasterProductSummary({
     window.history.back();
   };
 
-  const handleAddGroup = (type) => {
-    if (type === 2) {
-      setGroupSelection(selectedDatas);
-    } else {
-      setGroupSelection([]);
-    }
-    setGroup(type);
-    setId(0);
-    setPageRender(2);
-  };
+  
 
   // Handlers for your icons
   const handleAdd = (value) => {
@@ -356,36 +343,6 @@ export default function MasterProductSummary({
     setProperty(true);
   };
 
-  const handlePropertyConfirmation = async (status) => {
-    let propertyPayload;
-    if (selectedDatas?.length === 1) {
-      propertyPayload = [
-        {
-          id: selectedDatas[0],
-        },
-      ];
-    } else {
-      propertyPayload = selectedDatas.map((item) => ({
-        id: item,
-      }));
-    }
-    const saveData = {
-      status: status,
-      ids: propertyPayload,
-    };
-    try {
-      const response = await updateproductproperties(saveData);
-      if (response?.status === "Success") {
-        showAlert("success", response?.message);
-      }
-    } catch (error) {
-    } finally {
-      setrefreshFlag(true);
-      setselectedDatas([]);
-      setchangesTriggered(true);
-      setProperty(false);
-    }
-  };
 
   //To delete
   const handledeleteRole = async () => {
@@ -394,7 +351,7 @@ export default function MasterProductSummary({
     }));
 
     try {
-      let response = await deletetag(deletePayload, 11);
+      let response = await deleteProduct(deletePayload);
 
       if (response?.status === "Success") {
         showAlert("success", response?.message);
@@ -444,7 +401,7 @@ export default function MasterProductSummary({
       if (isHighlighted) {
         setGroupId(row?.Id);
         setPageRender(1);
-        handleParentGroup(row?.Id)
+        // handleParentGroup(row?.Id)
       } else {
         setGroupId(0);
       }
@@ -459,19 +416,7 @@ export default function MasterProductSummary({
     }
   };
  
-  const handleParentGroup = async (id) => {
-    const response = await gettagurl({
-      id: id,
-      tagId: 11,
-    });
-    setGroupId(id)
-   if(response?.status === "Success"){
-     const myObject = JSON.parse(response?.result)
-     setParentList(myObject)
-   }else{
-    setParentList([])
-   }
-  };
+  
   return (
     <>
       <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
@@ -505,7 +450,7 @@ export default function MasterProductSummary({
             //   currentTheme={currentTheme}
             handleLongPressStart={handleLongPressStart}
             handleLongPressEnd={handleLongPressEnd}
-            handleParentGroup={handleParentGroup}
+            // handleParentGroup={handleParentGroup}
             parentList={parentList}
             totalPages={totalPages}
             hardRefresh={hardRefresh}
@@ -518,13 +463,7 @@ export default function MasterProductSummary({
           data={confirmData}
           submite={handledeleteRole}
         />
-        <MasterProductConfirmation
-          handleClose={() => setProperty(false)}
-          open={property}
-          data={confirmData}
-          submite={handlePropertyConfirmation}
-          selectedDatas={selectedDatas?.length === 1 ? selectedDatas[0] : null}
-        />
+        
       </Box>
     </>
   );

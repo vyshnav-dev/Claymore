@@ -15,6 +15,7 @@ import {
     Paper,
     TableBody,
     Tooltip,
+    Switch,
 } from "@mui/material";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
 import PropTypes from "prop-types";
@@ -24,29 +25,18 @@ import ConfirmationAlert from "../../component/Alerts/ConfirmationAlert";
 import ActionButton from "../../component/Buttons/ActionButton";
 import { useAlert } from "../../component/Alerts/AlertContext";
 import {
+    logoImage,
     primaryColor,
     secondaryColor,
     thirdColor,
 } from "../../config/config";
 import UserInputField from "../../component/InputFields/UserInputField";
-import { stockCountApis } from "../../service/Transaction/stockcount";
-import { masterApis } from "../../service/Master/master";
-
-// import { MDBIcon } from "mdb-react-ui-kit";
-// import MasterSelectionAutoComplete from "../MasterWarehouse/MasterSelectionAutoComplete";
-// import UserAutoComplete from "../../../component/AutoComplete/UserAutoComplete";
-// import UserAutoCompleteManual from "../../../component/AutoComplete/UserAutoCompleteManual";
-// import ChecKBoxLabel from "../../../component/CheckBox/CheckBoxLabel";
-// import MasterParentAutoComplete from "../../../component/AutoComplete/MasterAutoComplete/MasterParentAutoComplete";
-// import MasterProductUnitInfo from "./MasterProductUnitInfo";
-// import MasterProductConfirmation from "./MasterProductConfirmation";
-import { Info } from "@mui/icons-material";
-import { assessmentData, docData, documentData, locationType } from "../../config";
-import InputCommon from "../../component/InputFields/InputCommon";
 import ChecKBoxLabel from "../../component/CheckBox/CheckBoxLabel";
 import NoteAltIcon from "@mui/icons-material/NoteAlt";
 import ImageModal from "../../component/Modal/ImageModal";
-import ChecKBoxLabel1 from "../../component/CheckBox/CheckBoxLabel1";
+import { inspectionApis } from "../../service/Inspection/inspection";
+import UserAutoComplete from "../../component/AutoComplete/UserAutoComplete";
+import { allocationApis } from "../../service/Allocation/allocation";
 
 const currentDate = new Date().toISOString().split("T")[0];
 function CustomTabPanel(props) {
@@ -64,31 +54,7 @@ function CustomTabPanel(props) {
         </div>
     );
 }
-const headerCellStyle = {
-    padding: "0px 4px",
-    border: `1px solid #ddd`,
-    fontWeight: "600",
-    fontSize: "14px",
-    color: "white",
-};
 
-const bodyCellStyle = {
-    border: `1px solid #ddd`,
-    whiteSpace: "nowrap",
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-    fontSize: "12px",
-};
-
-const iconsExtraSx = {
-    fontSize: "0.8rem",
-    padding: "0.4rem",
-    "&:hover": {
-        backgroundColor: thirdColor,
-    },
-};
-
-const visibleHeaders = ["Name"];
 
 CustomTabPanel.propTypes = {
     children: PropTypes.node,
@@ -96,7 +62,7 @@ CustomTabPanel.propTypes = {
     value: PropTypes.number.isRequired,
 };
 
-function BasicBreadcrumbs({ group }) {
+function BasicBreadcrumbs() {
     const style = {
         display: "flex",
         alignItems: "center",
@@ -149,7 +115,7 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction }) => {
                 scrollbarWidth: "thin",
             }}
         >
-            {userAction.some(
+            {/* {userAction.some(
                 (action) => action.Action === "New" && detailPageId !== 0
             ) && (
                     <ActionButton
@@ -158,7 +124,7 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction }) => {
                         caption={"New"}
                         iconName={"new"}
                     />
-                )}
+                )} */}
             {userAction.some(
                 (action) =>
                     (action.Action === "New" && detailPageId === 0) ||
@@ -184,18 +150,7 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction }) => {
                 </>
             )}
 
-            {userAction.some((action) => action.Action === "Property") && (
-                <>
-                    {detailPageId !== 0 && (
-                        <ActionButton
-                            iconsClick={iconsClick}
-                            icon={"fa-solid fa-gears"}
-                            caption={"Property"}
-                            iconName={"property"}
-                        />
-                    )}
-                </>
-            )}
+
 
             <ActionButton
                 iconsClick={iconsClick}
@@ -207,272 +162,46 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction }) => {
     );
 };
 
-const tableFields = [
-    {
-        AllowDate: 0,
-        AllowDateName: null,
-        AllowManualIncrement: false,
-        AuditTrail: false,
-        AvailableInMobileApp: false,
-        AvailableinCustomerPortal: false,
-        BannerText: null,
-        Behaviour: 1,
-        CannotBeExported: false,
-        CannotBeImported: false,
-        Caption: "Type",
-        CharacterCasing: 0,
-        ColumnSpan: 0,
-        CopyfromParent: false,
-        Default: false,
-        DefaultValue: "0",
-        DonotAllowSpecialChar: false,
-        EditableinCustomerPortal: false,
-        ErrorMessage: null,
-        Field: 333,
-        FieldDisplayType: "cell",
-        FieldName: "Type",
-        FieldOrder: 1,
-        FieldStructure: 5,
-        FieldType: "",
-        FilterCondition: null,
-        Hidden: false,
-        HiddenInGroup: false,
-        HideLeftPane: false,
-        InformationField: false,
-        InternalStdField: true,
-        // LinkTag: MastersTagId.Product,
-        Mandatory: true,
-        MandatoryInGroup: false,
-        MandatoryInRevision: false,
-        MaxSize: 0,
-        MaximumValue: null,
-        MergeField: false,
-        MinimumValue: null,
-        Negative: false,
-        NumberList: null,
-        PreLoadValuesOnDemand: false,
-        ReadOnly: false,
-        RegularExpression: null,
-        Removed: false,
-        RowSpan: 0,
-        ScrollBar: 0,
-        TabName: "General",
-        Tag: 20,
-        ToolTip: null,
-        View: 95,
-        ViewCaption: "dipin2",
-        Visible: false,
-        WordWrap: false,
-
-    },
-    {
-        AllowDate: 0,
-        AllowDateName: null,
-        AllowManualIncrement: false,
-        AuditTrail: false,
-        AvailableInMobileApp: false,
-        AvailableinCustomerPortal: false,
-        BannerText: null,
-        Behaviour: 1,
-        CannotBeExported: false,
-        CannotBeImported: false,
-        Caption: "Risk",
-        CharacterCasing: 0,
-        ColumnSpan: 0,
-        CopyfromParent: false,
-        Default: false,
-        DefaultValue: null,
-        DonotAllowSpecialChar: false,
-        EditableinCustomerPortal: false,
-        ErrorMessage: null,
-        Field: 334,
-        FieldDisplayType: "risk",
-        FieldName: "Risk",
-        FieldOrder: 2,
-        FieldStructure: 5,
-        FieldType: "",
-        FilterCondition: null,
-        Hidden: false,
-        HiddenInGroup: false,
-        HideLeftPane: false,
-        InformationField: false,
-        InternalStdField: true,
-        // LinkTag: MastersTagId.Unit,
-        Mandatory: true,
-        MandatoryInGroup: false,
-        MandatoryInRevision: false,
-        MaxSize: 0,
-        MaximumValue: null,
-        MergeField: false,
-        MinimumValue: null,
-        Negative: false,
-        NumberList: null,
-        PreLoadValuesOnDemand: false,
-        ReadOnly: false,
-        RegularExpression: "",
-        Removed: false,
-        RowSpan: 0,
-        ScrollBar: 0,
-        TabName: "General",
-        Tag: 20,
-        ToolTip: null,
-        View: 95,
-        ViewCaption: "dipin2",
-        Visible: false,
-        WordWrap: false,
-
-    },
-    {
-        AllowDate: 0,
-        AllowDateName: null,
-        AllowManualIncrement: false,
-        AuditTrail: false,
-        AvailableInMobileApp: false,
-        AvailableinCustomerPortal: false,
-        BannerText: null,
-        Behaviour: 1,
-        CannotBeExported: false,
-        CannotBeImported: false,
-        Caption: "Description",
-        CharacterCasing: 0,
-        ColumnSpan: 0,
-        CopyfromParent: false,
-        Default: false,
-        DefaultValue: null,
-        DonotAllowSpecialChar: false,
-        EditableinCustomerPortal: false,
-        ErrorMessage: null,
-        Field: 334,
-        FieldDisplayType: "Text Box",
-        FieldName: "Description",
-        FieldOrder: 3,
-        FieldStructure: 5,
-        FieldType: "text",
-        FilterCondition: null,
-        Hidden: false,
-        HiddenInGroup: false,
-        HideLeftPane: false,
-        InformationField: false,
-        InternalStdField: true,
-        LinkTag: 0,
-        Mandatory: true,
-        MandatoryInGroup: false,
-        MandatoryInRevision: false,
-        MaxSize: 0,
-        MaximumValue: null,
-        MergeField: false,
-        MinimumValue: null,
-        Negative: false,
-        NumberList: null,
-        PreLoadValuesOnDemand: false,
-        ReadOnly: false,
-        RegularExpression: "",
-        Removed: false,
-        RowSpan: 0,
-        ScrollBar: 0,
-        TabName: "General",
-        Tag: 20,
-        ToolTip: null,
-        View: 95,
-        ViewCaption: "dipin2",
-        Visible: false,
-        WordWrap: false,
-        RoundOff: null
-
-    },
-    {
-        AllowDate: 0,
-        AllowDateName: null,
-        AllowManualIncrement: false,
-        AuditTrail: false,
-        AvailableInMobileApp: false,
-        AvailableinCustomerPortal: false,
-        BannerText: null,
-        Behaviour: 1,
-        CannotBeExported: false,
-        CannotBeImported: false,
-        Caption: "Risk level",
-        CharacterCasing: 0,
-        ColumnSpan: 0,
-        CopyfromParent: false,
-        Default: false,
-        DefaultValue: null,
-        DonotAllowSpecialChar: false,
-        EditableinCustomerPortal: false,
-        ErrorMessage: null,
-        Field: 334,
-        FieldDisplayType: "level",
-        FieldName: "RiskLevel",
-        FieldOrder: 16,
-        FieldStructure: 5,
-        FieldType: "",
-        FilterCondition: null,
-        Hidden: false,
-        HiddenInGroup: false,
-        HideLeftPane: false,
-        InformationField: false,
-        InternalStdField: true,
-        LinkTag: 0,
-        Mandatory: false,
-        MandatoryInGroup: false,
-        MandatoryInRevision: false,
-        MaxSize: 200,
-        MaximumValue: null,
-        MergeField: false,
-        MinimumValue: null,
-        Negative: false,
-        NumberList: null,
-        PreLoadValuesOnDemand: false,
-        ReadOnly: false,
-        RegularExpression: "",
-        Removed: false,
-        RowSpan: 0,
-        ScrollBar: 0,
-        TabName: "General",
-        Tag: 20,
-        ToolTip: null,
-        View: 95,
-        ViewCaption: "dipin2",
-        Visible: false,
-        WordWrap: false,
-
-    },
-
+const bodyData = [
+    { caption: 'Inspector carry the checklist', key: 'InspectorCarryTheCheckList', Checked: 0 }, // Default "No"
+    { caption: 'Inspector carry Test Method', key: 'InspectorCarryTestMethod', Checked: 0 },   // Default "Yes"
+    { caption: 'Inspector carry filled Risk assessment form', key: 'InspectorCarryFilledRiskAssesmentForm', Checked: 0 },
 ]
+
+const docData = 'The above work has been completed / progressed :  I have read & confirm this report & time sheet & certify the work has been done to my satisfaction. Travelling time , expense & milleage will be charged extra.'
+
+const scopeOfWork = ['Verification', 'VirtualTest', 'FunctionalTest', 'LoadTest', 'Witness']
 
 export default function TimeRecordDetails({
     setPageRender,
     detailPageId: summaryId,
     userAction,
     disabledDetailed,
-    group,
-    groupSelection,
+    setId,
+    timeId,
 }) {
+
+
+    const userData = JSON.parse(localStorage.getItem("ClaymoreUserData"))[0];
     const [mainDetails, setMainDetails] = useState({});
-    const [companyList, setCompanyList] = useState([]);
-    const [unitInfo, setUnitInfo] = useState([]);
     const [detailPageId, setDetailPageId] = useState(summaryId);
     const [confirmAlert, setConfirmAlert] = useState(false);
     const [confirmData, setConfirmData] = useState({});
     const [confirmType, setConfirmType] = useState(null);
-    const { gettaglist, upsertstockcount } = stockCountApis();
-    const [baseUnit, setBaseUnit] = useState({});
-    const [property, setProperty] = useState(false);
-    const [expanded, setExpanded] = useState(1);//Accordion open
-    const [tableBody, setTableBody] = useState(assessmentData);
+    const [tableBody, setTableBody] = useState(bodyData);
     const [isImageModalOpenSign, setIsImageModalOpenSign] = useState(false);
-    console.log('table', tableBody);
+
 
     const { showAlert } = useAlert();
     const {
-        gettagdetails,
-        deletetag,
-        checkexistenceintag,
-        gettagparentlist,
-        upsertproductmaster,
-        updateproductproperties,
-        updatetagparent,
-    } = masterApis();
+        GetTimeSheetDetails,
+        UpsertTimeSheet,
+        deleteTimeSheet
+    } = inspectionApis();
+
+    const {
+        GetTechnicianList
+    } = allocationApis();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -489,121 +218,84 @@ export default function TimeRecordDetails({
         setIsImageModalOpenSign(false);
     };
 
-    const handleChangeValue = (index, updatedValue) => {
-        const updatedDocumentData = [...mainDetails.documentData];
-        updatedDocumentData[index] = { ...updatedDocumentData[index], ...updatedValue };
-        setMainDetails((prevState) => ({
-          ...prevState,
-          documentData: updatedDocumentData,
-        }));
-      };
 
     const tagDetails = async () => {
         try {
             if (detailPageId == 0) {
                 handleNew();
             } else {
-                const response = await gettagdetails({
+                const response = await GetTimeSheetDetails({
                     id: detailPageId,
-                    tagId: 11,
                 });
                 if (response?.status === "Success") {
                     const myObject = JSON.parse(response?.result);
-                    const baseUnitArray = myObject?.UnitInfo.filter(
-                        (item) => item.Baseunit === true
-                    );
-                    const nonBaseUnitArray = myObject?.UnitInfo.filter(
-                        (item) => item.Baseunit === false
-                    );
-                    setMainDetails(myObject?.TagInfo[0]);
-                    setCompanyList([...myObject?.EntityInfo, { BE: 0, BE_Name: null }]);
-                    setUnitInfo(
-                        nonBaseUnitArray?.length
-                            ? nonBaseUnitArray
-                            : [
-                                {
-                                    Barcode: null,
-                                    Conversion: null,
-                                    Unit: null,
-                                    Unit_Name: null,
-                                },
-                            ]
-                    );
-                    setBaseUnit(baseUnitArray[0]);
+                    console.log('timesheet', myObject);
+                    if (myObject) {
+                        const formattedDate = myObject[0]?.DateOfInspection?.split("T")[0];
+
+                        // Update the main details with the formatted date
+                        setMainDetails({
+                            ...myObject[0],
+                            DateOfInspection: formattedDate,
+                        });
+                    }
+
+                    // Map the values from myObject to bodyData
+                    const updatedBodyData = bodyData.map((item) => {
+                        return {
+                            ...item,
+                            Checked: myObject[0][item.key] !== undefined ? myObject[0][item.key] : item.Checked,
+                        };
+                    });
+
+                    console.log('Updated BodyData:', updatedBodyData);
+                    setTableBody(updatedBodyData); // Assuming you have a state for bodyData
                 } else {
                     handleNew();
                 }
             }
         } catch (error) {
+
             throw error;
         }
     };
 
-    //Accordion 
-    const handleChange = (panel) => (event, isExpanded) => {
-        setExpanded(isExpanded ? panel : null);
-    };
+
+
 
     const handleNew = async () => {
         setMainDetails({
-            AltName: null,
-            DisableBatch: false,
-            Category: null,
-            Category_Name: null,
-            Group: false,
-            Code: null,
+            CSSCReportNo: null,
+            Address: null,
+            TravelHour: null,
+            Verification: false,
+            VirtualTest: false,
+            TimeArrived: null,
             Id: detailPageId,
-            Name: null,
-            Parent: null,
-            Parent_Name: null,
-            DisableSerialNo: false,
-            Type: null,
-            Type_Name: null,
-            documentData : [
-                {caption:'Inspector carry the checklist',yesChecked:false,noChecked:false},
-                {caption:' Inspector carry Test Method',yesChecked:false,noChecked:false},
-                {caption:'Inspector carry filled Risk assessment form',yesChecked:false,noChecked:false},
-            ]
+            PurchaseOrderNo: null,
+            Location: null,
+            LoadTest: false,
+            Inspector: null,
+            FunctionalTest: false,
+            DateOfInspection: null,
+            Allocation: null,
+            Client_Name: null,
+            Contact: null,
+            EqpDescription: null,
+            TimeLeft: null,
+            SiteHour: null,
+            TotalTime: null,
+            Comments: null,
+            Witness: false,
+            CustomerAcceptanceCertificate: null,
         });
-        setCompanyList([{ BE: 0, BE_Name: null }]);
-        setUnitInfo([
-            {
-                Barcode: null,
-                Conversion: null,
-                Unit: null,
-                Unit_Name: null,
-            },
-        ]);
-        setBaseUnit({
-            Barcode: null,
-            Baseunit: true,
-            Conversion: null,
-            Id: 0,
-            Unit: null,
-            Unit_Name: null,
-        });
+        setTableBody(bodyData)
         setDetailPageId(0);
     };
 
-    useEffect(() => {
-        if (!baseUnit?.Unit) {
-            setUnitInfo([
-                {
-                    Barcode: null,
-                    Conversion: null,
-                    Unit: null,
-                    Unit_Name: null,
-                },
-            ]);
-        }
-    }, [baseUnit?.Unit]);
 
-    function hasDuplicateBarcode(data) {
-        return data.some(
-            (item, index, array) =>
-                array.findIndex((el) => el.Barcode === item.Barcode) !== index
-        );
-    }
+
+
 
     const handleIconsClick = async (value) => {
         switch (value.trim()) {
@@ -615,48 +307,14 @@ export default function TimeRecordDetails({
                 break;
             case "save":
                 const emptyFields = [];
-                if (!mainDetails?.Name) emptyFields.push("Name");
-                if (!mainDetails.Code) emptyFields.push("Code");
-                if (!mainDetails.Category) emptyFields.push("Category");
-                if (!mainDetails.Type) emptyFields.push("Type");
-                if (!baseUnit?.Unit) emptyFields.push("Base Unit");
-                if (!baseUnit?.Barcode) emptyFields.push("Bar Code");
-                const filteredCompanyList = companyList
-                    .filter((item) => item.BE && item.BE !== 0) // Filter out items where BE is 0 or not present
-                    .map((item) => ({ be: item.BE }));
-                if (!filteredCompanyList?.length) emptyFields.push("Entity");
+                // if (!mainDetails?.Name) emptyFields.push("Name");
+                // if (!mainDetails.Code) emptyFields.push("Code");
+                // if (!mainDetails.Category) emptyFields.push("Category");
+                // if (!mainDetails.Type) emptyFields.push("Type");
+                // if (!baseUnit?.Unit) emptyFields.push("Base Unit");
+                // if (!baseUnit?.Barcode) emptyFields.push("Bar Code");
                 if (emptyFields.length > 0) {
                     showAlert("info", `Please Provide ${emptyFields[0]}`);
-                    return;
-                }
-                let checkDataMissing = false;
-                if (unitInfo?.length > 1) {
-                    checkDataMissing = unitInfo.some(
-                        (item) => !item?.Unit || !item?.Conversion || !item?.Barcode
-                    );
-                } else if (unitInfo?.length === 1) {
-                    if (
-                        unitInfo.some(
-                            (item) => !item?.Unit && !item?.Conversion && !item?.Barcode
-                        )
-                    ) {
-                        checkDataMissing = false;
-                    } else {
-                        // If no completely empty items, check if all items are valid
-                        checkDataMissing = !unitInfo.some(
-                            (item) => item?.Unit && item?.Conversion && item?.Barcode
-                        );
-                    }
-                } else {
-                    checkDataMissing = false;
-                }
-
-                if (checkDataMissing) {
-                    showAlert("info", `Please fill the unit table row`);
-                    return;
-                }
-                if (hasDuplicateBarcode([...unitInfo, baseUnit])) {
-                    showAlert("info", `Please fill unique barcode`);
                     return;
                 }
                 setConfirmData({ message: "Save", type: "success" });
@@ -668,9 +326,6 @@ export default function TimeRecordDetails({
                 setConfirmType("delete");
                 setConfirmAlert(true);
                 break;
-            case "property":
-                handleProperty();
-                break;
             default:
                 break;
         }
@@ -678,68 +333,84 @@ export default function TimeRecordDetails({
     // Handlers for your icons
 
     const handleclose = () => {
-        setPageRender(1);
+        setId(timeId)
+        setPageRender(3);
     };
 
     const handleSave = async () => {
-        const filteredCompanyList = companyList
-            .filter((item) => item.BE && item.BE !== 0) // Filter out items where BE is 0 or not present
-            .map((item) => ({ be: item.BE }));
-        const filteredUnitInfo = unitInfo?.map((item) => ({
-            unit: item?.Unit,
-            conversion: item?.Conversion,
-            barcode: item?.Barcode,
-            baseUnit: item?.Baseunit,
-        }));
-        const updateUnit =
-            filteredUnitInfo?.length === 1 && !filteredUnitInfo[0]?.unit
-                ? []
-                : filteredUnitInfo;
+        const isAnyScopeOfWorkSelected = scopeOfWork.some((field) => mainDetails[field] === true);
+        
+        if (!isAnyScopeOfWorkSelected) {
+            showAlert("info", "Please select at least one field in Scope of Work .");
+            return; // Stop further execution if no field is selected
+        }
+
+        const isDoumentRequiredSelected = tableBody.some((item) => item.Checked === 1);
+        if (!isDoumentRequiredSelected) {
+            showAlert("info", "Please fill at least one field in Doument Required .");
+            return; // Stop further execution if no field is selected
+        }
+
         const saveData = {
-            id: mainDetails?.Id,
-            name: mainDetails?.Name,
-            code: mainDetails?.Code,
-            altName: mainDetails?.AltName,
-            type: mainDetails?.Type,
-            category: mainDetails?.Category,
-            // warehouse: mainDetails?.Id,
-            parent: mainDetails?.Parent,
-            group: group !== 0 ? true : mainDetails?.Group,
-            disableBatch: mainDetails?.Type !== 3 ? mainDetails?.DisableBatch : true,
-            disableSerialNo:
-                mainDetails?.Type !== 3 ? mainDetails?.DisableSerialNo : true,
-            unitInfo: [
-                {
-                    unit: baseUnit?.Unit,
-                    conversion: null,
-                    barcode: baseUnit?.Barcode,
-                    baseUnit: baseUnit?.Baseunit,
-                },
-                ...updateUnit,
-            ],
-            entityInfo: filteredCompanyList,
+            Id: detailPageId || 0,
+            allocation: mainDetails?.Allocation,
+            dateOfInspection: mainDetails?.DateOfInspection,
+            timeArrived: mainDetails?.TimeArrived,
+            timeLeft: mainDetails?.TimeLeft,
+            siteHour: mainDetails?.SiteHour,
+            travelHour: mainDetails?.TravelHour,
+            totalTime: mainDetails?.TotalTime,
+            comments: mainDetails?.Comments,
+            eqpDescription: mainDetails?.EqpDescription,
+            virtualTest: mainDetails?.VirtualTest,
+            loadTest: mainDetails?.LoadTest,
+            witness: mainDetails?.Witness,
+            verification: mainDetails?.Verification,
+            functionalTest:mainDetails?.FunctionalTest,
+            inspector: mainDetails?.Inspector,
+            customerAcceptanceCertificate: mainDetails?.CustomerAcceptanceCertificate,
         };
-        const response = await upsertproductmaster(saveData);
-        if (response.status === "Success") {
-            if (group === 2) {
-                const parentPayload = groupSelection?.map((item) => ({
-                    id: item,
-                }));
-                const parentData = {
-                    tagId: 11,
-                    parentId: Number(response?.result),
-                    ids: parentPayload,
-                };
-                const respone2 = await updatetagparent(parentData);
+
+        console.log('inside save', tableBody);
+
+        tableBody?.forEach((item) => {
+            if (saveData) {
+                saveData[item.key] = item.Checked; // Assign Checked value to the corresponding key in saveData
             }
+        });
+        console.log('9999', saveData);
+
+        const response = await UpsertTimeSheet(saveData);
+        if (response.status === "Success") {
+
             showAlert("success", response?.message);
             handleNew();
             const actionExists = userAction.some((action) => action.Action === "New");
             if (!actionExists) {
-                setPageRender(1);
+                handleclose();
             }
         }
     };
+
+
+    const handleChangeValue = (key, updatedValue) => {
+        setTableBody((prevState) => {
+            // Create a copy of the tableBody array
+            const updatedDocumentData = prevState.map((item) => {
+                // Check if the current item's key matches the key to be updated
+                if (item.key === key) {
+                    return {
+                        ...item,
+                        ...updatedValue, // Update the Checked value
+                    };
+                }
+                return item; // Return unchanged items
+            });
+
+            return updatedDocumentData; // Return the updated array
+        });
+    };
+
 
     //confirmation
 
@@ -768,78 +439,27 @@ export default function TimeRecordDetails({
     //Delete alert open
     const deleteClick = async () => {
         let response;
-        response = await deletetag([{ id: detailPageId }], 11);
+        response = await deleteTimeSheet([{ id: detailPageId }]);
         if (response?.status === "Success") {
             showAlert("success", response?.message);
             handleNew();
             const actionExists = userAction.some((action) => action.Action === "New");
             if (!actionExists) {
-                setPageRender(1);
+                setPageRender(3);
             }
         }
     };
 
-    const handleDeleteRow = (index) => {
-        if (companyList?.length <= 1) {
-            setCompanyList([{ BE: 0, BE_Name: null }]);
-        } else {
-            setCompanyList((prev) => prev.filter((_, i) => i !== index));
-        }
-    };
 
-    const handleMasterExist = async (type) => {
-        try {
-            const response = await checkexistenceintag({
-                tagId: 11,
-                id: mainDetails?.Id,
-                name: type === 1 ? mainDetails?.Name : mainDetails?.Code,
-                type: type,
-            });
-            if (response.status === "Success") {
-                return true;
-            } else {
-                return false;
-            }
-        } catch (error) {
-            return false;
-        }
-    };
 
-    const handleProperty = () => {
-        setConfirmData({
-            message: `You want to Activate/Inactivate the property.`,
-            type: "info",
-            header: "Property",
-        });
-        setProperty(true);
-    };
 
-    const handlePropertyConfirmation = async (status) => {
-        const propertyPayload = [
-            {
-                id: detailPageId,
-            },
-        ];
 
-        const saveData = {
-            status: status,
-            ids: propertyPayload,
-        };
-        try {
-            const response = await updateproductproperties(saveData);
 
-            if (response?.status === "Success") {
-                showAlert("success", response?.message);
-                setConfirmData({});
-            }
-        } catch (error) {
-        } finally {
-            setProperty(false);
-        }
-    };
 
-    console.log('dt',mainDetails);
-    
+
+
+    console.log('dt', tableBody);
+
 
     return (
         <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
@@ -854,7 +474,7 @@ export default function TimeRecordDetails({
                     flexWrap: "wrap",
                 }}
             >
-                <BasicBreadcrumbs group={group} />
+                <BasicBreadcrumbs />
                 <DefaultIcons
                     detailPageId={detailPageId}
                     iconsClick={handleIconsClick}
@@ -903,15 +523,14 @@ export default function TimeRecordDetails({
                         }}
                     >
                         <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <UserInputField
+                            <UserInputField
                                 label={"CSSC Report No"}
-                                name={"ReportNo"}
+                                name={"CSSCReportNo"}
                                 type={"text"}
                                 disabled={false}
                                 mandatory={true}
                                 value={mainDetails}
                                 setValue={setMainDetails}
-                                onBlurAction={() => handleMasterExist(2)}
                                 maxLength={100}
                             />
 
@@ -974,7 +593,6 @@ export default function TimeRecordDetails({
                                 mandatory={true}
                                 value={mainDetails}
                                 setValue={setMainDetails}
-                                onBlurAction={() => handleMasterExist(2)}
                                 maxLength={100}
                             />
                             <UserInputField
@@ -985,61 +603,59 @@ export default function TimeRecordDetails({
                                 mandatory={true}
                                 value={mainDetails}
                                 setValue={setMainDetails}
-                                onBlurAction={() => handleMasterExist(2)}
                                 maxLength={100}
                             />
-                            <Box
-                            sx={{
-                                display: "grid",
-                                gridTemplateColumns: "auto 1fr",
-                                alignItems: "center",
-                                width: "100%",
-                                paddingTop: 1,
-                            }}
-                        >
-                            <Typography variant="body1">Inspection</Typography>
                             <Box
                                 sx={{
-                                    borderBottom: "1px dotted",
-                                    // borderBottmColor: getBorderColor(),
-                                    marginLeft: "8px", // Adjust spacing to your preference
+                                    display: "grid",
+                                    gridTemplateColumns: "auto 1fr",
+                                    alignItems: "center",
+                                    width: "100%",
+                                    paddingTop: 1,
                                 }}
-                            />
-                        </Box>
+                            >
+                                <Typography variant="body1">Inspection</Typography>
+                                <Box
+                                    sx={{
+                                        borderBottom: "1px dotted",
+                                        // borderBottmColor: getBorderColor(),
+                                        marginLeft: "8px", // Adjust spacing to your preference
+                                    }}
+                                />
+                            </Box>
 
 
-                        <UserInputField
-                                label={"Inspector Name"}
-                                name={"Inspector"}
-                                type={"text"}
-                                disabled={false}
-                                mandatory={true}
-                                value={mainDetails}
-                                setValue={setMainDetails}
-                                onBlurAction={() => handleMasterExist(2)}
-                                maxLength={100}
+
+                            <UserAutoComplete
+                                apiKey={GetTechnicianList}
+                                formData={mainDetails}
+                                setFormData={setMainDetails}
+                                label={"Inspector"}
+                                autoId={"Inspector"}
+                                required={false}
+                                formDataName={"Inspector_Name"}
+                                formDataiId={"Inspector"}
+                                User={userData?.UserId}
                             />
 
                             <UserInputField
                                 label={"Date of Inspection"}
-                                name={"DateofInspection"}
+                                name={"DateOfInspection"}
                                 type={"date"}
                                 disabled={false}
                                 mandatory={true}
                                 value={mainDetails}
                                 setValue={setMainDetails}
-                                onBlurAction={() => handleMasterExist(2)}
                                 maxLength={100}
                             />
                             <UserInputField
                                 label={"Time Arrived"}
-                                name={"Time"}
+                                name={"TimeArrived"}
                                 type={"time"}
                                 disabled={false}
                                 mandatory={true}
                                 value={mainDetails}
                                 setValue={setMainDetails}
-                                onBlurAction={() => handleMasterExist(2)}
                                 maxLength={100}
                             />
                             <UserInputField
@@ -1050,7 +666,6 @@ export default function TimeRecordDetails({
                                 mandatory={true}
                                 value={mainDetails}
                                 setValue={setMainDetails}
-                                onBlurAction={() => handleMasterExist(2)}
                                 maxLength={100}
                             />
 
@@ -1062,18 +677,16 @@ export default function TimeRecordDetails({
                                 mandatory={true}
                                 value={mainDetails}
                                 setValue={setMainDetails}
-                                onBlurAction={() => handleMasterExist(2)}
                                 maxLength={100}
                             />
                             <UserInputField
                                 label={"Travel Hours"}
-                                name={"TravelHours"}
+                                name={"TravelHour"}
                                 type={"text"}
                                 disabled={false}
                                 mandatory={true}
                                 value={mainDetails}
                                 setValue={setMainDetails}
-                                onBlurAction={() => handleMasterExist(2)}
                                 maxLength={100}
                             />
                             <UserInputField
@@ -1084,7 +697,6 @@ export default function TimeRecordDetails({
                                 mandatory={true}
                                 value={mainDetails}
                                 setValue={setMainDetails}
-                                onBlurAction={() => handleMasterExist(2)}
                                 maxLength={100}
                             />
                             <UserInputField
@@ -1095,7 +707,6 @@ export default function TimeRecordDetails({
                                 mandatory={true}
                                 value={mainDetails}
                                 setValue={setMainDetails}
-                                onBlurAction={() => handleMasterExist(2)}
                                 maxLength={100}
                             />
 
@@ -1142,13 +753,12 @@ export default function TimeRecordDetails({
 
                             <UserInputField
                                 label={"Customer Name"}
-                                name={"Customer"}
+                                name={"Client_Name"}
                                 type={"text"}
                                 disabled={false}
                                 mandatory={true}
                                 value={mainDetails}
                                 setValue={setMainDetails}
-                                onBlurAction={() => handleMasterExist(2)}
                                 maxLength={100}
                             />
 
@@ -1160,20 +770,18 @@ export default function TimeRecordDetails({
                                 mandatory={true}
                                 value={mainDetails}
                                 setValue={setMainDetails}
-                                onBlurAction={() => handleMasterExist(2)}
                                 maxLength={100}
                             />
 
 
                             <UserInputField
                                 label={"Contact No"}
-                                name={"ContactNo"}
+                                name={"Contact"}
                                 type={"text"}
                                 disabled={false}
                                 mandatory={true}
                                 value={mainDetails}
                                 setValue={setMainDetails}
-                                onBlurAction={() => handleMasterExist(2)}
                                 maxLength={100}
                             />
 
@@ -1185,19 +793,17 @@ export default function TimeRecordDetails({
                                 mandatory={true}
                                 value={mainDetails}
                                 setValue={setMainDetails}
-                                onBlurAction={() => handleMasterExist(2)}
                                 maxLength={100}
                             />
 
                             <UserInputField
                                 label={"Equipment Description"}
-                                name={"Description"}
+                                name={"EqpDescription"}
                                 type={"text"}
                                 disabled={false}
                                 mandatory={true}
                                 value={mainDetails}
                                 setValue={setMainDetails}
-                                onBlurAction={() => handleMasterExist(2)}
                                 multiline={true}
                             />
 
@@ -1240,16 +846,16 @@ export default function TimeRecordDetails({
                         }}>
 
                             <ChecKBoxLabel
-                                label={"Visual Test"}
+                                label={"Virtual Test"}
                                 value={mainDetails}
                                 changeValue={setMainDetails}
-                                fieldName={"VisualTest"}
+                                fieldName={"VirtualTest"}
                             />
                             <ChecKBoxLabel
                                 label={" Functional Test"}
                                 value={mainDetails}
                                 changeValue={setMainDetails}
-                                fieldName={" FunctionalTest"}
+                                fieldName={"FunctionalTest"}
                             />
                             <ChecKBoxLabel
                                 label={"Load Test"}
@@ -1306,34 +912,53 @@ export default function TimeRecordDetails({
                                 gap: "2px", // Reduced width for small screens
                             },
                         }}>
-                            {mainDetails?.documentData?.map((item, index) => (
-                                <Box sx={{ display: 'flex', flexWrap: 'wrap', width: '500px', height: '40%', }}>
-                                    <Box sx={{ border: '1px solid', width: 'auto', display: 'flex', alignItems: 'center', }}>
-                                        <Typography sx={{ p: 1 }} >{item.caption}</Typography>
+                            {tableBody?.map((item, index) => (
+                                <Box
+                                    key={index}
+                                    sx={{
+                                        display: 'flex',
+                                        flexWrap: 'wrap',
+                                        width: '500px',
+                                        height: '40%',
+                                    }}
+                                >
+                                    {/* Caption Box */}
+                                    <Box
+                                        sx={{
+                                            border: '1px solid',
+                                            width: 'auto',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                        }}
+                                    >
+                                        <Typography sx={{ p: 1 }}>{item.caption}</Typography>
                                     </Box>
-                                    <Box sx={{
-                                        border: '1px solid', width: '30%', display: 'flex', flexDirection: 'row',
 
-                                    }}>
-                                        <ChecKBoxLabel1
-                                            label="Yes"
-                                            value={item}
-                                            changeValue={() => handleChangeValue(index, { yesChecked: true, noChecked: false })}
-                                            yesField="yesChecked"
-                                            noField="noChecked"
-                                            width="100px"
+                                    {/* Switch Box */}
+                                    <Box
+                                        sx={{
+                                            border: '1px solid',
+                                            width: '30%',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'space-between',
+                                            padding: '0 10px',
+                                        }}
+                                    >
+                                        <Typography>No</Typography>
+                                        <Switch
+                                            checked={item.Checked === 1} // If Checked is 1, switch is "Yes"
+                                            onChange={() =>
+                                                handleChangeValue(item.key, { Checked: item.Checked === 1 ? 0 : 1 }) // Toggle between 0 and 1
+                                            }
+                                            color='info'
                                         />
-                                        <ChecKBoxLabel1
-                                            label="No"
-                                            value={item}
-                                            changeValue={() => handleChangeValue(index, { yesChecked: false, noChecked: true })}
-                                            yesField="yesChecked"
-                                            noField="noChecked"
-                                            width="100px"
-                                        />
+                                        <Typography>Yes</Typography>
                                     </Box>
                                 </Box>
                             ))}
+
+
 
                         </Box>
 
@@ -1375,7 +1000,7 @@ export default function TimeRecordDetails({
                                 <ChecKBoxLabel
                                     value={mainDetails}
                                     changeValue={setMainDetails}
-                                    fieldName={"No1"}
+                                    fieldName={"CustomerAcceptanceCertificate"}
                                     width={'50px'}
                                 />
                                 <Typography>{docData}</Typography>
@@ -1402,13 +1027,7 @@ export default function TimeRecordDetails({
                 handleCloseImagePopup={handleCloseImagePopupSign}
             />
 
-            {/* <MasterProductConfirmation
-        handleClose={() => setProperty(false)}
-        open={property}
-        data={confirmData}
-        submite={handlePropertyConfirmation}
-        selectedDatas={detailPageId ? detailPageId : null}
-      /> */}
+
         </Box>
     );
 }

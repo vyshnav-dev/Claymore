@@ -1,33 +1,27 @@
-import React, { useState } from "react";
-import {
-    Box,
-    Stack,
-    Button as ButtonM,
-    useTheme,
-    useMediaQuery,
-    Typography,
-    Tabs,
-    Tab,
-} from "@mui/material";
-import Breadcrumbs from "@mui/material/Breadcrumbs";
+import * as React from "react";
 import PropTypes from "prop-types";
-import NavigateNextIcon from "@mui/icons-material/NavigateNext";
-import { useEffect } from "react";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import Box from "@mui/material/Box";
+import { Breadcrumbs, Stack, Typography, useTheme } from "@mui/material";
+// import { tagSettingsApis } from "../../../services/settings/TagSettings/tagSettings";
+import NormalButton from "../../../component/Buttons/NormalButton";
 import ConfirmationAlert from "../../../component/Alerts/ConfirmationAlert";
-import ActionButton from "../../../component/Buttons/ActionButton";
 import { useAlert } from "../../../component/Alerts/AlertContext";
-import { primaryColor } from "../../../config/config";
+import PDTable from "./PDTable";
+import {
+    primaryColor,
+    secondaryColor,
+    thirdColor,
+} from "../../../config/config";
+
+import NavigateNextIcon from "@mui/icons-material/NavigateNext";
+import ActionButton from "../../../component/Buttons/ActionButton";
+import PDInsertion from "./PDInsertion";
+import { masterApis } from "../../../service/Master/master";
+import UserAutoComplete from "../../../component/AutoComplete/UserAutoComplete";
 import UserInputField from "../../../component/InputFields/UserInputField";
-import { stockCountApis } from "../../../service/Transaction/stockcount";
-import WarehouseAutoComplete from "../../../component/AutoComplete/WarehouseAutoComplete";
-import { closeStockCountApis } from "../../../service/Transaction/closeStockCount";
-import { salesApis } from "../../../service/Transaction/sales";
-import InputCommon from "../../../component/InputFields/InputCommon";
-// import ReceiptBodyTable from "./ReceiptBodyTable";
-import AutoSelectNoHeader from "../../../component/AutoComplete/AutoSelectNoHeader";
-import Attachments from "../../../component/Attachment/Attachments";
-import PDInfoTable from "./PDInfoTable";
-const currentDate = new Date().toISOString().split("T")[0];
+
 function CustomTabPanel(props) {
     const { children, value, index, ...other } = props;
 
@@ -57,7 +51,7 @@ function a11yProps(index) {
     };
 }
 
-function BasicBreadcrumbs() {
+function BasicBreadcrumbs({ group }) {
     const style = {
         display: "flex",
         alignItems: "center",
@@ -91,7 +85,7 @@ function BasicBreadcrumbs() {
                     aria-label="breadcrumb"
                 >
                     <Typography underline="hover" sx={style} key="1">
-                        Product Description Details
+                        Product Field Details
                     </Typography>
                 </Breadcrumbs>
             </Stack>
@@ -110,14 +104,16 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction }) => {
                 scrollbarWidth: "thin",
             }}
         >
-            {userAction.some((action) => action.Action === "New" && detailPageId !== 0) && (
-                <ActionButton
-                    iconsClick={iconsClick}
-                    icon={"fa-solid fa-plus"}
-                    caption={"New"}
-                    iconName={"new"}
-                />
-            )}
+            {/* {userAction.some(
+                (action) => action.Action === "New" && detailPageId !== 0
+            ) && (
+                    <ActionButton
+                        iconsClick={iconsClick}
+                        icon={"fa-solid fa-plus"}
+                        caption={"New"}
+                        iconName={"new"}
+                    />
+                )}
             {userAction.some(
                 (action) =>
                     (action.Action === "New" && detailPageId === 0) ||
@@ -142,18 +138,20 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction }) => {
                     ) : null}
                 </>
             )}
-            {/* <ActionButton
-                iconsClick={iconsClick}
-                icon={"fa-solid fa-backward-step"}
-                caption={"Previous"}
-                iconName={"previous"}
-            />
-            <ActionButton
-                iconsClick={iconsClick}
-                icon={"fa-solid fa-forward-step"}
-                caption={"Next"}
-                iconName={"next"}
-            /> */}
+
+            {userAction.some((action) => action.Action === "Property") && (
+                <>
+                    {detailPageId !== 0 && (
+                        <ActionButton
+                            iconsClick={iconsClick}
+                            icon={"fa-solid fa-gears"}
+                            caption={"Property"}
+                            iconName={"property"}
+                        />
+                    )}
+                </>
+            )} */}
+
             <ActionButton
                 iconsClick={iconsClick}
                 icon={"fa-solid fa-xmark"}
@@ -164,470 +162,107 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction }) => {
     );
 };
 
-const tableFields = [
-    {
-        AllowDate: 0,
-        AllowDateName: null,
-        AllowManualIncrement: false,
-        AuditTrail: false,
-        AvailableInMobileApp: false,
-        AvailableinCustomerPortal: false,
-        BannerText: null,
-        Behaviour: 1,
-        CannotBeExported: false,
-        CannotBeImported: false,
-        Caption: "Customer",
-        CharacterCasing: 0,
-        ColumnSpan: 0,
-        CopyfromParent: false,
-        Default: false,
-        DefaultValue: "0",
-        DonotAllowSpecialChar: false,
-        EditableinCustomerPortal: false,
-        ErrorMessage: null,
-        Field: 333,
-        FieldDisplayType: "drop down",
-        FieldName: "Product",
-        FieldOrder: 1,
-        FieldStructure: 5,
-        FieldType: "Tag",
-        FilterCondition: null,
-        Hidden: false,
-        HiddenInGroup: false,
-        HideLeftPane: false,
-        InformationField: false,
-        InternalStdField: true,
-        LinkTag: 14,
-        Mandatory: true,
-        MandatoryInGroup: false,
-        MandatoryInRevision: false,
-        MaxSize: 0,
-        MaximumValue: null,
-        MergeField: false,
-        MinimumValue: null,
-        Negative: false,
-        NumberList: null,
-        PreLoadValuesOnDemand: false,
-        ReadOnly: false,
-        RegularExpression: null,
-        Removed: false,
-        RowSpan: 0,
-        ScrollBar: 0,
-        TabName: "General",
-        Tag: 20,
-        ToolTip: null,
-        View: 95,
-        ViewCaption: "dipin2",
-        Visible: false,
-        WordWrap: false,
-        width: 150
-    },
-    {
-        AllowDate: 0,
-        AllowDateName: null,
-        AllowManualIncrement: false,
-        AuditTrail: false,
-        AvailableInMobileApp: false,
-        AvailableinCustomerPortal: false,
-        BannerText: null,
-        Behaviour: 1,
-        CannotBeExported: false,
-        CannotBeImported: false,
-        Caption: "Amount",
-        CharacterCasing: 0,
-        ColumnSpan: 0,
-        CopyfromParent: false,
-        Default: false,
-        DefaultValue: null,
-        DonotAllowSpecialChar: false,
-        EditableinCustomerPortal: false,
-        ErrorMessage: null,
-        Field: 334,
-        FieldDisplayType: "Text Box",
-        FieldName: "Quantity",
-        FieldOrder: 3,
-        FieldStructure: 5,
-        FieldType: "integer",
-        FilterCondition: null,
-        Hidden: false,
-        HiddenInGroup: false,
-        HideLeftPane: false,
-        InformationField: false,
-        InternalStdField: true,
-        LinkTag: 0,
-        Mandatory: true,
-        MandatoryInGroup: false,
-        MandatoryInRevision: false,
-        MaxSize: 0,
-        MaximumValue: null,
-        MergeField: false,
-        MinimumValue: null,
-        Negative: false,
-        NumberList: null,
-        PreLoadValuesOnDemand: false,
-        ReadOnly: false,
-        RegularExpression: /^-?[0-9]*\.?[0-9]{0,0}$/,
-        Removed: false,
-        RowSpan: 0,
-        ScrollBar: 0,
-        TabName: "General",
-        Tag: 20,
-        ToolTip: null,
-        View: 95,
-        ViewCaption: "dipin2",
-        Visible: false,
-        WordWrap: false,
-        width: 80
-    },
-
-    {
-        AllowDate: 0,
-        AllowDateName: null,
-        AllowManualIncrement: false,
-        AuditTrail: false,
-        AvailableInMobileApp: false,
-        AvailableinCustomerPortal: false,
-        BannerText: null,
-        Behaviour: 1,
-        CannotBeExported: false,
-        CannotBeImported: false,
-        Caption: "Vat%",
-        CharacterCasing: 0,
-        ColumnSpan: 0,
-        CopyfromParent: false,
-        Default: false,
-        DefaultValue: null,
-        DonotAllowSpecialChar: false,
-        EditableinCustomerPortal: false,
-        ErrorMessage: null,
-        Field: 334,
-        FieldDisplayType: "Text Box",
-        FieldName: "vat%",
-        FieldOrder: 14,
-        FieldStructure: 5,
-        FieldType: "numeric",
-        FilterCondition: null,
-        Hidden: false,
-        HiddenInGroup: false,
-        HideLeftPane: false,
-        InformationField: false,
-        InternalStdField: true,
-        LinkTag: 0,
-        Mandatory: true,
-        MandatoryInGroup: false,
-        MandatoryInRevision: false,
-        MaxSize: 0,
-        MaximumValue: null,
-        MergeField: false,
-        MinimumValue: null,
-        Negative: false,
-        NumberList: null,
-        PreLoadValuesOnDemand: false,
-        ReadOnly: false,
-        RegularExpression: "",
-        Removed: false,
-        RowSpan: 0,
-        ScrollBar: 0,
-        TabName: "General",
-        Tag: 20,
-        ToolTip: null,
-        View: 95,
-        ViewCaption: "dipin2",
-        Visible: false,
-        WordWrap: false,
-        width: 80
-    },
-    {
-        AllowDate: 0,
-        AllowDateName: null,
-        AllowManualIncrement: false,
-        AuditTrail: false,
-        AvailableInMobileApp: false,
-        AvailableinCustomerPortal: false,
-        BannerText: null,
-        Behaviour: 1,
-        CannotBeExported: false,
-        CannotBeImported: false,
-        Caption: "Reference",
-        CharacterCasing: 0,
-        ColumnSpan: 0,
-        CopyfromParent: false,
-        Default: false,
-        DefaultValue: null,
-        DonotAllowSpecialChar: false,
-        EditableinCustomerPortal: false,
-        ErrorMessage: null,
-        Field: 334,
-        FieldDisplayType: "popup",
-        FieldName: "reference",
-        FieldOrder: 14,
-        FieldStructure: 5,
-        FieldType: "receiptpopup",
-        FilterCondition: null,
-        Hidden: false,
-        HiddenInGroup: false,
-        HideLeftPane: false,
-        InformationField: false,
-        InternalStdField: true,
-        LinkTag: 0,
-        Mandatory: true,
-        MandatoryInGroup: false,
-        MandatoryInRevision: false,
-        MaxSize: 0,
-        MaximumValue: null,
-        MergeField: false,
-        MinimumValue: null,
-        Negative: false,
-        NumberList: null,
-        PreLoadValuesOnDemand: false,
-        ReadOnly: false,
-        RegularExpression: "",
-        Removed: false,
-        RowSpan: 0,
-        ScrollBar: 0,
-        TabName: "General",
-        Tag: 20,
-        ToolTip: null,
-        View: 95,
-        ViewCaption: "dipin2",
-        Visible: false,
-        WordWrap: false,
-        width: 80
-    },
-    {
-        AllowDate: 0,
-        AllowDateName: null,
-        AllowManualIncrement: false,
-        AuditTrail: false,
-        AvailableInMobileApp: false,
-        AvailableinCustomerPortal: false,
-        BannerText: null,
-        Behaviour: 1,
-        CannotBeExported: false,
-        CannotBeImported: false,
-        Caption: "Remarks",
-        CharacterCasing: 0,
-        ColumnSpan: 0,
-        CopyfromParent: false,
-        Default: false,
-        DefaultValue: null,
-        DonotAllowSpecialChar: false,
-        EditableinCustomerPortal: false,
-        ErrorMessage: null,
-        Field: 334,
-        FieldDisplayType: "Text Box",
-        FieldName: "Remarks",
-        FieldOrder: 16,
-        FieldStructure: 5,
-        FieldType: "numeric",
-        FilterCondition: null,
-        Hidden: false,
-        HiddenInGroup: false,
-        HideLeftPane: false,
-        InformationField: false,
-        InternalStdField: true,
-        LinkTag: 0,
-        Mandatory: true,
-        MandatoryInGroup: false,
-        MandatoryInRevision: false,
-        MaxSize: 0,
-        MaximumValue: null,
-        MergeField: false,
-        MinimumValue: null,
-        Negative: false,
-        NumberList: null,
-        PreLoadValuesOnDemand: false,
-        ReadOnly: false,
-        RegularExpression: "",
-        Removed: false,
-        RowSpan: 0,
-        ScrollBar: 0,
-        TabName: "General",
-        Tag: 20,
-        ToolTip: null,
-        View: 95,
-        ViewCaption: "dipin2",
-        Visible: false,
-        WordWrap: false,
-        width: 150
-    },
-]
-
 export default function PDDetails({
     setPageRender,
-    detailPageId: summaryId,
+    detailPageId,
     userAction,
-    disabledDetailed,
-}) {
-    const [mainDetails, setMainDetails] = useState({ TagAttachments: [] });
-    const [tableBody, setTableBody] = useState([]);
-    const [batch, setBatch] = useState([]);
-    const [serial, setSerial] = useState([]);
-    const [detailPageId, setDetailPageId] = useState(summaryId);
-    const [modal, setModal] = useState(false);
-    const [modalData, setModalData] = useState({});
-    const [confirmAlert, setConfirmAlert] = useState(false);
-    const [confirmData, setConfirmData] = useState({});
-    const [confirmType, setConfirmType] = useState(null);
-    const [unitInfo, setUnitInfo] = useState([]);
-    const [baseUnit, setBaseUnit] = useState({});
+    disabledDetailed, }) {
 
-    //Table
-    const [tableData, settableData] = useState([])
-
-    //Tab change
-    const [tabValue, setTabValue] = useState(0);
-
-    //Attachments
-    const [dbTagAttachmentDetails, setdbTagAttachmentDetails] = useState([])
-
-
-
-
-    const { getdocno, getwarehousebyentity, gettaglist } = stockCountApis();
-    const { deletestockclose, upsertstockclose } =
-        closeStockCountApis();
+    const [value, setValue] = React.useState(0);
+    const [products, setProducts] = React.useState({ Name: null });
+    const [formData, setFormData] = React.useState({});
     const { showAlert } = useAlert();
+    const [action, setAction] = React.useState(0);
+    const { upsertProductFieldmaster, ProductFieldCheck, GetProductFieldDetails,getProductdetails } = masterApis();
+    const [editId, setEditId] = React.useState(0);
+    const [confirmAlert, setConfirmAlert] = React.useState(false);
+    const [confirmData, setConfirmData] = React.useState({});
+    const [numberList, setNumberList] = React.useState([]);
 
-    const { GetPrev_NextDocNo, GetSalesDetails, GetDriver } = salesApis()
-
-    //#region Prev_Next
-    const previousClick = async () => {
-        try {
-
-            const response = await GetPrev_NextDocNo({ iTransId: detailPageId, iDoctype: 2, iType: 1 })
-
-            if (response?.status == 200) {
-                console.log(JSON.parse(response.data.ResultData).Table[0]);
-                const data = JSON.parse(response.data.ResultData).Table[0]
-                setDetailPageId(data?.iTransId)
-                setMainDetails({ ...mainDetails, sDocNo: data?.sDocNo })
-
-            }
-
-
-        } catch (error) {
-
-        }
-    }
-    const NextClick = async () => {
-        try {
-
-            const response = await GetPrev_NextDocNo({ iTransId: detailPageId, iDoctype: 2, iType: 2 })
-
-            if (response?.status == 200) {
-                console.log(JSON.parse(response.data.ResultData).Table[0]);
-                const data = JSON.parse(response.data.ResultData).Table[0]
-                setDetailPageId(data?.iTransId)
-                setMainDetails({ ...mainDetails, sDocNo: data?.sDocNo })
-
-            }
-
-
-        } catch (error) {
-
-        }
-    }
-
-    useEffect(() => {
+    React.useEffect(() => {
         const fetchData = async () => {
-            await tagDetails();
+            if (editId !== 0) {
+                const response = await GetProductFieldDetails({
+                    id: editId,
+                });
+                if (response?.status === "Success") {
+                    const myObject = JSON.parse(response.result);
+                    setFormData(myObject[0]);
+                    if (myObject[0]?.NumberList) {
+                        setNumberList(JSON.parse(myObject[0]?.NumberList));
+                      } else {
+                        setNumberList([]);
+                      }
+                }
+            } else {
+                handleNew();
+            }
         };
+
+        fetchData();
+    }, [editId]);
+
+
+    React.useEffect(() => {
+        const fetchData = async () => {
+            if (detailPageId !== 0) {
+                const response = await getProductdetails({
+                    id: detailPageId,
+                });
+                if (response?.status === "Success") {
+                    const myObject = JSON.parse(response.result);
+                    setProducts(myObject[0]);
+                }
+            } else {
+                handleNew();
+            }
+        };
+
         fetchData();
     }, [detailPageId]);
 
-    const tagDetails = async () => {
-        try {
-            if (detailPageId == 0) {
-                handleNew();
-            } else {
-                const response = await GetSalesDetails({
-                    transId: detailPageId,
-                });
-                if (response?.status === "Success") {
-                    const myObject = JSON.parse(response?.result);
-                    const mainDetails = myObject?.Header[0];
-                    const formattedDocDate = mainDetails?.DocDate?.split("T")[0];
-                    const formattedStockDate = mainDetails?.StockDate?.split("T")[0];
-                    const tableBodyWithSlNo = myObject?.Body?.map((item, index) => ({
-                        ...item,
-                        SlNo: index + 1, // Assign SlNo based on the index, starting from 1
-                    }));
-                    const batchWithSINo = myObject?.Batch?.map((batchItem) => {
-                        const matchingTableItem = tableBodyWithSlNo.find(
-                            (tableItem) => tableItem.TransDtId === batchItem.TransDtId
-                        );
 
-                        return {
-                            ...batchItem,
-                            tableNo: matchingTableItem ? matchingTableItem.SlNo : null, // Add SINo if match is found
-                        };
-                    });
-
-                    const serialWithSINo = myObject?.Serial?.map((batchItem) => {
-                        const matchingTableItem = tableBodyWithSlNo.find(
-                            (tableItem) => tableItem.TransDtId === batchItem.TransDtId
-                        );
-
-                        return {
-                            ...batchItem,
-                            tableNo: matchingTableItem ? matchingTableItem.SlNo : null, // Add SINo if match is found
-                            productId: matchingTableItem ? matchingTableItem.Product : null,
-                        };
-                    });
-                    setMainDetails({
-                        ...mainDetails,
-                        DocDate: formattedDocDate,
-                        StockDate: formattedStockDate,
-                        Warehouse_Name: tableBodyWithSlNo[0]?.Warehouse_Name,
-                        Warehouse: tableBodyWithSlNo[0]?.Warehouse
-                    });
-                    setTableBody(tableBodyWithSlNo);
-                    setBatch(batchWithSINo);
-                    setSerial(serialWithSINo);
-                } else {
-                    handleNew();
-                }
-            }
-        } catch (error) {
-            throw error;
-        }
-    };
-
-
-
-
-
-    const handleNew = async () => {
-        let docNo;
-        const response = await getdocno({ docType: 2 });
-        if (response?.status === "Success") {
-            const myObject = JSON.parse(response.result);
-            docNo = myObject;
-        }
-
-        setMainDetails({
-            StockDate: currentDate,
-            DocDate: currentDate,
-            Warehouse: null,
-            Warehouse_Name: null,
-            DocNo: docNo,
-            AmtDecimal: 0,
-            BatchEnabled: false,
-            BinEnabled: false,
-            QtyDecimal: 0,
-            SerialNoEnabled: false,
-            TransId: 0,
-            BE: null,
-            BE_Name: null,
-            WarehouseHeader: false,
-            TagAttachments: []
+    const handleNew = () => {
+        setFormData({
+            Product: null,
+            Caption: "",
+            DataType: 0,
+            DataTypeId: 0,
+            DataTypeName: "",
+            Default: false,
+            DefaultValue: "",
+            DisplayControlType: 0,
+            DisplayControlTypeName: "",
+            FieldOrder: 0,
+            FieldType: 0,
+            FieldTypeName: "",
+            Hidden: false,
+            Id: 0,
+            MaxSize: 0,
+            MaximumValue: 0,
+            MinimumValue: 0,
+            Name: "",
+            ReadOnly: false,
+            Tab: 0,
+            Tab_Name: "",
+            ToolTip: "",
+            Product_Name: null
         });
-        setTableBody([]);
-        setBatch([]);
-        setSerial([]);
-        setDetailPageId(0);
     };
+
+    const handleChange = (event, newValue, id) => {
+        
+        setEditId(id ? id : 0);
+        setValue(newValue);
+    };
+
+    
+
+    const handleclose = () => {
+        setPageRender(1);
+    };
+
+    console.log('formdata', formData);
 
     const handleIconsClick = async (value) => {
         switch (value.trim()) {
@@ -639,52 +274,13 @@ export default function PDDetails({
                 break;
             case "save":
                 const emptyFields = [];
-                if (!mainDetails.BE) emptyFields.push("Entity");
-                if (!mainDetails.Warehouse && mainDetails?.WarehouseHeader)
-                    emptyFields.push("Warehouse");
-
+                if (!mainDetails?.Name) emptyFields.push("Name");
+                if (!mainDetails.Code) emptyFields.push("Code");
                 if (emptyFields.length > 0) {
                     showAlert("info", `Please Provide ${emptyFields[0]}`);
                     return;
                 }
 
-                const checkDataMissing = tableBody.some(
-                    (item) =>
-                        (!item?.Bin && mainDetails?.BinEnabled) ||
-                        (!item?.Warehouse && !mainDetails?.WarehouseHeader) ||
-                        !item?.Product ||
-                        !item?.Unit ||
-                        !item?.Qty
-                );
-
-                if (checkDataMissing) {
-                    showAlert("info", `Please fill the row`);
-                    return;
-                }
-                const batchableItems = tableBody.filter((item) => item.Batchable);
-
-                // Check if each batchable item has a corresponding batch entry
-                const missingBatches = batchableItems.filter(
-                    (item) => !batch.some((batch) => batch.TransDtId === item.TransDtId)
-                );
-
-                const serialNoItems = tableBody.filter((item) => item.SerialNoEnabled);
-
-                // Check if each batchable item has a corresponding batch entry
-                const missingSerialNo = serialNoItems.filter(
-                    (item) =>
-                        !serial.some((serial) => serial.TransDtId === item.TransDtId)
-                );
-
-                if (missingBatches?.length) {
-                    showAlert("info", `Batch Missing`);
-                    return;
-                }
-
-                if (missingSerialNo?.length) {
-                    showAlert("info", `Serial No Missing`);
-                    return;
-                }
                 setConfirmData({ message: "Save", type: "success" });
                 setConfirmType("save");
                 setConfirmAlert(true);
@@ -694,211 +290,115 @@ export default function PDDetails({
                 setConfirmType("delete");
                 setConfirmAlert(true);
                 break;
-            case "previous":
-                previousClick()
-                break;
-            case "next":
-                NextClick()
+            case "property":
+                handleProperty();
                 break;
             default:
                 break;
         }
     };
-    // Handlers for your icons
 
-    const handleclose = () => {
-        setPageRender(1);
-    };
+    
 
-    const handleSave = async () => {
+    const handleCheck = async () => {
+        const response = await ProductFieldCheck({
+            Id: editId || 0,
+            Product: detailPageId,
+            Tab: formData?.Tab,
+            Name: formData?.Name,
+            FieldOrder: formData?.FieldOrder
+        });
+        if (response?.status === "Success") {
+            return true;
+        }
+        else {
+            showAlert("info", response?.message)
+            return false;
+        }
+    }
 
-        const saveTableBody = tableBody.map((item) => ({
-            id: item?.SlNo,
-            product: item?.Product,
-            quantity: item?.Qty,
-            unit: item?.Unit,
-            bin: mainDetails?.BinEnabled ? item?.Bin : 0,
-            remarks: item?.Remarks,
-            warehouse: !mainDetails?.WarehouseHeader
-                ? item?.Warehouse
-                : mainDetails?.Warehouse,
-            rate: item?.Rate,
-        }));
-        const saveBatch = batch.map((item) => ({
-            id: item?.tableNo,
-            slNo: item?.SINo,
-            batch: item?.Batch,
-            quantity: item?.Qty,
-        }));
+    const handleSaveTagField = async () => {
 
-        const saveSerial = serial.map((item) => ({
-            id: item?.tableNo,
-            slNo: item?.SINo,
-            serialNo: item?.SerialNo,
-        }));
+        const status = await handleCheck(); // Wait for handleCheck to complete
+
+        if (!status) {
+            return; // Exit if handleCheck fails
+        }
 
         const saveData = {
-            transId: mainDetails?.TransId,
-            docNo: mainDetails?.DocNo,
-            docDate: mainDetails?.DocDate,
-            stockDate: mainDetails?.StockDate,
-            be: mainDetails?.BE,
-            // deviceId: 0,
-            // processedOn: currentDate,
-            body: saveTableBody,
-            batch: saveBatch,
-            serial: saveSerial,
+            iId: editId? editId: 0,
+            product: detailPageId,
+            name: formData.Name,
+            caption: formData.Caption,
+            dataType: formData.DataType,
+            tab: formData.Tab,
+            maxSize: formData.MaxSize,
+            defaultValue: formData.DefaultValue,
+            displayControlType: formData.DisplayControlType,
+            default: formData.Default,
+            fieldType: formData.FieldType,
+            minimumValue: formData.MinimumValue,
+            maximumValue: formData.MaximumValue,
+            toolTip: formData.ToolTip,
+            fieldOrder: formData.FieldOrder,
+            hidden: formData.Hidden,
+            readOnly: formData.ReadOnly,
+            numberlist:formData.DisplayControlType === 3 ? numberList :[]
         };
 
-        return
-        const response = await upsertstockclose(saveData);
-        if (response.status === "Success") {
-            showAlert("success", response?.message);
-            handleNew();
-            const actionExists = userAction.some((action) => action.Action === "New");
-            if (!actionExists) {
-                setPageRender(1);
+      
+            const response = await upsertProductFieldmaster(saveData);
+            if (response?.status === "Success") {
+                handleConfrimClose();
+                setValue(0);
+                handleNew();
+                setEditId(0)
+                showAlert("success", response?.message);
+                return;
             }
-        } else {
-            const myObject = JSON.parse(response.result);
-            if (myObject && myObject?.length) {
-                setTableBody((prevState) =>
-                    prevState.map((item) => {
-                        const hasError = myObject.some(
-                            (secondItem) => secondItem.Product === item.Product
-                        );
-                        return {
-                            ...item,
-                            error: hasError,
-                        };
-                    })
-                );
+        
+
+
+    };
+
+    const handleConfirmSubmit = (value) => {
+
+        if (value === 1) {
+            setAction(1);
+            const emptyFields = [];
+            if (!formData.Tab) emptyFields.push("Select Tab");
+            if (!formData.Caption) emptyFields.push("Caption");
+            if (!formData.Name) emptyFields.push("Name");
+            // if (!formData.DataType) emptyFields.push("Data Type");
+            if (!formData.DisplayControlType) emptyFields.push("Control Type");
+            if (!formData.FieldOrder) emptyFields.push("Field Order");
+            // if (!formData.FieldType) emptyFields.push("Field Type");
+            if (emptyFields.length > 0) {
+                showAlert("info", `Please Provide ${emptyFields[0]}`);
+                return;
             }
+            setConfirmData({ message: "Save", type: "success" });
+            setConfirmAlert(true);
         }
     };
 
-    const handleConfirmSubmit = () => {
-        if (confirmType === "save") {
-            handleSave();
-        } else if (confirmType === "delete") {
-            if (detailPageId == 0) {
-                setConfirmAlert(false);
-                setConfirmData({});
-                setConfirmType(null);
-                return;
-            }
-            deleteClick();
-        }
-        setConfirmAlert(false);
-        setConfirmData({});
-        setConfirmType(null);
-    };
     const handleConfrimClose = () => {
         setConfirmAlert(false);
         setConfirmData({});
-        setConfirmType(null);
     };
 
-    //Delete alert open
-    const deleteClick = async () => {
-        return
-        let response;
-        response = await deletestockclose([{ id: detailPageId }]);
-        if (response?.status === "Success") {
-            showAlert("success", response?.message);
-            handleNew();
-            const actionExists = userAction.some((action) => action.Action === "New");
-            if (!actionExists) {
-                setPageRender(1);
-            }
+    const handleSave = () => {
+        if (action === 1) {
+            handleSaveTagField();
         }
     };
 
-    const handleEntityChange = () => {
-        setTableBody([]);
-        setBatch([]);
-        setSerial([]);
-    };
+    console.log('prod', products);
 
-    const handleRowDoubleClick = (e, row) => {
-
-        // setModal(true);
-        // setModalData(row);
-    };
-
-    const handleAddRow = () => {
-        if (tableBody?.length >= 10000) {
-            showAlert("info", "Can't Add more than 10000 row");
-            return;
-        }
-        if (!mainDetails?.BE) {
-            showAlert("info", "Please Provide Entity");
-            return;
-        }
-        setModal(true);
-        setModalData({
-            Product_Name: null,
-            Product_Code: null,
-            Rate: 0,
-            Warehouse_Name: null,
-            Qty: null,
-            Unit_Name: null,
-            Remarks: null,
-            Bin: null,
-            Bin_Name: null,
-            DisableBatch: false,
-            DisableSerialNo: false,
-            Product: null,
-            SlNo: tableBody[tableBody?.length - 1]?.SlNo + 1 || 1,
-            TransDtId: tableBody[tableBody.length - 1]?.TransDtId + 1 || 1,
-            TransId: 0,
-            Unit: null,
-            Warehouse: null,
-        });
-    };
-
-    const handleEditRow = (row) => {
-        setModal(true);
-        setModalData(row);
-    };
-
-    const handleDeleteRow = (index) => {
-        if (tableBody.length > 1) {
-            const rowToDelete = tableBody[index];
-
-            const batchExist = batch.filter(
-                (row) => row.TransDtId !== rowToDelete?.TransDtId
-            );
-            const serialExist = serial.filter(
-                (row) => row.TransDtId !== rowToDelete?.TransDtId
-            );
-
-            setBatch(batchExist);
-            setSerial(serialExist);
-
-            setTableBody((prevBatch) => {
-                const updatedTableBody = prevBatch.filter((_, i) => i !== index);
-                return updatedTableBody;
-            });
-        } else {
-            setTableBody([]);
-        }
-    };
-
-    const handleModalClose = () => {
-        setModal(false);
-        setModalData({});
-    };
-
-    const handleRadioChangeHeader = (event) => {
-        setMainDetails({ ...mainDetails, Type: event.target.value });
-    };
-
-    const handleChange = (event, newValue) => {
-        setTabValue(newValue);
-    };
 
     return (
+
+
         <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
             <Box
                 sx={{
@@ -927,7 +427,7 @@ export default function PDDetails({
                     flexDirection: "column",
                     overflowY: "auto",
                     scrollbarWidth: "thin",
-                    paddingBottom: "10px",
+                    paddingBottom: "30px",
                 }}
             >
                 <Box
@@ -958,10 +458,22 @@ export default function PDDetails({
                             },
                         }}
                     >
-                        {/* <Tabs
-                            value={tabValue}
+                        <Box>
+                        <UserInputField
+                                label={"Product"}
+                                name={"Name"}
+                                type={"text"}
+                                disabled={true}
+                                mandatory={true}
+                                value={products}
+                                setValue={setProducts}
+                                maxLength={100}
+                            />
+                        </Box>
+                        
+                        <Tabs
+                            value={value}
                             sx={{
-
                                 minHeight: "35px",
                                 height: "35px",
                                 padding: "0px",
@@ -973,215 +485,79 @@ export default function PDDetails({
                             <Tab
                                 sx={{
                                     padding: "0px",
-                                    marginRight: "10px",
                                     textTransform: "none",
-
-
-
+                                    backgroundColor: null
                                 }}
-                                label="Header"
+                                label="Feilds"
                                 {...a11yProps(0)}
                             />
-
-
-
                             <Tab
                                 sx={{
-                                    display: false,
-                                    padding: "10px 0px",
+                                    padding: "0px",
                                     textTransform: "none",
-
-
+                                    backgroundColor: null
                                 }}
-                                label="Body"
+                                label="Add/Edit"
                                 {...a11yProps(1)}
                             />
 
-                        </Tabs> */}
-
-                        {/* <CustomTabPanel value={tabValue} index={0}> */}
-                            {/* {tabValue === 0 && ( */}
-                                <Box sx={{
-                                    display: "flex",
-                                    width: "100%",
-                                    flexDirection: "row",
-                                    justifyContent: "flex-start", // Changed from center to flex-start
-                                    padding: 1,
-                                    gap: "10px",
 
 
-                                    flexWrap: "wrap",
-                                    "@media (max-width: 768px)": {
-                                        gap: "10px", // Reduced width for small screens
-                                    },
-                                    "@media (max-width: 420px)": {
-                                        gap: "2px", // Reduced width for small screens
-                                    },
-                                }}>
-                                   
-                                    {/* <InputCommon
-              label={"Date"}
-              name={"sDate"}
-              type={"date"}
-              disabled={false}
-              mandatory={true}
-              value={mainDetails.sDate}
-              setValue={(data) => {const {name,value} = data
-              setMainDetails({...mainDetails,[name]:value})}}
-            /> */}
+                        </Tabs>
+                        <CustomTabPanel value={value} index={0}>
+                            {value === 0 && (
+                                <PDTable
+                                    detailPageId={detailPageId}
+                                    editAction={handleChange}
+                                    products={products}
+                                />
+                            )}
+                        </CustomTabPanel>
+                        <CustomTabPanel value={value} index={1}>
+                            {value === 1 && (
+                                <>
+                                    <Box
+                                        sx={{
+                                            display: "flex",
+                                            justifyContent: "flex-end",
+                                            mb: 1,
+                                            gap: 1,
+                                        }}
+                                    >
+                                        {/* <NormalButton action={handleNew} label="New" /> */}
+                                        <NormalButton
+                                            action={() => handleConfirmSubmit(1)}
+                                            label="Save"
+                                        />
+                                    </Box>
 
-                                    {/* <AutoComplete
-              apiKey={GetDriver}
-              formData={mainDetails}
-              setFormData={setMainDetails}
-              label={"payment Type"}
-              autoId={"SalesMan"}
-              required={true}
-              formDataName={"SalesMan"}
-              formDataiId={"SalesManId"}
-              params1="sSearch"
-              params2="iType"
-            /> */}
-                                    {/* <AutoComplete
-              apiKey={GetDriver}
-              formData={mainDetails}
-              setFormData={setMainDetails}
-              label={"Ware house"}
-              autoId={"SalesMan"}
-              required={true}
-              formDataName={"SalesMan"}
-              formDataiId={"SalesManId"}
-              params1="sSearch"
-              params2="iType"
-            />
-             <AutoComplete
-              apiKey={GetDriver}
-              formData={mainDetails}
-              setFormData={setMainDetails}
-              label={"Outlet"}
-              autoId={"SalesMan"}
-              required={true}
-              formDataName={"SalesMan"}
-              formDataiId={"SalesManId"}
-              params1="sSearch"
-              params2="iType"
-            />
-            <InputCommon
-              label={"Narration"}
-              name={"sDate"}
-              type={"text"}
-              disabled={false}
-              mandatory={true}
-              value={mainDetails.sDate}
-              setValue={(data) => {const {name,value} = data
-              setMainDetails({...mainDetails,[name]:value})}}
-            /> */}
-                                    <AutoSelectNoHeader
-                                        key={"Product"}
-                                        formData={mainDetails}
-                                        setFormData={setMainDetails}
-                                        autoId={"Product"}
-                                        formDataName={`Product_Name`}
-                                        formDataiId={"Product"}
-                                        required={false}
-                                        label={"Product"}
-                                        languageName={"english"}
-                                        ColumnSpan={0}
-                                        disabled={disabledDetailed}
-                                        Menu={[{ "Id": 1, "Name": "Product1" }, { "Id": 2, "Name": "Product2" }]}
-                                    />
-                                    <AutoSelectNoHeader
-                                        key={"Tab"}
-                                        formData={mainDetails}
-                                        setFormData={setMainDetails}
-                                        autoId={"Tab"}
-                                        formDataName={`Tab_Name`}
-                                        formDataiId={"Tab"}
-                                        required={false}
-                                        label={"Tab"}
-                                        languageName={"english"}
-                                        ColumnSpan={0}
-                                        disabled={disabledDetailed}
-                                        Menu={[{ "Id": 1, "Name": "Tab1" }, { "Id": 2, "Name": "Tab2" }]}
-                                    />
 
-                                    <PDInfoTable
-                                        tableBody={unitInfo}
-                                        setTableBody={setUnitInfo}
-                                        baseUnit={baseUnit}
+                                    <PDInsertion
+                                        formData={formData}
+                                        setFormData={setFormData}
+                                        detailPageId={detailPageId}
+                                        numberList={numberList}
+                                        setNumberList={setNumberList}
                                     />
 
 
 
-                                    
-                                </Box>
-                            {/* // )} */}
-                        {/* </CustomTabPanel> */}
-                        
+                                </>
+                            )}
+                        </CustomTabPanel>
                     </Box>
+
+
+
                 </Box>
             </Box>
 
-            {/* <TransactonTable
-        rows={tableBody}
-        IdName={"TransDtId"}
-        onRowDoubleClick={handleRowDoubleClick}
-        handleDeleteRow={handleDeleteRow}
-        handleAddRow={handleAddRow}
-        handleEditRow={handleEditRow}
-        mainDetails={mainDetails}
-      /> */}
 
-            <Box
-                sx={{
-                    width: "100%",
-                    overflowX: "auto",
-                    display: "flex",
-                    flexDirection: "column",
-                    overflowY: "auto",
-                    scrollbarWidth: "thin",
-                    paddingBottom: "10px",
-                }}
-            >
-                <Box
-                    sx={{
-                        width: "98%",
-                        margin: "auto",
-                        display: "flex",
-                        flexDirection: "column",
-                        paddingTop: "10px",
-                    }}
-                >
-                    {/* <Box
-                        sx={{
-                            display: "flex",
-                            width: "100%",
-                            flexDirection: "row",
-                            justifyContent: "flex-start", // Changed from center to flex-start
-                            padding: 1,
-                            gap: "10px",
-                            boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)",
-
-                            flexWrap: "wrap",
-                            "@media (max-width: 768px)": {
-                                gap: "10px", // Reduced width for small screens
-                            },
-                            "@media (max-width: 420px)": {
-                                gap: "2px", // Reduced width for small screens
-                            },
-                        }}
-                    >
-                        <ReceiptBodyTable  fields={tableFields} tableData={tableData} settableData={settableData} Batch={batch} setBatch={setBatch} preview={false} />
-
-
-                    </Box> */}
-                </Box>
-            </Box>
             <ConfirmationAlert
                 handleClose={handleConfrimClose}
                 open={confirmAlert}
                 data={confirmData}
-                submite={handleConfirmSubmit}
+                submite={handleSave}
             />
 
         </Box>

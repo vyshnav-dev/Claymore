@@ -11,6 +11,7 @@ import { masterApis } from "../../service/Master/master";
 // import MasterProductConfirmation from "./MasterProductConfirmation";
 import ExcelExport from "../../component/Excel/Excel";
 import { identity } from "lodash";
+import { inspectionApis } from "../../service/Inspection/inspection";
 
 function BasicBreadcrumbs() {
   const style = {
@@ -68,14 +69,14 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
         scrollbarWidth: "thin",
       }}
     >
-      {userAction.some((action) => action.Action === "New") && (
+      {/* {userAction.some((action) => action.Action === "New") && (
         <ActionButton
           iconsClick={iconsClick}
           icon={"fa-solid fa-plus"}
           caption={"New"}
           iconName={"new"}
         />
-      )}
+      )} */}
       {userAction.some((action) => action.Action === "Edit") && (
         <ActionButton
           iconsClick={iconsClick}
@@ -109,32 +110,8 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
             iconName={"view"}
           />
         )}
-      {userAction.some((action) => action.Action === "Property") && (
-        <ActionButton
-          iconsClick={iconsClick}
-          icon={"fa-solid fa-gears"}
-          caption={"Property"}
-          iconName={"property"}
-        />
-      )}
 
-      {userAction.some((action) => action.Action === "Group") && (
-        <ActionButton
-          iconsClick={iconsClick}
-          icon={"fa-solid fa-user-group"}
-          caption={"Group"}
-          iconName={"group"}
-        />
-      )}
-
-      {userAction.some((action) => action.Action === "Add Group") && (
-        <ActionButton
-          iconsClick={iconsClick}
-          icon={"fa-solid fa-user-plus"}
-          caption={"Add Group"}
-          iconName={"addGroup"}
-        />
-      )}
+      
       <ActionButton
         iconsClick={iconsClick}
         icon={"fa-solid fa-xmark"}
@@ -149,8 +126,6 @@ export default function RiskAssesmentSummary({
   setPageRender,
   setId,
   userAction,
-  setGroup,
-  setGroupSelection,
 }) {
   const [rows, setRows] = React.useState([]); //To Pass in Table
   const [displayLength, setdisplayLength] = React.useState(25); // Show Entries
@@ -165,9 +140,8 @@ export default function RiskAssesmentSummary({
   const [confirmAlert, setConfirmAlert] = useState(false); //To handle alert open
   const [confirmData, setConfirmData] = useState({}); //To pass alert data
   const latestSearchKeyRef = useRef(searchKey);
-  const [property, setProperty] = useState(false);
-  const { gettagsummary, deletetag, updateproductproperties, gettagurl } =
-    masterApis();
+  const { GetRisAssesmentSummary,deleteRiskAssesment } =
+    inspectionApis();
   const [groupId, setGroupId] = useState(0);
   const [parentList, setParentList] = useState([]);
   const longPressTriggeredRef = useRef(false); // Persist flag
@@ -178,17 +152,13 @@ export default function RiskAssesmentSummary({
   //Role Summary
   const fetchRoleSummary = async () => {
     setselectedDatas([]);
-    setGroup(0);
     const currentSearchKey = latestSearchKeyRef.current;
 
     try {
-      const response = await gettagsummary({
-        tagId: 11,
-        refreshFlag: refreshFlag,
-        pageNumber: pageNumber,
+      const response = await GetRisAssesmentSummary({
+        pageNo: pageNumber,
         pageSize: displayLength,
-        searchString: currentSearchKey,
-        groupId: groupId,
+        search: currentSearchKey,
       });
 
       setrefreshFlag(false);
@@ -200,8 +170,8 @@ export default function RiskAssesmentSummary({
 
         setRows(myObject?.Data);
 
-        const totalRows = myObject?.PageSummary[0].TotalRows;
-        const totalPages = myObject?.PageSummary[0].TotalPages;
+        const totalRows = myObject?.Metadata.TotalRows;
+        const totalPages = myObject?.Metadata.TotalPages;
 
         settotalRows(totalRows);
         setTotalPages(totalPages);
@@ -224,9 +194,6 @@ export default function RiskAssesmentSummary({
   }, [pageNumber, displayLength, searchKey, changesTriggered, groupId]);
 
 
-  useEffect(()=>{
-    handleParentGroup(0) 
-  },[])
 
   const handleRowDoubleClick = (rowiId) => {
     if (rowiId > 0) {
@@ -275,19 +242,6 @@ export default function RiskAssesmentSummary({
       case "view":
         handleAdd("edit");
         break;
-      case "property":
-        handleProperty();
-        break;
-      case "addGroup":
-        handleAddGroup(1);
-        break;
-      case "group":
-        if (!selectedDatas?.length) {
-          showAlert("info", "Please Select row for Group");
-          return;
-        }
-        handleAddGroup(2);
-        break;
       case "excel":
         handleExcelExport();
         break;
@@ -302,20 +256,10 @@ export default function RiskAssesmentSummary({
     window.history.back();
   };
 
-  const handleAddGroup = (type) => {
-    if (type === 2) {
-      setGroupSelection(selectedDatas);
-    } else {
-      setGroupSelection([]);
-    }
-    setGroup(type);
-    setId(0);
-    setPageRender(2);
-  };
+  
 
   // Handlers for your icons
   const handleAdd = (value) => {
-    setGroup(0);
     if (value === "edit") {
       if (selectedDatas.length !== 1) {
         showAlert(
@@ -343,50 +287,9 @@ export default function RiskAssesmentSummary({
     handleConfrimOpen();
   };
 
-  const handleProperty = () => {
-    if (selectedDatas.length === 0) {
-      showAlert("info", "Select rows to Active/Inactive");
-      return;
-    }
-    setConfirmData({
-      message: `You want to Activate/Inactivate the property.`,
-      type: "info",
-      header: "Property",
-    });
-    setProperty(true);
-  };
 
-  const handlePropertyConfirmation = async (status) => {
-    let propertyPayload;
-    if (selectedDatas?.length === 1) {
-      propertyPayload = [
-        {
-          id: selectedDatas[0],
-        },
-      ];
-    } else {
-      propertyPayload = selectedDatas.map((item) => ({
-        id: item,
-      }));
-    }
-    const saveData = {
-      status: status,
-      ids: propertyPayload,
-    };
-    try {
-      const response = await updateproductproperties(saveData);
-      if (response?.status === "Success") {
-        showAlert("success", response?.message);
-      }
-    } catch (error) {
-    } finally {
-      setrefreshFlag(true);
-      setselectedDatas([]);
-      setchangesTriggered(true);
-      setProperty(false);
-    }
-  };
 
+  
   //To delete
   const handledeleteRole = async () => {
     const deletePayload = selectedDatas.map((item) => ({
@@ -394,7 +297,7 @@ export default function RiskAssesmentSummary({
     }));
 
     try {
-      let response = await deletetag(deletePayload, 11);
+      let response = await deleteRiskAssesment(deletePayload);
 
       if (response?.status === "Success") {
         showAlert("success", response?.message);
@@ -436,42 +339,9 @@ export default function RiskAssesmentSummary({
     } catch (error) {}
   };
 
-  const handleLongPressStart = (event, row) => {
-    longPressTriggeredRef.current = false;
-    longPressTimerRef.current = setTimeout(() => {
-      longPressTriggeredRef.current = true;
-      const isHighlighted = row.Group;
-      if (isHighlighted) {
-        setGroupId(row?.Id);
-        setPageRender(1);
-        handleParentGroup(row?.Id)
-      } else {
-        setGroupId(0);
-      }
-    }, longPressThreshold);
-  };
-
-  // Function to handle the end of long press (mouse up or leave)
-  const handleLongPressEnd = () => {
-    if (longPressTimerRef.current) {
-      clearTimeout(longPressTimerRef.current);
-      longPressTimerRef.current = null;
-    }
-  };
+  
  
-  const handleParentGroup = async (id) => {
-    const response = await gettagurl({
-      id: id,
-      tagId: 11,
-    });
-    setGroupId(id)
-   if(response?.status === "Success"){
-     const myObject = JSON.parse(response?.result)
-     setParentList(myObject)
-   }else{
-    setParentList([])
-   }
-  };
+  
   return (
     <>
       <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
@@ -503,9 +373,6 @@ export default function RiskAssesmentSummary({
             onRowDoubleClick={handleRowDoubleClick}
             totalRows={totalRows}
             //   currentTheme={currentTheme}
-            handleLongPressStart={handleLongPressStart}
-            handleLongPressEnd={handleLongPressEnd}
-            handleParentGroup={handleParentGroup}
             parentList={parentList}
             totalPages={totalPages}
             hardRefresh={hardRefresh}

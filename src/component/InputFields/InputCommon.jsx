@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import ClearIcon from "@mui/icons-material/Clear";
 import { validateInput } from "./ValidateInput";
 import { useAlert } from "../Alerts/AlertContext";
+import { FixedValues } from "../../config/config";
 
 const CustomTextField = styled(TextField)({
   "& .MuiInputBase-root": {
@@ -69,8 +70,13 @@ export default function InputCommon({
   MaximumValue,
   dateType,
   DonotAllowSpecialChar,
-  tableField=false
+  tableField=false,
+  hardRefresh=false,
+  trigger,
+  DecimalPoints,
+  fullwidth
 }) {
+
 
 
     const { showAlert } = useAlert();
@@ -101,6 +107,19 @@ export default function InputCommon({
     };
   
 
+    useEffect(() => {
+      if(hardRefresh){
+      setFieldKey(fieldKey + 1);
+  
+      if(!value){
+        setInputValue("")
+      }
+      else{
+        setInputValue(value)
+      }
+    }
+    }, [trigger])
+    
 
   const validateSpecialChars = (val) => {
     if (DonotAllowSpecialChar) {
@@ -155,15 +174,16 @@ export default function InputCommon({
         else if(type ==InputType.numeric){
           let formattedValue = "";
           const regexString = RegularExpression?.toString();
-          const maxFractionDigits =  RegularExpression ?getMaxFractionDigitsFromRegex(regexString):20;
+          const maxFractionDigits =  RegularExpression ?getMaxFractionDigitsFromRegex(regexString):null;
+          const fractionDigits = DecimalPoints ?? maxFractionDigits;  // NEW
           formattedValue = 
           parentValue !== null
           ? new Intl.NumberFormat(
             "en-US",
             {
               style: "decimal",
-              minimumFractionDigits:RegularExpression ?maxFractionDigits:0,
-              maximumFractionDigits: maxFractionDigits,
+             minimumFractionDigits: Math.min(FixedValues.MinDisplayDecimals, (fractionDigits > 0 ? fractionDigits : FixedValues.DisplayDecimals)),
+             maximumFractionDigits: fractionDigits > 0 ? fractionDigits : FixedValues.DisplayDecimals, // Apply the same logic as minimumFractionDigits
             }
           ).format(parentValue)
           :""
@@ -216,7 +236,7 @@ export default function InputCommon({
         }
         
         if (errorResponse == errorMessages.regexFailed) {
-          showAlert("info", `Regular expresion mismatch`);
+          //showAlert("info", `Regular expresion mismatch`);
           newValue = "";
           // return;  // Prevent updating the value when less than MinimumValue
         }
@@ -225,16 +245,17 @@ export default function InputCommon({
         if (isNaN(newValue) || newValue === "") newValue = null;
 
         const regexString = RegularExpression?.toString();
-        const maxFractionDigits =  RegularExpression ?getMaxFractionDigitsFromRegex(regexString):20;
-        setValue({ name, value: newValue });
+        const maxFractionDigits =  RegularExpression ?getMaxFractionDigitsFromRegex(regexString):null;
+        const fractionDigits = DecimalPoints ?? maxFractionDigits;  // NEW
+        setValue({ name, value: newValue??0 });
         const formattedValue =
           newValue !== null
             ? new Intl.NumberFormat(
                 "en-US",
                 {
                   style: "decimal",
-                  minimumFractionDigits: 0, // Minimum fraction digits
-                  maximumFractionDigits: maxFractionDigits,
+                  minimumFractionDigits: Math.min(FixedValues.MinDisplayDecimals, (fractionDigits > 0 ? fractionDigits : FixedValues.DisplayDecimals)),
+                  maximumFractionDigits: fractionDigits > 0 ? fractionDigits : FixedValues.DisplayDecimals, // Apply the same logic as minimumFractionDigits
                   
                 }
               ).format(newValue)
@@ -290,7 +311,7 @@ export default function InputCommon({
         // if (isNaN(newValue)) newValue = null; // Reset if not a valid number
         if (isNaN(newValue) || newValue === "") newValue = null;
 
-        setValue({ name, value: newValue });
+        setValue({ name, value: newValue??0 });
         // Reformat with `Intl.NumberFormat`
         const formattedValue =
           newValue !== null
@@ -366,7 +387,7 @@ export default function InputCommon({
         // if (isNaN(newValue)) newValue = null; // Reset if not a valid number
         if (newValue === "") newValue = null;
 
-        setValue({ name, value: newValue });
+        setValue({ name, value: newValue??0 });
         newValue = newValue?.toString();
 
         // Reformat with `Intl.NumberFormat`
@@ -388,7 +409,7 @@ export default function InputCommon({
         }
       }
       catch{
-        setValue({ name, value: null });
+        setValue({ name, value: 0 });
         setInputValue(null);
         setFieldKey(fieldKey + 1);
         if (onBlur && !disabled && !isBlurred) {
@@ -399,7 +420,7 @@ export default function InputCommon({
       
       }
       else{
-        setValue({ name, value: null });
+        setValue({ name, value: 0 });
         setInputValue(null);
         setFieldKey(fieldKey + 1);
         if (onBlur && !disabled && !isBlurred) {
@@ -435,7 +456,7 @@ export default function InputCommon({
         if (RegularExpression) {
           
           if (errorResponse == errorMessages.regexFailed) {
-            showAlert("info", `regular expression mismatch`);
+            //showAlert("info", `regular expression mismatch`);
             newValue = "";
             // return;  // Prevent updating the value when less than MinimumValue
           }
@@ -453,7 +474,7 @@ export default function InputCommon({
         newValue = newValue ? newValue : null; // Default to today's date
       }
  
-      setValue({ name, value: newValue });
+      setValue({ name, value: newValue??"" });
       setInputValue(newValue);
       setFieldKey(fieldKey + 1);
       if (onBlur && !disabled && !isBlurred) {
@@ -666,10 +687,15 @@ export default function InputCommon({
         return; // Skip further validation to allow the decimal input
       }
 
+      const regexString = RegularExpression?.toString();
+      const maxFractionDigits =  RegularExpression ?getMaxFractionDigitsFromRegex(regexString):null;
+      
+      
+        
         // Check if regular expression is provided for decimal precision
-        if (RegularExpression) {
+        if (RegularExpression && maxFractionDigits) {
           if (!regex.test(newValue)) {
-            showAlert("info", `regular expression mismatch`);
+            //showAlert("info", `regular expression mismatch`);
             return; // Reset value if it doesn't match the regular expression
           }
         }
@@ -686,16 +712,15 @@ export default function InputCommon({
           }
         }
        
-        const regexString = RegularExpression?.toString();
-        const maxFractionDigits =  RegularExpression ?getMaxFractionDigitsFromRegex(regexString):20;
+        
         const formattedValue =
         newValue !== null
-          ? new Intl.NumberFormat(
+          ? new Intl.NumberFormat(//here take only regex rounding qty only. not consider decimal DecimalPoints
               "en-US",
               {
                 style: "decimal",
                 minimumFractionDigits: 0, // Minimum fraction digits
-                maximumFractionDigits: maxFractionDigits, // Up to 8 decimal places, adjust as needed
+                maximumFractionDigits: maxFractionDigits > 0 ? maxFractionDigits : FixedValues.DisplayDecimals, // Apply the same logic as minimumFractionDigits
                 
               }
             ).format(newValue?.toString())
@@ -950,6 +975,19 @@ export default function InputCommon({
                 min: minDateTime || undefined, // Set min to restrict future dates
                 max: maxDateTime || undefined, // Set max if needed for past dates
               }
+              : [InputType.numeric, InputType.tinyinteger, InputType.smallinteger, InputType.integer, InputType.biginteger].includes(type)
+            ? {
+                onFocus: (e) => {
+              
+                  
+                  // If the field is numeric and its current value is "0" or "0.00", clear it
+                  if (parseFloat(e.target.value) === 0) {
+                    setInputValue("");
+                    // Force cursor to the start
+                    requestAnimationFrame(() => e.target.setSelectionRange(0, 0));
+                  }
+                },
+              }
             : {}),
           style: {
             direction: type == InputType.text ? direction : "ltr", // Default to LTR if direction is not found
@@ -992,7 +1030,7 @@ export default function InputCommon({
         },
       }}
       sx={{
-        minWidth: width + ColumnSpan * 50, // Adjust the width as needed
+        minWidth: fullwidth? fullwidth : width + ColumnSpan * 50, // Adjust the width as needed
         // "@media (max-width: 360px)": {
         //       width: 220, // Reduced width for small screens
         //     },

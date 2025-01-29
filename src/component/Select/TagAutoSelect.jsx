@@ -5,13 +5,11 @@ import {
   Typography,
   ListSubheader,
   Paper,
-  CircularProgress,
-  useTheme,
 } from "@mui/material";
 import { useRef } from "react";
 import { secondaryColor, thirdColor } from "../../config/config";
 
-const AutoSelect = ({
+const TagAutoSelect = ({
   formData,
   setFormData,
   label,
@@ -23,13 +21,11 @@ const AutoSelect = ({
   languageName,
   width = 250,
   ColumnSpan = 0,
-  Menu=[],
-  tableField=false,
+  Menu=[]
 }) => {
   const [searchkey, setsearchkey] = useState("");
   const [autoCompleteKey, setAutoCompleteKey] = useState(0);
-  const direction ="ltr"
-  
+
     const focusedRef = useRef(false); // Use ref to track focus state
     const highlightRef = useRef(false); // Separate ref to track component focus state
       
@@ -119,6 +115,7 @@ const AutoSelect = ({
     );
   });
 
+
   const calculateLabelPosition = (width, isShrink) => {
     if (width <= 300) {
       return isShrink ? Math.max(0, width * 0.2) : 15; //30 Smaller fields have smaller translateX values
@@ -203,15 +200,15 @@ const AutoSelect = ({
               display: "flex",
               justifyContent: "space-between",
               width: "100%",
-              flexDirection: direction === "rtl" ? "row-reverse" : "row", // Swap direction for RTL
-              textAlign: direction === "rtl" ? "right" : "left",
+              flexDirection: "row", // Swap direction for RTL
+              textAlign: "left",
             }}
           >
             <Typography
               style={{
-                marginRight: direction === "rtl" ? 0 : "auto",
-                marginLeft: direction === "rtl" ? "auto" : 0,
-                textAlign: direction === "rtl" ? "right" : "left",
+                marginRight:  "auto",
+                marginLeft:  0,
+                textAlign: "left",
                 fontSize: "12px",
                 color:"inherit",
               }}
@@ -221,9 +218,9 @@ const AutoSelect = ({
             {option?.Code && (
               <Typography
                 style={{
-                  marginLeft: direction === "rtl" ? 0 : "auto",
-                  marginRight: direction === "rtl" ? "auto" : 0,
-                  textAlign: direction === "rtl" ? "left" : "right",
+                  marginLeft: "auto",
+                  marginRight:  0,
+                  textAlign: "right",
                   fontSize: "12px",
                   color:"inherit",
                 }}
@@ -249,16 +246,13 @@ const AutoSelect = ({
               borderStyle: "solid",
               fontSize: "12px",
               height: "18px",
-              padding:
-                direction == "rtl" ? (formData[formDataiId] ?"0px 20px 0px 55px":"0px 0px 0px 55px" ) : "0px 10px 0px 10px",
-              margin:
-                direction == "rtl" ? (formData[formDataiId] ? -72 : -25) : 0,
+              padding:"0px 10px 0px 10px",
+              margin: 0,
               color:"inherit",
             },
             inputProps: {
-              style: {
-                direction: direction ?? "ltr", // Default to LTR if direction is not found
-               // Default to inherit if fontFamily is not found
+              style: { // Default to LTR if direction is not found
+                fontFamily: "inherit", // Default to inherit if fontFamily is not found
               },
             },
             onKeyDown: (event) => {
@@ -306,20 +300,20 @@ const AutoSelect = ({
               zIndex: 1,
             },
             sx: {
-              textAlign: direction === "rtl" ? "right" : "left",
-              right: direction === "rtl" ? 0 : "auto",
+              textAlign: "left",
+              right: "auto",
             },
           }}
           sx={{
-            paddingTop:tableField?"0px":"16px",
+            paddingTop: "16px",
             minWidth: width + ColumnSpan * 50,
             // "@media (max-width: 360px)": {
             //   width: 220, // Reduced width for small screens
             // },
             "& .MuiOutlinedInput-input": {
-              padding: direction == "rtl" ? "8px 14px" : "2px 2px ",
+              padding: "2px 2px ",
               transform: "translate(-1px, 0px) scale(1)",
-              textAlign: direction === "rtl" ? "right" : "left",
+              textAlign:  "left",
             },
             "& .MuiInputBase-input": {
               fontSize: "0.75rem",
@@ -329,53 +323,43 @@ const AutoSelect = ({
             },
             "& .MuiInputLabel-outlined.MuiInputLabel-shrink": {
               // transform: "translate(14px, 7px) scale(0.75)",
-              transform:
-                direction === "rtl"
-                  ? `translate(${calculateLabelPosition(
-                      width + ColumnSpan * 50,
-                      true
-                    )}px, 7px) scale(0.75)`
-                  : "translate(14px, 7px) scale(0.75)", // Adjust label position when focused
+              transform:"translate(14px, 7px) scale(0.75)", // Adjust label position when focused
               padding: "0px 2px",
               color:"inherit",
             },
             "& .MuiOutlinedInput-root": {
               height: 30, // Adjust the height of the input area
               display: "flex",
-              flexDirection: direction === "rtl" ? "row-reverse" : "row",
+              flexDirection:"row",
               "& .MuiAutocomplete-endAdornment": {
-                right: direction === "rtl" ? "auto" : 0, // Position icons on the left in RTL
-                left: direction === "rtl" ? 0 : "auto", // Swap the position of the icons
+                right:  0, // Position icons on the left in RTL
+                left: "auto", // Swap the position of the icons
               },
               "& fieldset": {
-                borderColor: `#ddd`,
-                textAlign: direction === "rtl" ? "right" : "left",
+                borderColor: `${
+                  "#ddd"
+                }`,
+                textAlign:"left",
               },
               "&:hover fieldset": {
-                borderColor: "currentColor", // Keeps the border color on hover
+                borderColor:"currentColor", // Keeps the border color on hover
               },
               "&.Mui-focused fieldset": {
-                borderColor: "currentColor", // Keeps the current border color
+                borderColor:"currentColor", // Keeps the current border color
               },
               "& legend": {
-                width: direction === "rtl" ? "auto" : "max-content", // Let legend adjust width in RTL
+                width: "max-content", // Let legend adjust width in RTL
               },
 
               "& .MuiSvgIcon-root": {
-                marginRight: direction === "rtl" ? "auto" : 0,
-                marginLeft: direction === "rtl" ? 0 : "auto", // Adjust icon spacing
+                marginRight: 0,
+                marginLeft: "auto", // Adjust icon spacing
               },
             },
             "& .MuiInputLabel-root": {
               color:"inherit",
               fontSize: "14px",
-              transform:
-                direction === "rtl"
-                  ? `translate(${calculateLabelPosition(
-                      width + ColumnSpan * 50,
-                      false
-                    )}px, 20px) scale(0.9)`
-                  : null, // Adjust label position when not focused
+              transform: null, // Adjust label position when not focused
             },
           }}
         />
@@ -385,6 +369,5 @@ const AutoSelect = ({
   );
 };
 
-export default AutoSelect;
-
+export default TagAutoSelect;
 

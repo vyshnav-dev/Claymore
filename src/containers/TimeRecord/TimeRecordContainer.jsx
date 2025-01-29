@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { securityApis } from "../../service/Security/security";
 import TimeRecordSummary from "./TimeRecordSummary";
 import TimeRecordDetails from "./TimeRecordDetails";
+import TimeRecordSubSummary from "./TimeRecordSubSummary";
 
 export default function TimeRecordContainer() {
   const location = useLocation();
@@ -10,8 +11,7 @@ export default function TimeRecordContainer() {
   const [id, setId] = useState(0);
   const [menuIdLocal, setmenuIdLocal] = useState(null);
   const [userAction, setuserAction] = useState([]);
-  const [group, setGroup] = useState(0)
-  const [groupSelection, setGroupSelection] = useState([])
+  const [timeId, setTimeId] = useState(0);
   const menuId = location?.state;
   const navigate = useNavigate();
   const { getuseractionsforscreen } = securityApis();
@@ -22,8 +22,6 @@ export default function TimeRecordContainer() {
       navigate("/home");
     }
     setPage(1);
-    setGroup(0)
-    setGroupSelection([])
   }, [menuId?.ScreenId]);
 
   useEffect(() => {
@@ -50,17 +48,24 @@ export default function TimeRecordContainer() {
           Id={id}
           userAction={userAction}
           screenId={menuId}
-          setGroup={setGroup}
-          setGroupSelection={setGroupSelection}
  
+        />
+      ):page === 3 ? (
+        <TimeRecordSubSummary
+          setPageRender={setPage}
+          setId={setId}
+          Id={id}
+          userAction={userAction}
+          screenId={menuId}
+          setTimeId={setTimeId}
         />
       ) : page === 2 ? (
         <TimeRecordDetails
           setPageRender={setPage}
           detailPageId={id}
           userAction={userAction}
-          group={group}
-          groupSelection={groupSelection}
+          setId={setId}
+          timeId={timeId}
         />
       ) : null}
     </>

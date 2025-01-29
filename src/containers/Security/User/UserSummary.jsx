@@ -144,11 +144,10 @@ export default function UserSummary({ setPageRender, setId, userAction }) {
     try {
       const response = await getSecuritysummary(
         {
-          refreshFlag: refreshFlag,
-          pageNumber: pageNumber,
-          pageSize: displayLength,
-          searchString: currentSearchKey,
-        }, "user/getusersummary"
+          PageNo: pageNumber,
+          PageSize: displayLength,
+          Search: currentSearchKey,
+        }, "User/GetUserSummary"
       );
 
       setrefreshFlag(false);
@@ -157,11 +156,16 @@ export default function UserSummary({ setPageRender, setId, userAction }) {
         currentSearchKey === latestSearchKeyRef.current
       ) {
         const myObject = JSON.parse(response?.result);
+        console.log('my',myObject);
+        
 
         setRows(myObject?.Data);
 
-        const totalRows = myObject?.PageSummary[0].TotalRows;
-        const totalPages = myObject?.PageSummary[0].TotalPages;
+        
+        
+
+        const totalRows = myObject?.Metadata?.TotalRows;
+        const totalPages = myObject?.Metadata?.TotalPages;
 
         settotalRows(totalRows);
         setTotalPages(totalPages);
@@ -308,10 +312,9 @@ export default function UserSummary({ setPageRender, setId, userAction }) {
     try {
       const response = await getSecuritysummary(
         {
-          refreshFlag: true,
-          pageNumber: 0,
+          pageNo: 0,
           pageSize: 0,
-          searchString: "",
+          search: "",
         },
         "user/getusersummary"
       );
@@ -326,6 +329,7 @@ export default function UserSummary({ setPageRender, setId, userAction }) {
     } catch (error) { }
   };
 
+  console.log('rows',rows);
   const handleLongPressStart = () => { }
 
   return (

@@ -52,7 +52,6 @@ export default function SummaryTable(props) {
     IdName,
     handleLongPressStart,
     handleLongPressEnd,
-    handleParentGroup,
     parentList,
   } = props;
   const [selected, setSelected] = React.useState([]);
@@ -62,7 +61,10 @@ export default function SummaryTable(props) {
   const [filteredRows, setFilteredRows] = React.useState([]);
   const [columns, setColumns] = React.useState([]);
 
-  const excludedFields = [IdName, "Group", "GroupId","TotalRows"];
+  const profileDateFieldsArray = profileDateFields
+  .split(",")
+  .map((field) => field.trim()); 
+  const excludedFields = [ IdName,"Group", "GroupId","TotalRows","UserName"];
 
   //To apply some filters on table rows
   const initialColumns =
@@ -84,6 +86,8 @@ export default function SummaryTable(props) {
   React.useEffect(() => {
     setColumns(initialColumns);
   }, [rows]);
+
+  
 
   //To expand column on mouse dragging
   const handleResize = (index, event) => {
@@ -331,7 +335,7 @@ export default function SummaryTable(props) {
           />
         </div>
       </div>
-      <div
+      {/* <div
         style={{
           marginBottom: "10px",
           display: "flex",
@@ -347,7 +351,7 @@ export default function SummaryTable(props) {
           <React.Fragment key={parent.Id}>
             <Typography
               variant="body2"
-              onClick={() => handleParentGroup(parent.Id)}
+              // onClick={() => handleParentGroup(parent.Id)}
               style={{
                 cursor: "pointer",
                 // You can style the text
@@ -360,7 +364,7 @@ export default function SummaryTable(props) {
             )}
           </React.Fragment>
         ))}
-      </div>
+      </div> */}
       {filteredRows && filteredRows.length > 0 ? (
         <Paper sx={{ width: "100%", mb: 1 }}>
           {/* <EnhancedTableToolbar numSelected={selected.length} /> */}
@@ -417,14 +421,14 @@ export default function SummaryTable(props) {
                     <TableRow
                       key={`${row[IdName]}-${index}`}
                       onClick={(event) => handleClick(event, row)}
-                      onMouseDown={(event) => handleLongPressStart(event, row)}
+                      // onMouseDown={(event) => handleLongPressStart(event, row)}
                       onMouseUp={handleLongPressEnd}
                       onMouseLeave={handleLongPressEnd} // In case the user drags out of the row
-                      onTouchStart={(event) => handleLongPressStart(event, row)} // For mobile
+                      // onTouchStart={(event) => handleLongPressStart(event, row)} // For mobile
                       onTouchEnd={handleLongPressEnd}
                       role="checkbox"
                       aria-checked={isItemSelected}
-                      onDoubleClick={() => props.onRowDoubleClick(row[IdName])}
+                      onDoubleClick={() => props.onRowDoubleClick(row[IdName],row)}
                       tabIndex={-1}
                       sx={{
                         cursor: "pointer",
@@ -465,7 +469,7 @@ export default function SummaryTable(props) {
                             key={column.id}
                             style={{ minWidth: column.minWidth }}
                           >
-                            {profileDateFields.includes(column.label)
+                            {profileDateFieldsArray.includes(column.label)
                               ? convertToLocaleDateString(row[column.id])
                               : row[column.id] === null
                               ? ""

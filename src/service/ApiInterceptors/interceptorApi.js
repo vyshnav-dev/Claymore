@@ -63,7 +63,7 @@ const refreshToken = async () => {
   }
   try {
     
-    const response = await axios.get(`${baseUrl}Auth/regenerate-token?RefreshToken=${refreshTokenValue}`);
+    const response = await axios.get(`${baseUrl}login/regeneratetokens?refreshToken=${refreshTokenValue}`);
     const myObject = response?.data
     // Store tokens in localStorage
     localStorage.setItem("SangClaymoreAccessToken", myObject.accessToken);
@@ -100,6 +100,7 @@ baseApi.interceptors.response.use(
     return response.data;
   },
   async (error) => {
+  
     const originalRequest = error.config;
 
     
@@ -113,14 +114,15 @@ baseApi.interceptors.response.use(
         try {
           const newToken = await refreshToken();
           isRefreshing = false;
-          baseApi.defaults.headers.common["Authorization"] =
-            "Bearer " + newToken;
+          // baseApi.defaults.headers.common["Authorization"] =
+          //   "Bearer " + newToken;
           processQueue(null, newToken);
           originalRequest._retry = true;
           originalRequest.headers["Authorization"] = "Bearer " + newToken;
           return baseApi(originalRequest);
         } catch (refreshError) {
           processQueue(refreshError, null);
+          isRefreshing = false;
           // window.location.href = '/';
           localStorage.removeItem("SangClaymoreAccessToken");
           localStorage.removeItem("SangClaymoreRefreshToken");
@@ -217,7 +219,7 @@ const baseApis = () => {
           break;
       }
     } else {
-      // console.error('An error occurred:', error.message);
+     
     }
   };
 
@@ -253,7 +255,7 @@ const baseApis = () => {
 
       return response;
     } catch (error) {
-      console.error(`Error in ${url}`, error);
+
 
       handleError(error);
       throw error?.response?.data;

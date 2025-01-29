@@ -47,7 +47,7 @@ function BasicBreadcrumbs() {
           aria-label="breadcrumb"
         >
           <Typography underline="hover" sx={style} key="1">
-            Product Description Summary
+            Product Fields
           </Typography>
         </Breadcrumbs>
       </Stack>
@@ -56,7 +56,6 @@ function BasicBreadcrumbs() {
 }
 
 const DefaultIcons = ({ iconsClick, userAction }) => {
-  const hasEditAction = userAction.some((action) => action.Name === "Edit");
   return (
     <Box
       sx={{
@@ -80,7 +79,7 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
         <ActionButton
           iconsClick={iconsClick}
           icon={"fa-solid fa-pen"}
-          caption={"Edit"}
+          caption={"Add"}
           iconName={"edit"}
         />
       )}
@@ -92,49 +91,16 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
           iconName={"excel"}
         />
       )}
-      {userAction.some((action) => action.Action === "Delete") && (
+      {/* {userAction.some((action) => action.Action === "Delete") && (
         <ActionButton
           iconsClick={iconsClick}
           icon={"trash"}
           caption={"Delete"}
           iconName={"delete"}
         />
-      )}
-      {!hasEditAction &&
-        userAction.some((action) => action.Name === "View") && (
-          <ActionButton
-            iconsClick={iconsClick}
-            icon={"fa-solid fa-eye"}
-            caption={"View"}
-            iconName={"view"}
-          />
-        )}
-      {userAction.some((action) => action.Action === "Property") && (
-        <ActionButton
-          iconsClick={iconsClick}
-          icon={"fa-solid fa-gears"}
-          caption={"Property"}
-          iconName={"property"}
-        />
-      )}
-
-      {userAction.some((action) => action.Action === "Group") && (
-        <ActionButton
-          iconsClick={iconsClick}
-          icon={"fa-solid fa-user-group"}
-          caption={"Group"}
-          iconName={"group"}
-        />
-      )}
-
-      {userAction.some((action) => action.Action === "Add Group") && (
-        <ActionButton
-          iconsClick={iconsClick}
-          icon={"fa-solid fa-user-plus"}
-          caption={"Add Group"}
-          iconName={"addGroup"}
-        />
-      )}
+      )} */}
+      
+      
       <ActionButton
         iconsClick={iconsClick}
         icon={"fa-solid fa-xmark"}
@@ -150,7 +116,6 @@ export default function PDSummary({
   setId,
   userAction,
   setGroup,
-  setGroupSelection,
 }) {
   const [rows, setRows] = React.useState([]); //To Pass in Table
   const [displayLength, setdisplayLength] = React.useState(25); // Show Entries
@@ -165,8 +130,7 @@ export default function PDSummary({
   const [confirmAlert, setConfirmAlert] = useState(false); //To handle alert open
   const [confirmData, setConfirmData] = useState({}); //To pass alert data
   const latestSearchKeyRef = useRef(searchKey);
-  const [property, setProperty] = useState(false);
-  const { gettagsummary, deletetag, updateproductproperties, gettagurl } =
+  const { GetProductSummary,updateproductproperties, gettagurl } =
     masterApis();
   const [groupId, setGroupId] = useState(0);
   const [parentList, setParentList] = useState([]);
@@ -182,13 +146,10 @@ export default function PDSummary({
     const currentSearchKey = latestSearchKeyRef.current;
 
     try {
-      const response = await gettagsummary({
-        tagId: 11,
-        refreshFlag: refreshFlag,
-        pageNumber: pageNumber,
+      const response = await GetProductSummary({
+        pageNo: pageNumber,
         pageSize: displayLength,
-        searchString: currentSearchKey,
-        groupId: groupId,
+        search: currentSearchKey,
       });
 
       setrefreshFlag(false);
@@ -200,8 +161,8 @@ export default function PDSummary({
 
         setRows(myObject?.Data);
 
-        const totalRows = myObject?.PageSummary[0].TotalRows;
-        const totalPages = myObject?.PageSummary[0].TotalPages;
+        const totalRows = myObject?.Metadata.TotalRows;
+        const totalPages = myObject?.Metadata.TotalPages;
 
         settotalRows(totalRows);
         setTotalPages(totalPages);
@@ -224,9 +185,7 @@ export default function PDSummary({
   }, [pageNumber, displayLength, searchKey, changesTriggered, groupId]);
 
 
-  useEffect(()=>{
-    handleParentGroup(0) 
-  },[])
+  
 
   const handleRowDoubleClick = (rowiId) => {
     if (rowiId > 0) {
@@ -272,21 +231,6 @@ export default function PDSummary({
       case "delete":
         deleteClick();
         break;
-      case "view":
-        handleAdd("edit");
-        break;
-      case "property":
-        handleProperty();
-        break;
-      case "addGroup":
-        handleAddGroup(1);
-        break;
-      case "group":
-        if (!selectedDatas?.length) {
-          showAlert("info", "Please Select row for Group");
-          return;
-        }
-        handleAddGroup(2);
         break;
       case "excel":
         handleExcelExport();
@@ -302,16 +246,7 @@ export default function PDSummary({
     window.history.back();
   };
 
-  const handleAddGroup = (type) => {
-    if (type === 2) {
-      setGroupSelection(selectedDatas);
-    } else {
-      setGroupSelection([]);
-    }
-    setGroup(type);
-    setId(0);
-    setPageRender(2);
-  };
+  
 
   // Handlers for your icons
   const handleAdd = (value) => {
@@ -321,7 +256,7 @@ export default function PDSummary({
         showAlert(
           "info",
           selectedDatas.length === 0
-            ? "Select row to Edit "
+            ? "Select row to Add/Edit "
             : "Can't Edit Multiple Role"
         );
         return;
@@ -343,49 +278,9 @@ export default function PDSummary({
     handleConfrimOpen();
   };
 
-  const handleProperty = () => {
-    if (selectedDatas.length === 0) {
-      showAlert("info", "Select rows to Active/Inactive");
-      return;
-    }
-    setConfirmData({
-      message: `You want to Activate/Inactivate the property.`,
-      type: "info",
-      header: "Property",
-    });
-    setProperty(true);
-  };
+  
 
-  const handlePropertyConfirmation = async (status) => {
-    let propertyPayload;
-    if (selectedDatas?.length === 1) {
-      propertyPayload = [
-        {
-          id: selectedDatas[0],
-        },
-      ];
-    } else {
-      propertyPayload = selectedDatas.map((item) => ({
-        id: item,
-      }));
-    }
-    const saveData = {
-      status: status,
-      ids: propertyPayload,
-    };
-    try {
-      const response = await updateproductproperties(saveData);
-      if (response?.status === "Success") {
-        showAlert("success", response?.message);
-      }
-    } catch (error) {
-    } finally {
-      setrefreshFlag(true);
-      setselectedDatas([]);
-      setchangesTriggered(true);
-      setProperty(false);
-    }
-  };
+  
 
   //To delete
   const handledeleteRole = async () => {
@@ -444,7 +339,6 @@ export default function PDSummary({
       if (isHighlighted) {
         setGroupId(row?.Id);
         setPageRender(1);
-        handleParentGroup(row?.Id)
       } else {
         setGroupId(0);
       }
@@ -459,19 +353,7 @@ export default function PDSummary({
     }
   };
  
-  const handleParentGroup = async (id) => {
-    const response = await gettagurl({
-      id: id,
-      tagId: 11,
-    });
-    setGroupId(id)
-   if(response?.status === "Success"){
-     const myObject = JSON.parse(response?.result)
-     setParentList(myObject)
-   }else{
-    setParentList([])
-   }
-  };
+  
   return (
     <>
       <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
@@ -505,7 +387,6 @@ export default function PDSummary({
             //   currentTheme={currentTheme}
             handleLongPressStart={handleLongPressStart}
             handleLongPressEnd={handleLongPressEnd}
-            handleParentGroup={handleParentGroup}
             parentList={parentList}
             totalPages={totalPages}
             hardRefresh={hardRefresh}
@@ -518,13 +399,7 @@ export default function PDSummary({
           data={confirmData}
           submite={handledeleteRole}
         />
-        {/* <MasterProductConfirmation
-          handleClose={() => setProperty(false)}
-          open={property}
-          data={confirmData}
-          submite={handlePropertyConfirmation}
-          selectedDatas={selectedDatas?.length === 1 ? selectedDatas[0] : null}
-        /> */}
+        
       </Box>
     </>
   );

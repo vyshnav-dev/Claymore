@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { securityApis } from "../../../service/Security/security";
+import { securityApis } from "../../service/Security/security";
+import AllocatedSummary from "./AllocatedSummary";
+// import AllocationDetails from "./AllocationDetails";
 
-import MasterWarehouseSummary from "./MasterWarehouseSummary";
-import MasterWarehouseDetails from "./MasterWarehouseDetails";
-
-export default function MasterWarehouseContainer() {
+export default function AllocatedContainer() {
   const location = useLocation();
   const [page, setPage] = useState(1);
   const [id, setId] = useState(0);
@@ -40,21 +39,15 @@ export default function MasterWarehouseContainer() {
 
   return (
     <>
-      {page === 1 ? (
-        <MasterWarehouseSummary
+      {page === 1  && (
+        <AllocatedSummary
           setPageRender={setPage}
           setId={setId}
           Id={id}
           userAction={userAction}
           screenId={menuId}
         />
-      ) : page === 2 ? (
-        <MasterWarehouseDetails
-          setPageRender={setPage}
-          detailPageId={id}
-          userAction={userAction}
-        />
-      ) : null}
+      ) }
     </>
   );
 }

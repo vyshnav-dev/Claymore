@@ -30,18 +30,18 @@ export const assessmentData = [
     {
         Name:'Location',
         Data:[
-            {Type:'locations1',Risk:0,Description:'',RiskLevel:0},
-            {Type:'locations1',Risk:0,Description:'',RiskLevel:0},
-            {Type:'locations1',Risk:0,Description:'',RiskLevel:0},
-            {Type:'locations1',Risk:0,Description:'',RiskLevel:0},
-            {Type:'locations1',Risk:0,Description:'',RiskLevel:0},
-            {Type:'locations1',Risk:0,Description:'',RiskLevel:0},
+            {Type:'locations1',RiskData:0,Description:'',RiskLevel:0},
+            {Type:'locations1',RiskData:0,Description:'',RiskLevel:0},
+            {Type:'locations1',RiskData:0,Description:'',RiskLevel:0},
+            {Type:'locations1',DataRisk:0,Description:'',RiskLevel:0},
+            {Type:'locations1',DataRisk:0,Description:'',RiskLevel:0},
+            {Type:'locations1',RiskData:0,Description:'',RiskLevel:0},
         ]
     },
     {
         Name:'Training and Competencies',
         Data:[
-            {Type:'Training2',Risk:1,Description:'',RiskLevel:1},
+            {Type:'Training2',Risk:1,Description:'',RiskLevel:2},
             {Type:'Training2',Risk:1,Description:'',RiskLevel:1},
             {Type:'Training2',Risk:1,Description:'',RiskLevel:1},
             {Type:'Training2',Risk:1,Description:'',RiskLevel:1},
@@ -69,12 +69,14 @@ export const assessmentData = [
 ]
 
 export const documentData = [
-    {caption:'Inspector carry the checklist',yesChecked:false,noChecked:false},
-    {caption:' Inspector carry Test Method',yesChecked:false,noChecked:false},
-    {caption:'Inspector carry filled Risk assessment form',yesChecked:false,noChecked:false},
-]
+    { caption: 'Inspector carry the checklist', Checked: 0 }, // Default "No"
+    { caption: 'Inspector carry Test Method', Checked: 1 },   // Default "Yes"
+    { caption: 'Inspector carry filled Risk assessment form', Checked: 0 },
+];
 
-export const docData = 'The above work has been completed / progressed :  I have read & confirm this report & time sheet & certify the work has been done to my satisfaction. Travelling time , expense & milleage will be charged extra.'
+
+
+
 
 
 export const summaryData = [

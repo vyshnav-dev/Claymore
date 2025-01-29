@@ -159,13 +159,15 @@ export default function RoleDetails({
       if (detailPageId === 0) {
         handleNew();
       } else {
+        
+        
         const response = await getroledetails({
-          roleId: detailPageId,
+          Role: detailPageId,
         });
         if (response?.status === "Success") {
           const myObject = JSON.parse(response?.result);
           setMainDetails(myObject?.RoleDetails[0]);
-          setMenuAction(myObject?.SelectedRestrictions);
+          setMenuAction(myObject?.ScreenDetails);
         } else {
           handleNew();
         }
@@ -176,7 +178,7 @@ export default function RoleDetails({
   };
 
   const handleNew = () => {
-    setMainDetails({ RoleId: 0, RoleName: "" });
+    setMainDetails({ Id: 0, RoleName: "" });
     setDetailPageId(0);
     setMenuAction([]);
   };
@@ -222,9 +224,9 @@ export default function RoleDetails({
       actionId: ActionId,
     }));
     const saveData = {
-      id: mainDetails?.RoleId,
-      roleName: mainDetails?.RoleName,
-      screenActions: updatedArray,
+      id: mainDetails?.Id,
+      name: mainDetails?.RoleName,
+      details: updatedArray,
     };
     const response = await upsertrole(saveData);
     if (response.status === "Success") {
@@ -293,6 +295,9 @@ export default function RoleDetails({
       return false;
     }
   };
+
+  console.log('maindetail33',mainDetails);
+  
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>

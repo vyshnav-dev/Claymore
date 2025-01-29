@@ -59,7 +59,7 @@ function BasicBreadcrumbs() {
 }
 
 const DefaultIcons = ({ iconsClick, userAction }) => {
-  const hasEditAction = userAction.some((action) => action.Name === "Edit");
+  
   return (
     <Box
       sx={{
@@ -103,41 +103,6 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
           iconName={"delete"}
         />
       )}
-      {!hasEditAction &&
-        userAction.some((action) => action.Name === "View") && (
-          <ActionButton
-            iconsClick={iconsClick}
-            icon={"fa-solid fa-eye"}
-            caption={"View"}
-            iconName={"view"}
-          />
-        )}
-      {userAction.some((action) => action.Action === "Property") && (
-        <ActionButton
-          iconsClick={iconsClick}
-          icon={"fa-solid fa-gears"}
-          caption={"Property"}
-          iconName={"property"}
-        />
-      )}
-
-      {userAction.some((action) => action.Action === "Group") && (
-        <ActionButton
-          iconsClick={iconsClick}
-          icon={"fa-solid fa-user-group"}
-          caption={"Group"}
-          iconName={"group"}
-        />
-      )}
-
-      {userAction.some((action) => action.Action === "Add Group") && (
-        <ActionButton
-          iconsClick={iconsClick}
-          icon={"fa-solid fa-user-plus"}
-          caption={"Add Group"}
-          iconName={"addGroup"}
-        />
-      )}
       <ActionButton
         iconsClick={iconsClick}
         icon={"fa-solid fa-xmark"}
@@ -150,11 +115,17 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
 
 export default function FormBodySummary({
   setPageRender,
-  setId,
   userAction,
   setGroup,
   setGroupSelection,
 }) {
+
+  const [mainDetails, setMainDetails] = React.useState({
+    Product: null,
+    Category: null
+  });
+
+  const [id, setId] = useState(0);
   const [rows, setRows] = React.useState([]); //To Pass in Table
   const [displayLength, setdisplayLength] = React.useState(25); // Show Entries
   const [pageNumber, setpageNumber] = React.useState(1); //Table current page number
@@ -169,16 +140,31 @@ export default function FormBodySummary({
   const [confirmData, setConfirmData] = useState({}); //To pass alert data
   const latestSearchKeyRef = useRef(searchKey);
   const [property, setProperty] = useState(false);
-  const { gettagsummary, deletetag, updateproductproperties, gettagurl } =
+  const { updateproductproperties, gettagurl, } =
     masterApis();
+
+  const { GetSubCategorySummary, getproductlist, getcategorylist, upsertSubcategorytmaster, getSubCategorydetails,deleteSubCategory } = masterApis()
+
+  const userData = JSON.parse(localStorage.getItem("ClaymoreUserData"))[0];
+
   const [groupId, setGroupId] = useState(0);
   const [parentList, setParentList] = useState([]);
-  
+
   const [addMenu, setAddMenu] = useState(false);
   const longPressTriggeredRef = useRef(false); // Persist flag
   const longPressTimerRef = useRef(null); // Persist timer
 
   const longPressThreshold = 500;
+
+  const [formData, setFormData] = useState({
+    id: 0,
+    Name: null,
+    Code: null,
+    Category: 0,
+    Product_Name: null,
+    CategoryName: null,
+    Product: null
+  });
 
   //Role Summary
   const fetchRoleSummary = async () => {
@@ -187,13 +173,12 @@ export default function FormBodySummary({
     const currentSearchKey = latestSearchKeyRef.current;
 
     try {
-      const response = await gettagsummary({
-        tagId: 11,
-        refreshFlag: refreshFlag,
-        pageNumber: pageNumber,
-        pageSize: displayLength,
-        searchString: currentSearchKey,
-        groupId: groupId,
+      const response = await GetSubCategorySummary({
+        Product: mainDetails?.Product,
+        Category: mainDetails?.Category,
+        PageNo: pageNumber,
+        PageSize: displayLength,
+        Search: currentSearchKey,
       });
 
       setrefreshFlag(false);
@@ -205,8 +190,8 @@ export default function FormBodySummary({
 
         setRows(myObject?.Data);
 
-        const totalRows = myObject?.PageSummary[0].TotalRows;
-        const totalPages = myObject?.PageSummary[0].TotalPages;
+        const totalRows = myObject?.Metadata.TotalRows;
+        const totalPages = myObject?.Metadata.TotalPages;
 
         settotalRows(totalRows);
         setTotalPages(totalPages);
@@ -218,7 +203,7 @@ export default function FormBodySummary({
         setRows([]);
         settotalRows(null);
         setTotalPages(null);
-    
+
       }
     } finally {
     }
@@ -226,17 +211,15 @@ export default function FormBodySummary({
 
   React.useEffect(() => {
     fetchRoleSummary(); // Initial data fetch
-  }, [pageNumber, displayLength, searchKey, changesTriggered, groupId]);
+  }, [pageNumber, displayLength, searchKey, changesTriggered, mainDetails]);
 
 
-  useEffect(()=>{
-    handleParentGroup(0) 
-  },[])
+ 
 
   const handleRowDoubleClick = (rowiId) => {
     if (rowiId > 0) {
       setId(rowiId);
-      setPageRender(2);
+      setAddMenu(true);
     }
   };
 
@@ -266,33 +249,19 @@ export default function FormBodySummary({
     setchangesTriggered(true);
   };
 
+  
+
+
   const handleIconsClick = (value) => {
     switch (value) {
       case "new":
-        // handleAdd("new");
-       setAddMenu(true);
+        handleAdd("new");
         break;
       case "edit":
         handleAdd("edit");
         break;
       case "delete":
         deleteClick();
-        break;
-      case "view":
-        handleAdd("edit");
-        break;
-      case "property":
-        handleProperty();
-        break;
-      case "addGroup":
-        handleAddGroup(1);
-        break;
-      case "group":
-        if (!selectedDatas?.length) {
-          showAlert("info", "Please Select row for Group");
-          return;
-        }
-        handleAddGroup(2);
         break;
       case "excel":
         handleExcelExport();
@@ -308,16 +277,11 @@ export default function FormBodySummary({
     window.history.back();
   };
 
-  const handleAddGroup = (type) => {
-    if (type === 2) {
-      setGroupSelection(selectedDatas);
-    } else {
-      setGroupSelection([]);
-    }
-    setGroup(type);
-    setId(0);
-    setPageRender(2);
-  };
+  const handleCloseModal = () => {
+    setFormData({})
+    setAddMenu(false)
+  }
+  
 
   // Handlers for your icons
   const handleAdd = (value) => {
@@ -334,9 +298,10 @@ export default function FormBodySummary({
       }
       setId(selectedDatas[0]);
     } else {
+     
       setId(0);
     }
-    setPageRender(2);
+    setAddMenu(true);
   };
 
   //Delete alert open
@@ -349,50 +314,9 @@ export default function FormBodySummary({
     handleConfrimOpen();
   };
 
-  const handleProperty = () => {
-    if (selectedDatas.length === 0) {
-      showAlert("info", "Select rows to Active/Inactive");
-      return;
-    }
-    setConfirmData({
-      message: `You want to Activate/Inactivate the property.`,
-      type: "info",
-      header: "Property",
-    });
-    setProperty(true);
-  };
+  
 
-  const handlePropertyConfirmation = async (status) => {
-    let propertyPayload;
-    if (selectedDatas?.length === 1) {
-      propertyPayload = [
-        {
-          id: selectedDatas[0],
-        },
-      ];
-    } else {
-      propertyPayload = selectedDatas.map((item) => ({
-        id: item,
-      }));
-    }
-    const saveData = {
-      status: status,
-      ids: propertyPayload,
-    };
-    try {
-      const response = await updateproductproperties(saveData);
-      if (response?.status === "Success") {
-        showAlert("success", response?.message);
-      }
-    } catch (error) {
-    } finally {
-      setrefreshFlag(true);
-      setselectedDatas([]);
-      setchangesTriggered(true);
-      setProperty(false);
-    }
-  };
-
+ 
   //To delete
   const handledeleteRole = async () => {
     const deletePayload = selectedDatas.map((item) => ({
@@ -400,7 +324,7 @@ export default function FormBodySummary({
     }));
 
     try {
-      let response = await deletetag(deletePayload, 11);
+      let response = await deleteSubCategory(deletePayload);
 
       if (response?.status === "Success") {
         showAlert("success", response?.message);
@@ -439,7 +363,7 @@ export default function FormBodySummary({
         filteredRows,
         excludedFields,
       });
-    } catch (error) {}
+    } catch (error) { }
   };
 
   const handleLongPressStart = (event, row) => {
@@ -450,7 +374,6 @@ export default function FormBodySummary({
       if (isHighlighted) {
         setGroupId(row?.Id);
         setPageRender(1);
-        handleParentGroup(row?.Id)
       } else {
         setGroupId(0);
       }
@@ -464,20 +387,10 @@ export default function FormBodySummary({
       longPressTimerRef.current = null;
     }
   };
- 
-  const handleParentGroup = async (id) => {
-    const response = await gettagurl({
-      id: id,
-      tagId: 11,
-    });
-    setGroupId(id)
-   if(response?.status === "Success"){
-     const myObject = JSON.parse(response?.result)
-     setParentList(myObject)
-   }else{
-    setParentList([])
-   }
-  };
+
+  
+  console.log('body main dtel', mainDetails);
+
   return (
     <>
       <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
@@ -495,7 +408,7 @@ export default function FormBodySummary({
           <BasicBreadcrumbs />
           <DefaultIcons iconsClick={handleIconsClick} userAction={userAction} />
         </Box>
-        
+
         <Box sx={{ width: "100%", overflowX: "auto", paddingBottom: "10px" }}>
           <FormBodyTable
             rows={rows}
@@ -512,11 +425,15 @@ export default function FormBodySummary({
             //   currentTheme={currentTheme}
             handleLongPressStart={handleLongPressStart}
             handleLongPressEnd={handleLongPressEnd}
-            handleParentGroup={handleParentGroup}
             parentList={parentList}
             totalPages={totalPages}
             hardRefresh={hardRefresh}
             IdName={"Id"}
+            mainDetails={mainDetails}
+            setMainDetails={setMainDetails}
+            getcategorylist={getcategorylist}
+            getproductlist={getproductlist}
+            userData={userData}
           />
         </Box>
         <ConfirmationAlert
@@ -526,17 +443,22 @@ export default function FormBodySummary({
           submite={handledeleteRole}
         />
 
-<NormalModal
-        isOpen={addMenu}
-        handleCloseModal={() => setAddMenu(false)}
-      >
-        <FormBodyModal
+        <NormalModal
+          isOpen={addMenu}
           handleCloseModal={() => setAddMenu(false)}
-          // selected={general?.MenuId}
-          // submitAction={fetchData}
-          treeRefresh={() => setTreeKey((prevKey) => prevKey + 1)}
-        />
-      </NormalModal>
+        >
+          <FormBodyModal
+            handleCloseModal={handleCloseModal}
+            formData={formData}
+            setFormData={setFormData}
+            getcategorylist={getcategorylist}
+            getproductlist={getproductlist}
+            userData={userData}
+            upsertSubcategorytmaster={upsertSubcategorytmaster}
+            id={id}
+            getSubCategorydetails={getSubCategorydetails}
+          />
+        </NormalModal>
         {/* <MasterProductConfirmation
           handleClose={() => setProperty(false)}
           open={property}

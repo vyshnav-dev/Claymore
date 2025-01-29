@@ -45,26 +45,23 @@ function Header() {
 
   const userData = JSON.parse(localStorage.getItem("ClaymoreUserData"))[0];
 
-
+  console.log('user',userData);
+  
 
   React.useEffect(() => {
     fetchData();
   }, []);
 
   const fetchData = async () => {
-    // const response = await getscreensforuser();
+    const response = await getscreensforuser();
     
-    // console.log(response);
-    // if (response?.status === "Success") {
-    //   const myObject = JSON.parse(response.result);
-    //   console.log(myObject);
+    console.log(response);
+    if (response?.status === "Success") {
+      const myObject = JSON.parse(response.result);
+      console.log(myObject);
      
-    //   setMenu(myObject);
+      setMenu(myObject);
   
-    // }
-    if(getScreen)
-    {
-      setMenu(getScreen);
     }
      else {
       setMenu([]);
@@ -83,25 +80,10 @@ function Header() {
     const parentArray = menu?.some((list) => list?.Parent === Id?.ScreenId)
     if(!parentArray)
     {
-      if(Id?.ScreenId === 4)
+      
+     if(Id?.ScreenId === 31)
       {
-        navigate("/risk", { state:{ScreenId:16} });
-      }
-      else if(Id?.ScreenId === 12)
-      {
-        navigate("/time", { state:{ScreenId:16} });
-      }
-      else if(Id?.ScreenId === 3)
-      {
-        navigate("/allocation", { state:{ScreenId:16} });
-      }
-      else if(Id?.ScreenId === 7)
-      {
-        navigate("/ack", { state:{ScreenId:16} });
-      }
-      else if(Id?.ScreenId === 10)
-      {
-        navigate("/insp", { state:{ScreenId:16} });
+        navigate("/approve", { state : Id });
       }
     }
     else{
@@ -132,56 +114,46 @@ function Header() {
   const handleClickEvent = async (menu) => {
     console.log('menu',menu);
     
-    if (menu?.Parent === 1) {
-      if (menu?.ScreenId === 5) {
-        navigate("/user", { state:{ScreenId:16} });
-      } else if (menu?.ScreenId === 6) {
-        navigate("/role", { state: {ScreenId:17} });
-      } else if (menu?.ScreenId === 18) {
-        navigate("/reset-password", { state: menu });
-      }
+    if (menu?.Parent === 6) {
+      if (menu?.ScreenId === 24) {
+        navigate("/user", { state: menu});
+      } else if (menu?.ScreenId === 7) {
+        navigate("/role", { state: menu});
+      } 
     }
-    else if(menu?.Parent === 2){
-      if(menu?.ScreenId === 11)
+    else if(menu?.Parent === 26){
+      if(menu?.ScreenId === 27)
       {
-        navigate("/product", { state:{ScreenId:16} });
+        navigate("/risk", { state:menu });
       }
-      else if(menu?.ScreenId === 8)
+      else if(menu?.ScreenId === 28)
       {
-        navigate("/categories", { state:{ScreenId:16} });
+        navigate("/timesheet", { state:menu });
       }
-      else if(menu?.ScreenId === 9)
+      else if(menu?.ScreenId === 29)
       {
-        navigate("/description", { state:{ScreenId:16} });
+        navigate("/inspection", { state:menu });
       }
-      else if(menu?.ScreenId === 13)
+      else if(menu?.ScreenId === 30)
       {
-        navigate("/form", { state:{ScreenId:16} });
+        navigate("/acknowledgement", { state:menu });
       }
     } 
-     else if (menu?.Parent === 3) {
-      if ((menu?.ScreenId === 16)) {
-        navigate("/Request", { state: menu });
-      } else if (menu?.ScreenId === 17) {
-        navigate("/Order", { state: menu });
-      } else if (menu?.ScreenId === 18) {
-        navigate("/Sales", { state: menu });
-      } else if (menu?.ScreenId === 19) {
-        navigate("/Receipt", { state: menu });
-      } else if (menu?.ScreenId === 20) {
-        navigate("/Return", { state: menu });
+     else if (menu?.Parent === 1) {
+      if ((menu?.ScreenId === 2)) {
+        navigate("/product", { state: menu });
+      } else if (menu?.ScreenId === 3) {
+        navigate("/categories", { state: menu });
+      } else if (menu?.ScreenId === 4) {
+        navigate("/form", { state: menu });
+      } else if (menu?.ScreenId === 5) {
+        navigate("/sub", { state: menu });
       }
-    }  else if (menu?.Parent === 5) {
-      if (menu?.ScreenId === 20) {
-        navigate("/stock-count-report", { state: menu });
-      }else if (menu?.ScreenId === 19) {
-        navigate("/closing-stock-report", { state: menu });
-      }else if (menu?.ScreenId === 21) {
-        navigate("/reconciliation-report", { state: menu });
-      }else if (menu?.ScreenId === 22) {
-        navigate("/excess-report", { state: menu });
-      }else if (menu?.ScreenId === 23) {
-        navigate("/shortage-report", { state: menu });
+    }  else if (menu?.Parent === 25) {
+      if (menu?.ScreenId === 32) {
+        navigate("/pending", { state: menu });
+      }else if (menu?.ScreenId === 33) {
+        navigate("/allocated", { state: menu });
       }
     } else {
       navigate("/home");
@@ -189,30 +161,21 @@ function Header() {
     handleMenuList();
   };
 
-  const handleMobMenu = (id) => {
-    if (id === 25) {
+  const handleMobMenu = (id,menu) => {
+    if (id === 5) {
       navigate("/home");
     }
-    else if(id === 4)
+    else if(id === 25)
       {
-        navigate("/risk", { state:{ScreenId:16} });
+        navigate("/allocation", { state:menu });
         setAnchorElNav(null);
       }
-      else if(id === 12)
-        {
-          navigate("/time", { state:{ScreenId:16} });
-          setAnchorElNav(null);
-        }
-        else if(id === 3)
-        {
-          navigate("/allocation", { state:{ScreenId:16} });
-          setAnchorElNav(null);
-        }
-        else if(id === 7)
-        {
-          navigate("/ack", { state:{ScreenId:16} });
-          setAnchorElNav(null);
-        }
+    else if(id === 31)
+      {
+        navigate("/approve", { state:menu });
+        setAnchorElNav(null);
+      }
+      
     else {
       setActiveSubMenuId(id);
     }
@@ -233,7 +196,7 @@ function Header() {
       .map((menuList) => (
         <MenuItem
           key={menuList.ScreenId}
-          onClick={() => handleMobMenu(menuList.ScreenId)}
+          onClick={() => handleMobMenu(menuList.ScreenId,menuList)}
           sx={{
             fontSize: "0.875rem", // Reduce text size for individual MenuItem
             padding: "4px 8px", // Reduce padding (gap) for individual MenuItem
@@ -473,7 +436,7 @@ function Header() {
             </Box>
 
             <Box sx={{ flexGrow: 0 }}>
-              <Tooltip title={userData?.LoginName}>
+              <Tooltip title={userData?.LoginName} >
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                   <Stack direction="row" spacing={2}>
                     <Avatar

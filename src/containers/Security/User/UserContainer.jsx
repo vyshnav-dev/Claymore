@@ -28,8 +28,8 @@ export default function UserContainer() {
   useEffect(() => {
     const fetchUserActions = async () => {
       try {
-        const response = await getuseractionsforscreen({ screenId: menuIdLocal });
-        console.log('res', response);
+        const response = await getuseractionsforscreen({ ScreenId: menuIdLocal });
+        console.log('action res', response);
 
         const data = JSON.parse(response?.result);
         setuserAction(data);

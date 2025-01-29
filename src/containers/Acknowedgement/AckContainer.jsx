@@ -10,8 +10,6 @@ export default function AckContainer() {
   const [id, setId] = useState(0);
   const [menuIdLocal, setmenuIdLocal] = useState(null);
   const [userAction, setuserAction] = useState([]);
-  const [group, setGroup] = useState(0)
-  const [groupSelection, setGroupSelection] = useState([])
   const menuId = location?.state;
   const navigate = useNavigate();
   const { getuseractionsforscreen } = securityApis();
@@ -22,8 +20,6 @@ export default function AckContainer() {
       navigate("/home");
     }
     setPage(1);
-    setGroup(0)
-    setGroupSelection([])
   }, [menuId?.ScreenId]);
 
   useEffect(() => {
@@ -50,8 +46,6 @@ export default function AckContainer() {
           Id={id}
           userAction={userAction}
           screenId={menuId}
-          setGroup={setGroup}
-          setGroupSelection={setGroupSelection}
  
         />
       ) : page === 2 ? (
@@ -59,8 +53,6 @@ export default function AckContainer() {
           setPageRender={setPage}
           detailPageId={id}
           userAction={userAction}
-          group={group}
-          groupSelection={groupSelection}
         />
       ) : null}
     </>

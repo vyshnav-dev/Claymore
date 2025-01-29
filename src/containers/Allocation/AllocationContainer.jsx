@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { securityApis } from "../../service/Security/security";
 import AllocationSummary from "./AllocationSummary";
-import AllocationDetails from "./AllocationDetails";
+// import AllocationDetails from "./AllocationDetails";
 
 export default function AllocationContainer() {
   const location = useLocation();
@@ -10,8 +10,6 @@ export default function AllocationContainer() {
   const [id, setId] = useState(0);
   const [menuIdLocal, setmenuIdLocal] = useState(null);
   const [userAction, setuserAction] = useState([]);
-  const [group, setGroup] = useState(0)
-  const [groupSelection, setGroupSelection] = useState([])
   const menuId = location?.state;
   const navigate = useNavigate();
   const { getuseractionsforscreen } = securityApis();
@@ -22,8 +20,6 @@ export default function AllocationContainer() {
       navigate("/home");
     }
     setPage(1);
-    setGroup(0)
-    setGroupSelection([])
   }, [menuId?.ScreenId]);
 
   useEffect(() => {
@@ -43,26 +39,15 @@ export default function AllocationContainer() {
 
   return (
     <>
-      {page === 1 ? (
+      {page === 1  && (
         <AllocationSummary
           setPageRender={setPage}
           setId={setId}
           Id={id}
           userAction={userAction}
           screenId={menuId}
-          setGroup={setGroup}
-          setGroupSelection={setGroupSelection}
- 
         />
-      ) : page === 2 ? (
-        <AllocationDetails
-          setPageRender={setPage}
-          detailPageId={id}
-          userAction={userAction}
-          group={group}
-          groupSelection={groupSelection}
-        />
-      ) : null}
+      ) }
     </>
   );
 }

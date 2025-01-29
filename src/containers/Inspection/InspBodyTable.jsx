@@ -85,101 +85,160 @@ const InspBodyTable = ({ fields, tableData, settableData, Batch, setBatch, previ
 
 
 
-    const handleRowChange = (index, field, data) => {
-        console.log('field', field);
+    // const handleRowChange = (index, field, data) => {
+    //     console.log('field', field);
 
+    //     if (preview) {
+    //         return;
+    //     }
+
+    //     const fieldName = field.FieldName;
+
+    //     settableData(prevRows => {
+    //         const updatedRows = [...prevRows];
+    //         console.log('upd', updatedRows);
+
+    //         if (field.FieldDisplayType === "check type") {
+    //             const checkValues = ['s', 'ns', 'na', 'se'];
+
+    //             let newArray = updatedRows.find(item => item.Name === typeName);
+
+    //             const Data1 = [...newArray.Data];
+
+    //             // Check if field.FieldName is in checkValues
+    //             if (checkValues.includes(fieldName)) {
+    //                 // Set the selected field to the provided data
+    //                 Data1[index] = {
+    //                     ...Data1[index],
+    //                     [fieldName]: data
+    //                 };
+
+    //                 // Set all other fields in checkValues to 0
+    //                 checkValues.forEach(key => {
+    //                     if (key !== fieldName) {
+    //                         Data1[index][key] = 0; // Set value to 0 for other keys
+    //                     }
+    //                 });
+    //             } else {
+    //                 // Set default values for all keys in checkValues to 0 if not already present
+    //                 checkValues.forEach(key => {
+    //                     if (!(key in Data1[index])) {
+    //                         Data1[index][key] = 0;
+    //                     }
+    //                 });
+    //             }
+
+    //             newArray = {
+    //                 ...newArray,
+    //                 Data: Data1
+    //             };
+
+    //             const typeIndex = updatedRows.findIndex(item => item.Name === typeName);
+    //             updatedRows[typeIndex] = {
+    //                 ...newArray
+    //             };
+    //         } 
+    //          else if (data) {
+    //             const { name, value } = data;
+
+    //             let newArray = updatedRows.find(item => item.Name === typeName);
+    //             const Data1 = [...newArray.Data];
+    //             Data1[index] = {
+    //                 ...Data1[index],
+    //                 [name]: value
+    //             };
+
+    //             newArray = {
+    //                 ...newArray,
+    //                 Data: Data1
+    //             };
+
+    //             const typeIndex = updatedRows.findIndex(item => item.Name === typeName);
+    //             updatedRows[typeIndex] = {
+    //                 ...newArray
+    //             };
+    //         }
+
+    //         return updatedRows;
+    //     });
+    // };
+
+
+    const handleRowChange = (index, field, data) => {
+        
+        
         if (preview) {
-            return;
+            return
         }
 
         const fieldName = field.FieldName;
 
         settableData(prevRows => {
             const updatedRows = [...prevRows];
-            console.log('upd', updatedRows);
 
-            if (field.FieldDisplayType === "risk") {
-                const checkValues = ['s', 'ns', 'na', 'se'];
+            // if (field.FieldDisplayType == "risk") {
+                
+            //     let newArray = updatedRows.find((item)=>item.Name === typeName)
+                
+            //     const Data1 = [...newArray.items]
+            //     Data1[index] = {
+            //         ...Data1[index],
+            //         [field.FieldName]: data
+            //     };
+            //     newArray = {
+            //         ...newArray,
+            //         items:Data1
+            //     }
+            //     let typeIndex = updatedRows.findIndex((item)=>item.Name === typeName)
+            //     updatedRows[typeIndex] = {
+            //         ...newArray
+            //     };
 
-                let newArray = updatedRows.find(item => item.Name === typeName);
-
-                const Data1 = [...newArray.Data];
-
-                // Check if field.FieldName is in checkValues
-                if (checkValues.includes(fieldName)) {
-                    // Set the selected field to the provided data
-                    Data1[index] = {
-                        ...Data1[index],
-                        [fieldName]: data
-                    };
-
-                    // Set all other fields in checkValues to 0
-                    checkValues.forEach(key => {
-                        if (key !== fieldName) {
-                            Data1[index][key] = 0; // Set value to 0 for other keys
-                        }
-                    });
-                } else {
-                    // Set default values for all keys in checkValues to 0 if not already present
-                    checkValues.forEach(key => {
-                        if (!(key in Data1[index])) {
-                            Data1[index][key] = 0;
-                        }
-                    });
-                }
-
-                newArray = {
-                    ...newArray,
-                    Data: Data1
-                };
-
-                const typeIndex = updatedRows.findIndex(item => item.Name === typeName);
-                updatedRows[typeIndex] = {
-                    ...newArray
-                };
-            } else if (field.FieldDisplayType === "level") {
-                let newArray = updatedRows.find(item => item.Name === typeName);
-
-                const Data1 = [...newArray.Data];
+            // }
+            // else 
+            if (field.FieldDisplayType == "check type"){
+                let newArray = updatedRows.find((item)=>item.Name === typeName)
+                
+                const Data1 = [...newArray.items]
                 Data1[index] = {
                     ...Data1[index],
                     [field.FieldName]: data
                 };
-
                 newArray = {
                     ...newArray,
-                    Data: Data1
-                };
-
-                const typeIndex = updatedRows.findIndex(item => item.Name === typeName);
-                updatedRows[typeIndex] = {
-                    ...newArray
-                };
-            } else if (data) {
-                const { name, value } = data;
-
-                let newArray = updatedRows.find(item => item.Name === typeName);
-                const Data1 = [...newArray.Data];
-                Data1[index] = {
-                    ...Data1[index],
-                    [name]: value
-                };
-
-                newArray = {
-                    ...newArray,
-                    Data: Data1
-                };
-
-                const typeIndex = updatedRows.findIndex(item => item.Name === typeName);
+                    items:Data1
+                }
+                let typeIndex = updatedRows.findIndex((item)=>item.Name === typeName)
                 updatedRows[typeIndex] = {
                     ...newArray
                 };
             }
+            else if (data) {
 
+                const { name, value } = data
+
+                let newArray = updatedRows.find((item)=>item.Name === typeName)
+                const Data1 = [...newArray.items]
+                Data1[index] = {
+                    ...Data1[index],
+                    [name]: value
+                };
+                newArray = {
+                    ...newArray,
+                    items:Data1
+                }
+                
+                let typeIndex = updatedRows.findIndex((item)=>item.Name === typeName)
+                updatedRows[typeIndex] = {
+                    ...newArray
+                };
+
+            }
             return updatedRows;
+            
+            
         });
     };
-
     const validateFormData = () => {
 
 
@@ -264,8 +323,9 @@ const InspBodyTable = ({ fields, tableData, settableData, Batch, setBatch, previ
     return (
 
         <Box sx={{
-            opacity: preview ? 0.5 : 1,
-            pointerEvents: preview ? 'none' : 'auto', width: "fit-Content", maxWidth: "100%"
+            // opacity: preview ? 0.5 : 1,
+            pointerEvents: preview ? 'none' : 'auto', 
+            overflowY:'auto'
         }}>
 
 
@@ -304,7 +364,7 @@ const InspBodyTable = ({ fields, tableData, settableData, Batch, setBatch, previ
                             // minHeight: "200px",
                             scrollbarWidth: "thin",
                             padding: "0px",
-                            width: "fit-content",
+                            // width: "fit-content",
                             overflowY: "auto",
 
                         }}
@@ -479,42 +539,69 @@ const MemoizedTableRow = ({ row, index, rowClick, handleRowChange, bodyCell, fie
                         dateType={field?.AllowDate}
                         DonotAllowSpecialChar={field?.DonotAllowSpecialChar}
                         tableField={true}
-
+                        fullwidth={'100%'}
 
 
                     />
                 );
 
 
-            case "risk":
+            case "check type":
 
                 return (
                     <Box
-                        sx={{
-                            cursor: "pointer",
-                            border: "1px solid #ccc",
-                            padding: "3px",
-                            borderRadius: "4px",
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center', // Center the checkbox vertically
-                            width: field.RowSpan ? `${250 * field.RowSpan}px` : "100px",
-                        }}
-                    >
-                        <FormControl>
-                            <Checkbox
-                                checked={Boolean(row[field.FieldName])} // Use boolean value for the checkbox
-                                onChange={(e) => handleRowChange(index, field, e.target.checked ? 1 : 0)} // Update the value based on checked state
-                                sx={{
-                                    padding: 0,
-                                    color: `#ccc`,
-                                    "&.Mui-checked": {
-                                        color: `currentColor`,
-                                    }, // Remove default padding
-                                }}
-                            />
-                        </FormControl>
-                    </Box>
+                            sx={{
+                              cursor: "pointer",
+                              border: "1px solid #ccc",
+                              padding: "0px",
+                              borderRadius: "4px",
+                              display:'flex',
+                              justifyContent:'center',
+                              width: field.RowSpan ? `${250 * field.RowSpan}px` : "100%",
+                              minWidth:field.RowSpan ? `${250 * field.RowSpan}px` : "250px"
+                            }}
+                          >
+                            <FormControl>
+                              <RadioGroup
+                                row
+                                aria-labelledby="risk-radio-group-label"
+                                name={`${field.FieldName}-radio-group`}
+                              >
+                                <FormControlLabel
+                                  value="S"
+                                  control={<Radio />}
+                                  label="S"
+                                  sx={radioButtonStyle}
+                                  checked={row[field.FieldName] === 1}
+                                  onChange={() => handleRowChange(index, field, 1)} // Pass updated value
+                                />
+                                <FormControlLabel
+                                  value="NS"
+                                  control={<Radio />}
+                                  label="NS"
+                                  sx={radioButtonStyle}
+                                  checked={row[field.FieldName] === 2}
+                                  onChange={() => handleRowChange(index, field, 2)} // Pass updated value
+                                />
+                                <FormControlLabel
+                                  value="NA"
+                                  control={<Radio />}
+                                  label="NA"
+                                  sx={radioButtonStyle}
+                                  checked={row[field.FieldName] === 3}
+                                  onChange={() => handleRowChange(index, field, 3)} // Pass updated value
+                                />
+                                <FormControlLabel
+                                  value="SE"
+                                  control={<Radio />}
+                                  label="SE"
+                                  sx={radioButtonStyle}
+                                  checked={row[field.FieldName] === 4}
+                                  onChange={() => handleRowChange(index, field, 4)} // Pass updated value
+                                />
+                              </RadioGroup>
+                            </FormControl>
+                          </Box>
                 );
 
 
@@ -530,10 +617,10 @@ const MemoizedTableRow = ({ row, index, rowClick, handleRowChange, bodyCell, fie
                             borderRadius: "4px",
                             display: 'flex',
                             justifyContent: 'center',
-                            width: field.RowSpan ? `${250 * field.RowSpan}px` : "250px",
+                            width: field.RowSpan ? `${250 * field.RowSpan}px` : "100%",
                         }}
                     >
-                        <Typography sx={{ fontSize: '14px' }}>{row.Equipent}</Typography>
+                        <Typography sx={{ fontSize: '14px' }}>{row.Name}</Typography>
 
                     </Box>
                 )

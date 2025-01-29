@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { securityApis } from "../../../service/Security/security";
-import MasterBinSummary from "./MasterBinSummary";
-import MasterBinDetails from "./MasterBinDetails";
+import { securityApis } from "../../service/Security/security";
+import ApproveMainSummary from "./ApproveMainSummary";
+import ApproveSummary from "./ApproveSummary";
 
-export default function MasterBinContainer() {
+export default function ApproveContainer() {
   const location = useLocation();
   const [page, setPage] = useState(1);
   const [id, setId] = useState(0);
   const [menuIdLocal, setmenuIdLocal] = useState(null);
   const [userAction, setuserAction] = useState([]);
+  const [group, setGroup] = useState(0)
+  const [groupSelection, setGroupSelection] = useState([])
   const menuId = location?.state;
   const navigate = useNavigate();
   const { getuseractionsforscreen } = securityApis();
@@ -20,6 +22,8 @@ export default function MasterBinContainer() {
       navigate("/home");
     }
     setPage(1);
+    setGroup(0)
+    setGroupSelection([])
   }, [menuId?.ScreenId]);
 
   useEffect(() => {
@@ -40,20 +44,28 @@ export default function MasterBinContainer() {
   return (
     <>
       {page === 1 ? (
-        <MasterBinSummary
+        <ApproveMainSummary
           setPageRender={setPage}
           setId={setId}
           Id={id}
           userAction={userAction}
           screenId={menuId}
+          setGroup={setGroup}
+          setGroupSelection={setGroupSelection}
+ 
         />
-      ) : page === 2 ? (
-        <MasterBinDetails
-          setPageRender={setPage}
-          detailPageId={id}
-          userAction={userAction}
+      ):page === 2 ? (
+        <ApproveSummary
+        setPageRender={setPage}
+        setId={setId}
+        Id={id}
+        userAction={userAction}
+        screenId={menuId}
+        setGroup={setGroup}
+        setGroupSelection={setGroupSelection}
+
         />
-      ) : null}
+      )  : null}
     </>
   );
 }

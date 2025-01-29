@@ -14,6 +14,7 @@ export let IMAGE_URL = null;
 export let allowedExtensionsReceipt = null
 export let MastersTagId = null
 export let TransactionData = null
+export let FixedValues = null
 
 export const getConfig = () => {
     if (!config) {
@@ -41,4 +42,5 @@ export const getConfig = () => {
     allowedExtensionsReceipt = config.allowedExtensionsReceipt
     MastersTagId = config1.MastersTagId
     TransactionData = config1.TransactionData
+    FixedValues = config1.FixedValues
 }

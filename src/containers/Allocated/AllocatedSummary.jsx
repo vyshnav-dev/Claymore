@@ -1,15 +1,20 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Box, Typography, Stack, useTheme } from "@mui/material";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
-import ActionButton from "../../../component/Buttons/ActionButton";
-import { useAlert } from "../../../component/Alerts/AlertContext";
-import SummaryTable from "../../../component/Table/SummaryTable";
-import { primaryColor } from "../../../config/config";
-import ConfirmationAlert from "../../../component/Alerts/ConfirmationAlert";
-import { masterApis } from "../../../service/Master/master";
-import ConfirmationAlertContent from "../../../component/Alerts/ConfirmationAlertContent";
-import ExcelExport from "../../../component/Excel/Excel";
+import ActionButton from "../../component/Buttons/ActionButton";
+import { useAlert } from "../../component/Alerts/AlertContext";
+import SummaryTable from "../../component/Table/SummaryTable";
+import { primaryColor } from "../../config/config";
+import ConfirmationAlert from "../../component/Alerts/ConfirmationAlert";
+import { masterApis } from "../../service/Master/master";
+// import MasterProductConfirmation from "./MasterProductConfirmation";
+import ExcelExport from "../../component/Excel/Excel";
+import { identity } from "lodash";
+import { summaryData } from "../../config";
+import NormalModal from "../../component/Modal/NormalModal";
+import { allocationApis } from "../../service/Allocation/allocation";
+import AllocatedModal from "./AllocatedModal";
 
 function BasicBreadcrumbs() {
   const style = {
@@ -46,7 +51,7 @@ function BasicBreadcrumbs() {
           aria-label="breadcrumb"
         >
           <Typography underline="hover" sx={style} key="1">
-            Business Entity Summary
+             Allocated Job Orders
           </Typography>
         </Breadcrumbs>
       </Stack>
@@ -55,7 +60,7 @@ function BasicBreadcrumbs() {
 }
 
 const DefaultIcons = ({ iconsClick, userAction }) => {
-  const hasEditAction = userAction.some((action) => action.Name === "Edit");
+  // const hasEditAction = userAction.some((action) => action.Name === "Edit");
   return (
     <Box
       sx={{
@@ -67,18 +72,18 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
         scrollbarWidth: "thin",
       }}
     >
-      {userAction.some((action) => action.Action === "New") && (
+      {/* {userAction.some((action) => action.Action === "New") && (
         <ActionButton
           iconsClick={iconsClick}
           icon={"fa-solid fa-plus"}
           caption={"New"}
           iconName={"new"}
         />
-      )}
+      )} */}
       {userAction.some((action) => action.Action === "Edit") && (
         <ActionButton
           iconsClick={iconsClick}
-          icon={"fa-solid fa-pen"}
+          icon={"fa-solid fa-person-circle-plus"}
           caption={"Edit"}
           iconName={"edit"}
         />
@@ -99,7 +104,7 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
           iconName={"delete"}
         />
       )}
-      {!hasEditAction &&
+      {/* {!hasEditAction &&
         userAction.some((action) => action.Name === "View") && (
           <ActionButton
             iconsClick={iconsClick}
@@ -108,14 +113,16 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
             iconName={"view"}
           />
         )}
-          {userAction.some((action) => action.Action === "Property") && (
-      <ActionButton
-        iconsClick={iconsClick}
-        icon={"fa-solid fa-gears"}
-        caption={"Property"}
-        iconName={"property"}
-      />
-    )}
+      {userAction.some((action) => action.Action === "Property") && (
+        <ActionButton
+          iconsClick={iconsClick}
+          icon={"fa-solid fa-gears"}
+          caption={"Property"}
+          iconName={"property"}
+        />
+      )} */}
+
+      
       <ActionButton
         iconsClick={iconsClick}
         icon={"fa-solid fa-xmark"}
@@ -126,10 +133,11 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
   );
 };
 
-export default function MasterEntitySummary({
+export default function AllocatedSummary({
   setPageRender,
   setId,
   userAction,
+  Id
 }) {
   const [rows, setRows] = React.useState([]); //To Pass in Table
   const [displayLength, setdisplayLength] = React.useState(25); // Show Entries
@@ -145,21 +153,27 @@ export default function MasterEntitySummary({
   const [confirmData, setConfirmData] = useState({}); //To pass alert data
   const latestSearchKeyRef = useRef(searchKey);
   const [property, setProperty] = useState(false);
-  const { gettagsummary, deletetag, updatetagproperties } = masterApis();
+  const [addMenu, setAddMenu] = useState(false);
+  const { GetAllocatedJobOrderSummary,deleteAllocatedJobOrder  } =
+    allocationApis();
+  const [groupId, setGroupId] = useState(0);
+  const [parentList, setParentList] = useState([]);
+  const longPressTriggeredRef = useRef(false); // Persist flag
+  const longPressTimerRef = useRef(null); // Persist timer
+
+  const longPressThreshold = 500;
+
 
   //Role Summary
   const fetchRoleSummary = async () => {
     setselectedDatas([]);
-
     const currentSearchKey = latestSearchKeyRef.current;
-
+    
     try {
-      const response = await gettagsummary({
-        tagId: 1,
-        refreshFlag: refreshFlag,
-        pageNumber: pageNumber,
+      const response = await GetAllocatedJobOrderSummary({
+        pageNo: pageNumber,
         pageSize: displayLength,
-        searchString: currentSearchKey,
+        search: currentSearchKey,
       });
 
       setrefreshFlag(false);
@@ -169,14 +183,17 @@ export default function MasterEntitySummary({
       ) {
         const myObject = JSON.parse(response?.result);
 
-        setRows(myObject?.Data);
+        setRows(myObject?.Data );
 
-        const totalRows = myObject?.PageSummary[0].TotalRows;
-        const totalPages = myObject?.PageSummary[0].TotalPages;
+        const totalRows = myObject?.Metadata.TotalRows;
+        const totalPages = myObject?.Metadata.TotalPages;
 
         settotalRows(totalRows);
         setTotalPages(totalPages);
-      } else {
+      }
+      
+      
+      else {
         setRows([]);
       }
     } catch (error) {
@@ -184,6 +201,7 @@ export default function MasterEntitySummary({
         setRows([]);
         settotalRows(null);
         setTotalPages(null);
+    
       }
     } finally {
     }
@@ -191,7 +209,9 @@ export default function MasterEntitySummary({
 
   React.useEffect(() => {
     fetchRoleSummary(); // Initial data fetch
-  }, [pageNumber, displayLength, searchKey, changesTriggered]);
+  }, [pageNumber, displayLength, searchKey, changesTriggered, groupId]);
+
+
 
   const handleRowDoubleClick = (rowiId) => {
     if (rowiId > 0) {
@@ -239,12 +259,9 @@ export default function MasterEntitySummary({
       case "view":
         handleAdd("edit");
         break;
-      case "property":
-        handleProperty();
+      case "excel":
+        handleExcelExport();
         break;
-        case "excel":
-          handleExcelExport();
-          break;
       case "close":
         handleclose();
       default:
@@ -255,6 +272,8 @@ export default function MasterEntitySummary({
   const handleclose = () => {
     window.history.back();
   };
+
+  
 
   // Handlers for your icons
   const handleAdd = (value) => {
@@ -268,58 +287,13 @@ export default function MasterEntitySummary({
         );
         return;
       }
+     
       setId(selectedDatas[0]);
     } else {
       setId(0);
+      
     }
-    setPageRender(2);
-  };
-
-  const handleProperty = () => {
-    if (selectedDatas.length === 0) {
-      showAlert("info", "Select rows to Active/Inactive");
-      return;
-    }
-    setConfirmData({
-      message: `You want to Activate/Inactivate the property.`,
-      type: "info",
-      header: "Property",
-    });
-    setProperty(true);
-  };
-
-  const handlePropertyConfirmation = async (status) => {
-    let propertyPayload;
-    if (selectedDatas?.length === 1) {
-      propertyPayload = [
-        {
-          id: selectedDatas[0],
-        },
-      ];
-    } else {
-      propertyPayload = selectedDatas.map((item) => ({
-        id: item,
-      }));
-    }
-
-    const saveData = {
-      tagId: 1,
-      status: status,
-      ids: propertyPayload,
-    };
-    try {
-      const response = await updatetagproperties(saveData);
-
-      if (response?.status === "Success") {
-        showAlert("success", response?.message);
-      }
-    } catch (error) {
-    } finally {
-      setrefreshFlag(true);
-      setselectedDatas([]);
-      setchangesTriggered(true);
-      setProperty(false);
-    }
+    setAddMenu(true);
   };
 
   //Delete alert open
@@ -332,6 +306,10 @@ export default function MasterEntitySummary({
     handleConfrimOpen();
   };
 
+  
+
+  
+
   //To delete
   const handledeleteRole = async () => {
     const deletePayload = selectedDatas.map((item) => ({
@@ -339,7 +317,7 @@ export default function MasterEntitySummary({
     }));
 
     try {
-      let response = await deletetag(deletePayload, 1);
+      let response = await deleteAllocatedJobOrder(deletePayload);
 
       if (response?.status === "Success") {
         showAlert("success", response?.message);
@@ -364,7 +342,7 @@ export default function MasterEntitySummary({
   const handleExcelExport = async () => {
     try {
       const response = await gettagsummary({
-        tagId: 1,
+        tagId: 11,
         refreshFlag: true,
         pageNumber: 0,
         pageSize: 0,
@@ -381,8 +359,30 @@ export default function MasterEntitySummary({
     } catch (error) {}
   };
 
-  const handleLongPressStart = ()=>{}
+  const handleLongPressStart = (event, row) => {
+    longPressTriggeredRef.current = false;
+    longPressTimerRef.current = setTimeout(() => {
+      longPressTriggeredRef.current = true;
+      const isHighlighted = row.Group;
+      if (isHighlighted) {
+        setGroupId(row?.Id);
+        setPageRender(1);
+      } else {
+        setGroupId(0);
+      }
+    }, longPressThreshold);
+  };
 
+  // Function to handle the end of long press (mouse up or leave)
+  const handleLongPressEnd = () => {
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
+  };
+ 
+  
+  
   return (
     <>
       <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
@@ -415,6 +415,8 @@ export default function MasterEntitySummary({
             totalRows={totalRows}
             //   currentTheme={currentTheme}
             handleLongPressStart={handleLongPressStart}
+            handleLongPressEnd={handleLongPressEnd}
+            parentList={parentList}
             totalPages={totalPages}
             hardRefresh={hardRefresh}
             IdName={"Id"}
@@ -426,15 +428,27 @@ export default function MasterEntitySummary({
           data={confirmData}
           submite={handledeleteRole}
         />
-        <ConfirmationAlertContent
+
+<NormalModal
+        isOpen={addMenu}
+        handleCloseModal={() => setAddMenu(false)}
+      >
+        <AllocatedModal
+          handleCloseModal={() => setAddMenu(false)}
+          selected={Id}
+          hardRefresh={hardRefresh}
+        />
+      </NormalModal>
+        {/* <MasterProductConfirmation
           handleClose={() => setProperty(false)}
           open={property}
           data={confirmData}
           submite={handlePropertyConfirmation}
-          tagId={1}
           selectedDatas={selectedDatas?.length === 1 ? selectedDatas[0] : null}
-        />
+        /> */}
       </Box>
     </>
   );
 }
+
+

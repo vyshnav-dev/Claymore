@@ -23,6 +23,8 @@ import AckContainer from "./containers/Acknowedgement/AckContainer";
 import PDContainer from "./containers/Master/ProductDescripton/PDContainer";
 import FormBodyContainer from "./containers/Master/MasterBody/FormBodyContainer";
 import InspContainer from "./containers/Inspection/InspContainer";
+import ApproveContainer from "./containers/Approve/ApproveContainer";
+import AllocatedContainer from "./containers/Allocated/AllocatedContainer";
 
 export default function RoutePath() {
   const location = useLocation();
@@ -104,75 +106,91 @@ export default function RoutePath() {
             <Route
               path="/product"
               element={
-                // <ProtectedRoute>
+                <ProtectedRoute>
                   <MasterProductContainer />
-                // </ProtectedRoute>
+                 </ProtectedRoute>
               }
             />
             <Route
               path="/categories"
               element={
-                // <ProtectedRoute>
+                <ProtectedRoute>
                   <MasterCategoriesContainer />
-                // </ProtectedRoute>
+                </ProtectedRoute>
               }
             />
             <Route
-              path="/description"
+              path="/sub"
               element={
-                // <ProtectedRoute>
+                <ProtectedRoute>
                   <PDContainer />
-                // </ProtectedRoute>
+                 </ProtectedRoute>
               }
             />
             <Route
               path="/form"
               element={
-                // <ProtectedRoute>
+                <ProtectedRoute>
                   <FormBodyContainer/>
-                // </ProtectedRoute>
+                </ProtectedRoute>
               }
             />
             <Route
-              path="/allocation"
+              path="/pending"
               element={
-                // <ProtectedRoute>
+                <ProtectedRoute>
                   <AllocationContainer />
-                // </ProtectedRoute>
+                </ProtectedRoute>
               }
             />
             <Route
-              path="/insp"
+              path="/allocated"
               element={
-                // <ProtectedRoute>
+                <ProtectedRoute>
+                  <AllocatedContainer/>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/inspection"
+              element={
+                <ProtectedRoute>
                   <InspContainer />
-                // </ProtectedRoute>
+                </ProtectedRoute>
               }
             />
             <Route
-              path="/ack"
+              path="/acknowledgement"
               element={
-                // <ProtectedRoute>
+                <ProtectedRoute>
                   <AckContainer />
-                // </ProtectedRoute>
+                </ProtectedRoute>
               }
             />
 
             <Route
               path="/risk"
               element={
-                // <ProtectedRoute>
+                <ProtectedRoute>
                   <RiskAssesmentContainer/>
-                // </ProtectedRoute>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/approve"
+              element={
+                <ProtectedRoute>
+                  <ApproveContainer/>
+                </ProtectedRoute>
               }
             />
 
             <Route
-              path="/time"
+              path="/timesheet"
               element={
-                // <ProtectedRoute>
+                <ProtectedRoute>
                   <TimeRecordContainer/>
-                // </ProtectedRoute>
+                </ProtectedRoute>
               }
             />
           

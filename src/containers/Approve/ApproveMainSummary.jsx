@@ -1,16 +1,17 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Box, Typography, Stack, useTheme } from "@mui/material";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
-import ActionButton from "../../../component/Buttons/ActionButton";
-import { useAlert } from "../../../component/Alerts/AlertContext";
-import SummaryTable from "../../../component/Table/SummaryTable";
-import { primaryColor } from "../../../config/config";
-import ConfirmationAlert from "../../../component/Alerts/ConfirmationAlert";
-import { stockCountApis } from "../../../service/Transaction/stockcount";
-import { masterApis } from "../../../service/Master/master";
-import ConfirmationAlertContent from "../../../component/Alerts/ConfirmationAlertContent";
-import ExcelExport from "../../../component/Excel/Excel";
+import ActionButton from "../../component/Buttons/ActionButton";
+import { useAlert } from "../../component/Alerts/AlertContext";
+import SummaryTable from "../../component/Table/SummaryTable";
+import { primaryColor } from "../../config/config";
+import ConfirmationAlert from "../../component/Alerts/ConfirmationAlert";
+import { masterApis } from "../../service/Master/master";
+// import MasterProductConfirmation from "./MasterProductConfirmation";
+import ExcelExport from "../../component/Excel/Excel";
+import { identity } from "lodash";
+import { summaryData } from "../../config";
 
 function BasicBreadcrumbs() {
   const style = {
@@ -47,7 +48,7 @@ function BasicBreadcrumbs() {
           aria-label="breadcrumb"
         >
           <Typography underline="hover" sx={style} key="1">
-            Warehouse Summary
+            Approve Main Summary
           </Typography>
         </Breadcrumbs>
       </Stack>
@@ -109,15 +110,32 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
             iconName={"view"}
           />
         )}
-         {userAction.some((action) => action.Action === "Property") && (
-      <ActionButton
-        iconsClick={iconsClick}
-        icon={"fa-solid fa-gears"}
-        caption={"Property"}
-        iconName={"property"}
-      />
-    )}
-    
+      {userAction.some((action) => action.Action === "Property") && (
+        <ActionButton
+          iconsClick={iconsClick}
+          icon={"fa-solid fa-gears"}
+          caption={"Property"}
+          iconName={"property"}
+        />
+      )}
+
+      {userAction.some((action) => action.Action === "Group") && (
+        <ActionButton
+          iconsClick={iconsClick}
+          icon={"fa-solid fa-user-group"}
+          caption={"Group"}
+          iconName={"group"}
+        />
+      )}
+
+      {userAction.some((action) => action.Action === "Add Group") && (
+        <ActionButton
+          iconsClick={iconsClick}
+          icon={"fa-solid fa-user-plus"}
+          caption={"Add Group"}
+          iconName={"addGroup"}
+        />
+      )}
       <ActionButton
         iconsClick={iconsClick}
         icon={"fa-solid fa-xmark"}
@@ -128,10 +146,12 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
   );
 };
 
-export default function MasterWarehouseSummary({
+export default function ApproveMainSummary({
   setPageRender,
   setId,
   userAction,
+  setGroup,
+  setGroupSelection,
 }) {
   const [rows, setRows] = React.useState([]); //To Pass in Table
   const [displayLength, setdisplayLength] = React.useState(25); // Show Entries
@@ -147,21 +167,30 @@ export default function MasterWarehouseSummary({
   const [confirmData, setConfirmData] = useState({}); //To pass alert data
   const latestSearchKeyRef = useRef(searchKey);
   const [property, setProperty] = useState(false);
-  const { gettagsummary, deletetag, updatetagproperties } = masterApis();
+  const { gettagsummary, deletetag, updateproductproperties, gettagurl } =
+    masterApis();
+  const [groupId, setGroupId] = useState(0);
+  const [parentList, setParentList] = useState([]);
+  const longPressTriggeredRef = useRef(false); // Persist flag
+  const longPressTimerRef = useRef(null); // Persist timer
+
+  const longPressThreshold = 500;
+
 
   //Role Summary
   const fetchRoleSummary = async () => {
     setselectedDatas([]);
-
+    setGroup(0);
     const currentSearchKey = latestSearchKeyRef.current;
-
+    
     try {
       const response = await gettagsummary({
-        tagId: 13,
+        tagId: 11,
         refreshFlag: refreshFlag,
         pageNumber: pageNumber,
         pageSize: displayLength,
         searchString: currentSearchKey,
+        groupId: groupId,
       });
 
       setrefreshFlag(false);
@@ -171,14 +200,23 @@ export default function MasterWarehouseSummary({
       ) {
         const myObject = JSON.parse(response?.result);
 
-        setRows(myObject?.Data);
+        setRows(myObject?.Data );
 
         const totalRows = myObject?.PageSummary[0].TotalRows;
         const totalPages = myObject?.PageSummary[0].TotalPages;
 
         settotalRows(totalRows);
         setTotalPages(totalPages);
-      } else {
+      }
+    //   if(summaryData)
+    //   {
+        
+    //     setRows(summaryData)
+    //     settotalRows(summaryData.length);
+    //     setTotalPages(1);
+    //   }
+      
+      else {
         setRows([]);
       }
     } catch (error) {
@@ -186,6 +224,7 @@ export default function MasterWarehouseSummary({
         setRows([]);
         settotalRows(null);
         setTotalPages(null);
+    
       }
     } finally {
     }
@@ -193,7 +232,12 @@ export default function MasterWarehouseSummary({
 
   React.useEffect(() => {
     fetchRoleSummary(); // Initial data fetch
-  }, [pageNumber, displayLength, searchKey, changesTriggered]);
+  }, [pageNumber, displayLength, searchKey, changesTriggered, groupId]);
+
+
+  useEffect(()=>{
+    handleParentGroup(0) 
+  },[])
 
   const handleRowDoubleClick = (rowiId) => {
     if (rowiId > 0) {
@@ -211,6 +255,7 @@ export default function MasterWarehouseSummary({
     setselectedDatas(selectedRowsData);
   };
   const resetChangesTrigger = () => {
+    setGroupId(0);
     setchangesTriggered(false);
   };
   const handleDisplayLengthChange = (newDisplayLength) => {
@@ -244,9 +289,19 @@ export default function MasterWarehouseSummary({
       case "property":
         handleProperty();
         break;
-        case "excel":
-          handleExcelExport();
-          break;
+      case "addGroup":
+        handleAddGroup(1);
+        break;
+      case "group":
+        if (!selectedDatas?.length) {
+          showAlert("info", "Please Select row for Group");
+          return;
+        }
+        handleAddGroup(2);
+        break;
+      case "excel":
+        handleExcelExport();
+        break;
       case "close":
         handleclose();
       default:
@@ -258,8 +313,20 @@ export default function MasterWarehouseSummary({
     window.history.back();
   };
 
+  const handleAddGroup = (type) => {
+    if (type === 2) {
+      setGroupSelection(selectedDatas);
+    } else {
+      setGroupSelection([]);
+    }
+    setGroup(type);
+    setId(0);
+    setPageRender(2);
+  };
+
   // Handlers for your icons
   const handleAdd = (value) => {
+    setGroup(0);
     if (value === "edit") {
       if (selectedDatas.length !== 1) {
         showAlert(
@@ -287,27 +354,6 @@ export default function MasterWarehouseSummary({
     handleConfrimOpen();
   };
 
-  //To delete
-  const handledeleteRole = async () => {
-    const deletePayload = selectedDatas.map((item) => ({
-      id: item,
-    }));
-
-    try {
-      let response = await deletetag(deletePayload, 13);
-
-      if (response?.status === "Success") {
-        showAlert("success", response?.message);
-      }
-    } catch (error) {
-    } finally {
-      setrefreshFlag(true);
-      setselectedDatas([]);
-      setchangesTriggered(true);
-      handleConfrimClose();
-    }
-  };
-
   const handleProperty = () => {
     if (selectedDatas.length === 0) {
       showAlert("info", "Select rows to Active/Inactive");
@@ -320,29 +366,26 @@ export default function MasterWarehouseSummary({
     });
     setProperty(true);
   };
-  
+
   const handlePropertyConfirmation = async (status) => {
     let propertyPayload;
     if (selectedDatas?.length === 1) {
-      propertyPayload =  [
+      propertyPayload = [
         {
-          id: selectedDatas[0]
-        }
-      ]
+          id: selectedDatas[0],
+        },
+      ];
     } else {
       propertyPayload = selectedDatas.map((item) => ({
         id: item,
       }));
     }
-
     const saveData = {
-      tagId: 13,
-      status:status,
+      status: status,
       ids: propertyPayload,
     };
     try {
-      const response = await updatetagproperties(saveData);
-
+      const response = await updateproductproperties(saveData);
       if (response?.status === "Success") {
         showAlert("success", response?.message);
       }
@@ -352,6 +395,27 @@ export default function MasterWarehouseSummary({
       setselectedDatas([]);
       setchangesTriggered(true);
       setProperty(false);
+    }
+  };
+
+  //To delete
+  const handledeleteRole = async () => {
+    const deletePayload = selectedDatas.map((item) => ({
+      id: item,
+    }));
+
+    try {
+      let response = await deletetag(deletePayload, 11);
+
+      if (response?.status === "Success") {
+        showAlert("success", response?.message);
+      }
+    } catch (error) {
+    } finally {
+      setrefreshFlag(true);
+      setselectedDatas([]);
+      setchangesTriggered(true);
+      handleConfrimClose();
     }
   };
 
@@ -366,7 +430,7 @@ export default function MasterWarehouseSummary({
   const handleExcelExport = async () => {
     try {
       const response = await gettagsummary({
-        tagId: 13,
+        tagId: 11,
         refreshFlag: true,
         pageNumber: 0,
         pageSize: 0,
@@ -383,9 +447,43 @@ export default function MasterWarehouseSummary({
     } catch (error) {}
   };
 
-  const handleLongPressStart = ()=>{}
+  const handleLongPressStart = (event, row) => {
+    longPressTriggeredRef.current = false;
+    longPressTimerRef.current = setTimeout(() => {
+      longPressTriggeredRef.current = true;
+      const isHighlighted = row.Group;
+      if (isHighlighted) {
+        setGroupId(row?.Id);
+        setPageRender(2);
+        handleParentGroup(row?.Id)
+      } else {
+        setGroupId(0);
+      }
+    }, longPressThreshold);
+  };
 
-
+  // Function to handle the end of long press (mouse up or leave)
+  const handleLongPressEnd = () => {
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
+  };
+ 
+  const handleParentGroup = async (id) => {
+    const response = await gettagurl({
+      id: id,
+      tagId: 11,
+    });
+    setGroupId(id)
+   if(response?.status === "Success"){
+     const myObject = JSON.parse(response?.result)
+     setParentList(myObject)
+   }else{
+    setParentList([])
+   }
+  };
+  
   return (
     <>
       <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
@@ -418,6 +516,9 @@ export default function MasterWarehouseSummary({
             totalRows={totalRows}
             //   currentTheme={currentTheme}
             handleLongPressStart={handleLongPressStart}
+            handleLongPressEnd={handleLongPressEnd}
+            handleParentGroup={handleParentGroup}
+            parentList={parentList}
             totalPages={totalPages}
             hardRefresh={hardRefresh}
             IdName={"Id"}
@@ -429,15 +530,17 @@ export default function MasterWarehouseSummary({
           data={confirmData}
           submite={handledeleteRole}
         />
-        <ConfirmationAlertContent
+        {/* <MasterProductConfirmation
           handleClose={() => setProperty(false)}
           open={property}
           data={confirmData}
           submite={handlePropertyConfirmation}
-          tagId={13}
           selectedDatas={selectedDatas?.length === 1 ? selectedDatas[0] : null}
-        />
+        /> */}
       </Box>
     </>
   );
 }
+
+
+

@@ -6,7 +6,6 @@ import FormBodySummary from "./FormBodySummary";
 export default function FormBodyContainer() {
   const location = useLocation();
   const [page, setPage] = useState(1);
-  const [id, setId] = useState(0);
   const [menuIdLocal, setmenuIdLocal] = useState(null);
   const [userAction, setuserAction] = useState([]);
   const [group, setGroup] = useState(0)
@@ -45,8 +44,6 @@ export default function FormBodyContainer() {
       {page === 1 && (
         <FormBodySummary
           setPageRender={setPage}
-          setId={setId}
-          Id={id}
           userAction={userAction}
           screenId={menuId}
           setGroup={setGroup}

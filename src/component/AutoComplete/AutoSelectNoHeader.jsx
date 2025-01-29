@@ -101,7 +101,7 @@ const AutoSelectNoHeader = ({
         <ListSubheader
           style={{
             backgroundColor:secondaryColor,
-            padding: "5px",
+            padding: "4px",
             color:thirdColor
           }}
         >

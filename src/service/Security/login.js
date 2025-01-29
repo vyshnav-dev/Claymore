@@ -81,7 +81,7 @@ const loginApi = () => {
 
   const loginLogin = async (payload) => {
     try {
-      const response = await axios.post(`${baseUrl}Auth/Login`, payload);   
+      const response = await axios.post(`${baseUrl}login/login`, payload);   
  
       return response.data;
     } catch (error) {

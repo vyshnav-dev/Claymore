@@ -48,6 +48,8 @@ export default function RoleTree({ menuAction, id, handleChild }) {
 
   // Fetch actions based on selected screen
   const handleAction = async (screenId, isGroup) => {
+    console.log('scrnid', screenId, isGroup);
+
     setAction([])
     if (isGroup) {
       try {
@@ -144,7 +146,7 @@ export default function RoleTree({ menuAction, id, handleChild }) {
           boxShadow: "0px 5px 15px rgba(0, 0, 0, 0.1)",
           height: isSmallScreen ? "auto" : 460,
           overflow: "auto",
-          scrollbarWidth:"thin",
+          scrollbarWidth: "thin",
           maxWidth: isSmallScreen ? "100%" : "49%",
           mb: isSmallScreen ? 2 : 0,
         }}
@@ -167,11 +169,32 @@ export default function RoleTree({ menuAction, id, handleChild }) {
           maxWidth: isSmallScreen ? "100%" : "49%",
         }}
       >
-        <Typography variant="h6" fontWeight="bold" gutterBottom>
-          Action
-        </Typography>
+
         {action.length > 0 && (
           <>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                mt: 1,
+              }}
+            >
+              <Typography variant="h6" fontWeight="bold" gutterBottom>
+                Action
+              </Typography>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    id="check-all"
+                    size="small"
+                    color="primary"
+                    checked={isAllActionsChecked()}
+                    onChange={handleCheckboxChangeAll}
+                  />
+                }
+                label="Select All"
+              />
+            </Box>
             <FormControl component="fieldset">
               {action.map((actionItem) => {
                 const isSelected = list.some(
@@ -196,26 +219,7 @@ export default function RoleTree({ menuAction, id, handleChild }) {
                 );
               })}
             </FormControl>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "flex-end",
-                mt: 1,
-              }}
-            >
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    id="check-all"
-                    size="small"
-                    color="primary"
-                    checked={isAllActionsChecked()}
-                    onChange={handleCheckboxChangeAll}
-                  />
-                }
-                label="Select All"
-              />
-            </Box>
+
           </>
         )}
       </Box>

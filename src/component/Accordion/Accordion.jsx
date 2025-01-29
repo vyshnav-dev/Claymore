@@ -25,6 +25,7 @@ const Accordion = styled((props) => (
 
 const AccordionSummary = styled((props) => {
   const theme = useTheme();
+  
   // const { currentTheme } = useCustomTheme();
   return (
     <MuiAccordionSummary
@@ -36,7 +37,7 @@ const AccordionSummary = styled((props) => {
               color:"#26668b"
             }}
           />
-        ) : (
+        ): (
           <AddCircleOutlineIcon
             sx={{
               fontSize: "1.25rem",
@@ -78,9 +79,11 @@ export default function CustomizedAccordions({
 }) {
   // const { currentTheme } = useCustomTheme();
   // const theme = useTheme();
+  console.log('log',expanded);
+  
   return (
     <div>
-      <Accordion defaultExpanded  onChange={onChange}>
+      <Accordion  onChange={onChange}>
         <AccordionSummary
           aria-controls="panel1d-content"
           id="panel1d-header"

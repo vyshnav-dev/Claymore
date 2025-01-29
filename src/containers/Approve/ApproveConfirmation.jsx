@@ -10,39 +10,42 @@ import {
   MDBModalFooter,
 } from "mdb-react-ui-kit";
 import { Typography, useTheme } from "@mui/material";
-import { masterApis } from "../../../service/Master/master";
-import ChecKBoxLabel from "../../../component/CheckBox/CheckBoxLabel";
+// import { masterApis } from "../../../service/Master/master";
+// import ChecKBoxLabel from "../../../component/CheckBox/CheckBoxLabel";
+import UserInputField from "../../component/InputFields/UserInputField";
 
-export default function MasterProductConfirmation({
+export default function ApproveConfirmation({
   handleClose,
   open,
   data,
   submite,
   selectedDatas,
+  itemLabel
 }) {
   const themes = useTheme();
-  const { gettagpropertiesdetails } = masterApis();
+//   const { gettagpropertiesdetails } = masterApis();
   const [activeData, setActiveData] = useState({});
+  const [mainDetails, setMainDetails] = useState({});
 
-  useEffect(() => {
-    if (selectedDatas) {
-      const fetchData = async () => {
-        const response = await gettagpropertiesdetails({
-          tagId: 11,
-          id: selectedDatas,
-        });
-        if (response?.status === "Success") {
-          const myObject = JSON.parse(response?.result);
-          setActiveData(myObject);
-        } else {
-          handleNew();
-        }
-      };
-      fetchData();
-    } else {
-      handleNew();
-    }
-  }, [open]);
+//   useEffect(() => {
+//     if (selectedDatas) {
+//       const fetchData = async () => {
+//         const response = await gettagpropertiesdetails({
+//           tagId: 11,
+//           id: selectedDatas,
+//         });
+//         if (response?.status === "Success") {
+//           const myObject = JSON.parse(response?.result);
+//           setActiveData(myObject);
+//         } else {
+//           handleNew();
+//         }
+//       };
+//       fetchData();
+//     } else {
+//       handleNew();
+//     }
+//   }, [open]);
 
   const handleNew = () => {
     setActiveData({
@@ -61,7 +64,7 @@ export default function MasterProductConfirmation({
               className={`bg-${
                 !selectedDatas
                   ? data?.type
-                  : activeData?.Status === 0
+                  : itemLabel === 'reject'
                   ? "danger"
                   : "success"
               } text-white d-flex justify-content-center`}
@@ -71,9 +74,20 @@ export default function MasterProductConfirmation({
 
             {/* Modal Body */}
             <MDBModalBody className="d-flex flex-column justify-content-center align-items-center text-center">
-              <Typography m={2} color="grey">
+                {itemLabel === 'approve' ? (<Typography m={2} color="grey">
                 {data?.message}
-              </Typography>
+              </Typography>):(
+                <UserInputField
+                name={"findings"}
+                type={"text"}
+                disabled={false}
+                mandatory={true}
+                value={mainDetails}
+                setValue={setMainDetails}
+                multiline={true}
+            />
+              )}
+              
             </MDBModalBody>
 
             {/* Modal Footer */}
@@ -81,22 +95,13 @@ export default function MasterProductConfirmation({
               <MDBBtn color="secondary" onClick={handleClose}>
                 Close
               </MDBBtn>
-              {!selectedDatas ? (
-                <>
-                  <MDBBtn onClick={() => submite(0)} color={"success"}>
-                    Activate
-                  </MDBBtn>
-                  <MDBBtn onClick={() => submite(3)} color={"danger"}>
-                    InActivate
-                  </MDBBtn>
-                </>
-              ) : activeData?.Status === 0 ? (
+              { itemLabel === 'reject' ? (
                 <MDBBtn onClick={() => submite(3)} color={"danger"}>
-                  InActivate
+                  Reject
                 </MDBBtn>
               ) : (
                 <MDBBtn onClick={() => submite(0)} color={"success"}>
-                  Activate
+                  Approve
                 </MDBBtn>
               )}
             </MDBModalFooter>

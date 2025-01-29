@@ -142,12 +142,12 @@ export default function RoleSummary({ setPageRender, setId, userAction }) {
     try {
       const response = await getSecuritysummary(
         {
-          refreshFlag: refreshFlag,
-          pageNumber: pageNumber,
-          pageSize: displayLength,
-          searchString: currentSearchKey,
+          // refreshFlag: refreshFlag,
+          PageNo: pageNumber,
+          PageSize: displayLength,
+          Search: currentSearchKey,
         },
-        "role/getrolesummary"
+        "Role/GetRoleSummary"
       );
 
       setrefreshFlag(false);
@@ -159,8 +159,8 @@ export default function RoleSummary({ setPageRender, setId, userAction }) {
 
         setRows(myObject?.Data);
 
-        const totalRows = myObject?.PageSummary[0].TotalRows;
-        const totalPages = myObject?.PageSummary[0].TotalPages;
+        const totalRows = myObject?.Metadata?.TotalRows;
+        const totalPages = myObject?.Metadata?.TotalPages;
 
         settotalRows(totalRows);
         setTotalPages(totalPages);

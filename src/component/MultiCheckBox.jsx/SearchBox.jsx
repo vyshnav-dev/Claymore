@@ -159,6 +159,8 @@ const SearchBox = React.memo(({ initialItems, search ,handleSelectedIds, params,
   }
 };
   
+console.log('iitial',initialItems);
+
   
   return (
     <Box sx={{ display: "flex", flexDirection: "column",gap:2 }}>
@@ -217,36 +219,43 @@ const SearchBox = React.memo(({ initialItems, search ,handleSelectedIds, params,
           zIndex:5,
         }}
       >
-        {initialItems &&
-          initialItems?.map((item, index) => (
-            <Item key={item.Id}>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={!!items[item.Id]} // Ensure boolean value
-                    onChange={() => handleItemToggle(item.Id)}
-                    onKeyDown={(e) => handleKeyDown(e, item.Id)}
-                    tabIndex={0}
-                    disabled={disabled}
-                    sx={{
-                      padding: 0,
-                      color:"currentColor",
-                      "&.Mui-checked": {
+        
+        {initialItems && initialItems.length > 0 ? (
+            initialItems?.map((item, index) => (
+              <Item key={item.Id}>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={!!items[item.Id]} // Ensure boolean value
+                      onChange={() => handleItemToggle(item.Id)}
+                      onKeyDown={(e) => handleKeyDown(e, item.Id)}
+                      tabIndex={0}
+                      disabled={disabled}
+                      sx={{
+                        padding: 0,
                         color:"currentColor",
-                      },
-                    }}
-                  />
-                }
-                label={
-                  <span style={{ padding: "0px" }}>
-                    <Typography sx={{ fontSize: "12px" }}>
-                      {item.Name}
-                    </Typography>
-                  </span>
-                }
-              />
-            </Item>
-          ))}
+                        "&.Mui-checked": {
+                          color:"currentColor",
+                        },
+                      }}
+                    />
+                  }
+                  label={
+                    <span style={{ padding: "0px" }}>
+                      <Typography sx={{ fontSize: "12px" }}>
+                        {item.Name}
+                      </Typography>
+                    </span>
+                  }
+                />
+              </Item>
+            ))
+        ) :(
+          <Box sx={{ width: "100%", textAlign: "center", my: 4 }}>
+            <Typography>No Data</Typography>
+          </Box>
+        )
+          }
       </Box>
     </Box>
   );

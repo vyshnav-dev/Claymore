@@ -21,6 +21,6 @@ export function encrypt(plainText, useDefaultEncryptKey = true) {
 function getEncryptionKey(useDefaultEncryptKey = true) {
     // Use the same encryption key logic as in the .NET code
     return useDefaultEncryptKey
-      ? "a8h3GZ9KsNp5Rv2t"  // Example key, replace with actual key
-      : "a8h3GZ9KsNp5Rv2t";
+      ? "a8h3GZ9KsNp5Rv2y"  // Example key, replace with actual key
+      : "a8h3GZ9KsNp5Rv2y";
 }

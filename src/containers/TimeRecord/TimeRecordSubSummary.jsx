@@ -2,14 +2,16 @@ import React, { useEffect, useRef, useState } from "react";
 import { Box, Typography, Stack, useTheme } from "@mui/material";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
-import ActionButton from "../../../component/Buttons/ActionButton";
-import { useAlert } from "../../../component/Alerts/AlertContext";
-import SummaryTable from "../../../component/Table/SummaryTable";
-import { primaryColor } from "../../../config/config";
-import ConfirmationAlert from "../../../component/Alerts/ConfirmationAlert";
-import { masterApis } from "../../../service/Master/master";
-import ConfirmationAlertContent from "../../../component/Alerts/ConfirmationAlertContent";
-import ExcelExport from "../../../component/Excel/Excel";
+import ActionButton from "../../component/Buttons/ActionButton";
+import { useAlert } from "../../component/Alerts/AlertContext";
+import SummaryTable from "../../component/Table/SummaryTable";
+import { primaryColor } from "../../config/config";
+import ConfirmationAlert from "../../component/Alerts/ConfirmationAlert";
+import { masterApis } from "../../service/Master/master";
+// import MasterProductConfirmation from "./MasterProductConfirmation";
+import ExcelExport from "../../component/Excel/Excel";
+import { identity } from "lodash";
+import { inspectionApis } from "../../service/Inspection/inspection";
 
 function BasicBreadcrumbs() {
   const style = {
@@ -46,7 +48,7 @@ function BasicBreadcrumbs() {
           aria-label="breadcrumb"
         >
           <Typography underline="hover" sx={style} key="1">
-            Unit Summary
+            Site Time Records
           </Typography>
         </Breadcrumbs>
       </Stack>
@@ -67,14 +69,14 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
         scrollbarWidth: "thin",
       }}
     >
-      {userAction.some((action) => action.Action === "New") && (
+      {/* {userAction.some((action) => action.Action === "New") && (
         <ActionButton
           iconsClick={iconsClick}
           icon={"fa-solid fa-plus"}
           caption={"New"}
           iconName={"new"}
         />
-      )}
+      )} */}
       {userAction.some((action) => action.Action === "Edit") && (
         <ActionButton
           iconsClick={iconsClick}
@@ -108,32 +110,8 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
             iconName={"view"}
           />
         )}
-       {userAction.some((action) => action.Action === "Property") && (
-      <ActionButton
-        iconsClick={iconsClick}
-        icon={"fa-solid fa-gears"}
-        caption={"Property"}
-        iconName={"property"}
-      />
-    )}
+      
 
-{userAction.some((action) => action.Action === "Group") && (
-        <ActionButton
-          iconsClick={iconsClick}
-          icon={"fa-solid fa-user-group"}
-          caption={"Group"}
-          iconName={"group"}
-        />
-      )}
-
-      {userAction.some((action) => action.Action === "Add Group") && (
-        <ActionButton
-          iconsClick={iconsClick}
-          icon={"fa-solid fa-user-plus"}
-          caption={"Add Group"}
-          iconName={"addGroup"}
-        />
-      )}
       <ActionButton
         iconsClick={iconsClick}
         icon={"fa-solid fa-xmark"}
@@ -144,12 +122,14 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
   );
 };
 
-export default function MasterUnitSummary({
+
+
+export default function TimeRecordSubSummary({
   setPageRender,
   setId,
   userAction,
-  setGroup,
-  setGroupSelection,
+  Id,
+  setTimeId
 }) {
   const [rows, setRows] = React.useState([]); //To Pass in Table
   const [displayLength, setdisplayLength] = React.useState(25); // Show Entries
@@ -164,8 +144,8 @@ export default function MasterUnitSummary({
   const [confirmAlert, setConfirmAlert] = useState(false); //To handle alert open
   const [confirmData, setConfirmData] = useState({}); //To pass alert data
   const latestSearchKeyRef = useRef(searchKey);
-  const [property, setProperty] = useState(false);
-  const { gettagsummary, deletetag, updatetagproperties, gettagurl } = masterApis();
+  const { GetTimeSheetSummary,deleteTimeSheet} =
+    inspectionApis();
   const [groupId, setGroupId] = useState(0);
   const [parentList, setParentList] = useState([]);
   const longPressTriggeredRef = useRef(false); // Persist flag
@@ -176,19 +156,16 @@ export default function MasterUnitSummary({
   //Role Summary
   const fetchRoleSummary = async () => {
     setselectedDatas([]);
-    setGroup(0);
     const currentSearchKey = latestSearchKeyRef.current;
 
     try {
-      const response = await gettagsummary({
-        tagId: 14,
-        refreshFlag: refreshFlag,
-        pageNumber: pageNumber,
+      const response = await GetTimeSheetSummary({
+        allocation:Id,
+        pageNo: pageNumber,
         pageSize: displayLength,
-        searchString: currentSearchKey,
-        groupId: groupId,
+        search: currentSearchKey,
       });
-
+      setTimeId(Id)
       setrefreshFlag(false);
       if (
         response?.status === "Success" &&
@@ -198,8 +175,8 @@ export default function MasterUnitSummary({
 
         setRows(myObject?.Data);
 
-        const totalRows = myObject?.PageSummary[0].TotalRows;
-        const totalPages = myObject?.PageSummary[0].TotalPages;
+        const totalRows = myObject?.Metadata.TotalRows;
+        const totalPages = myObject?.Metadata.TotalPages;
 
         settotalRows(totalRows);
         setTotalPages(totalPages);
@@ -211,6 +188,7 @@ export default function MasterUnitSummary({
         setRows([]);
         settotalRows(null);
         setTotalPages(null);
+    
       }
     } finally {
     }
@@ -218,11 +196,10 @@ export default function MasterUnitSummary({
 
   React.useEffect(() => {
     fetchRoleSummary(); // Initial data fetch
-  }, [pageNumber, displayLength, searchKey, changesTriggered, groupId]);
+  }, [pageNumber, displayLength, searchKey, changesTriggered,Id]);
 
-  useEffect(()=>{
-    handleParentGroup(0) 
-  },[])
+
+ 
 
   const handleRowDoubleClick = (rowiId) => {
     if (rowiId > 0) {
@@ -270,23 +247,9 @@ export default function MasterUnitSummary({
         break;
       case "view":
         handleAdd("edit");
+      case "excel":
+        handleExcelExport();
         break;
-      case "property":
-        handleProperty();
-        break;
-        case "addGroup":
-          handleAddGroup(1);
-          break;
-        case "group":
-          if (!selectedDatas?.length) {
-            showAlert("info", "Please Select row for Group");
-            return;
-          }
-          handleAddGroup(2);
-          break;
-          case "excel":
-            handleExcelExport();
-            break;
       case "close":
         handleclose();
       default:
@@ -295,19 +258,11 @@ export default function MasterUnitSummary({
   };
 
   const handleclose = () => {
-    window.history.back();
+    // window.history.back();
+    setPageRender(1)
   };
 
-  const handleAddGroup = (type) => {
-    if (type === 2) {
-      setGroupSelection(selectedDatas);
-    } else {
-      setGroupSelection([]);
-    }
-    setGroup(type);
-    setId(0);
-    setPageRender(2);
-  };
+  
 
   // Handlers for your icons
   const handleAdd = (value) => {
@@ -328,53 +283,6 @@ export default function MasterUnitSummary({
     setPageRender(2);
   };
 
-  const handleProperty = () => {
-    if (selectedDatas.length === 0) {
-      showAlert("info", "Select rows to Active/Inactive");
-      return;
-    }
-    setConfirmData({
-      message: `You want to Activate/Inactivate the property.`,
-      type: "info",
-      header: "Property",
-    });
-    setProperty(true);
-  };
-
-  const handlePropertyConfirmation = async (status) => {
-    let propertyPayload;
-    if (selectedDatas?.length === 1) {
-      propertyPayload = [
-        {
-          id: selectedDatas[0],
-        },
-      ];
-    } else {
-      propertyPayload = selectedDatas.map((item) => ({
-        id: item,
-      }));
-    }
-
-    const saveData = {
-      tagId: 14,
-      status: status,
-      ids: propertyPayload,
-    };
-    try {
-      const response = await updatetagproperties(saveData);
-
-      if (response?.status === "Success") {
-        showAlert("success", response?.message);
-      }
-    } catch (error) {
-    } finally {
-      setrefreshFlag(true);
-      setselectedDatas([]);
-      setchangesTriggered(true);
-      setProperty(false);
-    }
-  };
-
   //Delete alert open
   const deleteClick = async () => {
     if (selectedDatas.length === 0) {
@@ -385,6 +293,10 @@ export default function MasterUnitSummary({
     handleConfrimOpen();
   };
 
+  
+
+  
+
   //To delete
   const handledeleteRole = async () => {
     const deletePayload = selectedDatas.map((item) => ({
@@ -392,7 +304,7 @@ export default function MasterUnitSummary({
     }));
 
     try {
-      let response = await deletetag(deletePayload, 14);
+      let response = await deleteTimeSheet(deletePayload);
 
       if (response?.status === "Success") {
         showAlert("success", response?.message);
@@ -417,7 +329,7 @@ export default function MasterUnitSummary({
   const handleExcelExport = async () => {
     try {
       const response = await gettagsummary({
-        tagId: 14,
+        tagId: 11,
         refreshFlag: true,
         pageNumber: 0,
         pageSize: 0,
@@ -434,7 +346,6 @@ export default function MasterUnitSummary({
     } catch (error) {}
   };
 
-
   const handleLongPressStart = (event, row) => {
     longPressTriggeredRef.current = false;
     longPressTimerRef.current = setTimeout(() => {
@@ -443,7 +354,6 @@ export default function MasterUnitSummary({
       if (isHighlighted) {
         setGroupId(row?.Id);
         setPageRender(1);
-        handleParentGroup(row?.Id)
       } else {
         setGroupId(0);
       }
@@ -458,21 +368,7 @@ export default function MasterUnitSummary({
     }
   };
  
-  const handleParentGroup = async (id) => {
-    const response = await gettagurl({
-      id: id,
-      tagId: 14,
-    });
-    setGroupId(id)
-   if(response?.status === "Success"){
-     const myObject = JSON.parse(response?.result)
-     setParentList(myObject)
-   }else{
-    setParentList([])
-   }
-  };
-
-
+  
   return (
     <>
       <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
@@ -506,7 +402,6 @@ export default function MasterUnitSummary({
             //   currentTheme={currentTheme}
             handleLongPressStart={handleLongPressStart}
             handleLongPressEnd={handleLongPressEnd}
-            handleParentGroup={handleParentGroup}
             parentList={parentList}
             totalPages={totalPages}
             hardRefresh={hardRefresh}
@@ -519,14 +414,13 @@ export default function MasterUnitSummary({
           data={confirmData}
           submite={handledeleteRole}
         />
-        <ConfirmationAlertContent
+        {/* <MasterProductConfirmation
           handleClose={() => setProperty(false)}
           open={property}
           data={confirmData}
           submite={handlePropertyConfirmation}
-          tagId={14}
           selectedDatas={selectedDatas?.length === 1 ? selectedDatas[0] : null}
-        />
+        /> */}
       </Box>
     </>
   );

@@ -3,17 +3,7 @@ import {
     Box,
     Stack,
     Button as ButtonM,
-    useTheme,
-    useMediaQuery,
     Typography,
-    TableCell,
-    Table,
-    TableHead,
-    TableRow,
-    TableContainer,
-    IconButton,
-    Paper,
-    TableBody,
 } from "@mui/material";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
 import PropTypes from "prop-types";
@@ -28,23 +18,12 @@ import {
     thirdColor,
 } from "../../config/config";
 import UserInputField from "../../component/InputFields/UserInputField";
-import { stockCountApis } from "../../service/Transaction/stockcount";
-import { masterApis } from "../../service/Master/master";
-
-// import { MDBIcon } from "mdb-react-ui-kit";
-// import MasterSelectionAutoComplete from "../MasterWarehouse/MasterSelectionAutoComplete";
-// import UserAutoComplete from "../../../component/AutoComplete/UserAutoComplete";
-// import UserAutoCompleteManual from "../../../component/AutoComplete/UserAutoCompleteManual";
-// import ChecKBoxLabel from "../../../component/CheckBox/CheckBoxLabel";
-// import MasterParentAutoComplete from "../../../component/AutoComplete/MasterAutoComplete/MasterParentAutoComplete";
-// import MasterProductUnitInfo from "./MasterProductUnitInfo";
-// import MasterProductConfirmation from "./MasterProductConfirmation";
-import { Info } from "@mui/icons-material";
 import CustomizedAccordions from "../../component/Accordion/Accordion";
 import { assessmentData, InspectionData, locationType } from "../../config";
-import InputCommon from "../../component/InputFields/InputCommon";
 import InspBodyTable from "./InspBodyTable";
 import InspDetailsTab from "./InspDetailsTab";
+import { inspectionApis } from "../../service/Inspection/inspection";
+import TabFields from "./TabFields";
 const currentDate = new Date().toISOString().split("T")[0];
 function CustomTabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -61,29 +40,7 @@ function CustomTabPanel(props) {
         </div>
     );
 }
-const headerCellStyle = {
-    padding: "0px 4px",
-    border: `1px solid #ddd`,
-    fontWeight: "600",
-    fontSize: "14px",
-    color: "white",
-};
 
-const bodyCellStyle = {
-    border: `1px solid #ddd`,
-    whiteSpace: "nowrap",
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-    fontSize: "12px",
-};
-
-const iconsExtraSx = {
-    fontSize: "0.8rem",
-    padding: "0.4rem",
-    "&:hover": {
-        backgroundColor: thirdColor,
-    },
-};
 
 const visibleHeaders = ["Name"];
 
@@ -93,7 +50,7 @@ CustomTabPanel.propTypes = {
     value: PropTypes.number.isRequired,
 };
 
-function BasicBreadcrumbs({ group }) {
+function BasicBreadcrumbs() {
     const style = {
         display: "flex",
         alignItems: "center",
@@ -128,7 +85,7 @@ function BasicBreadcrumbs({ group }) {
                 >
                     <Typography underline="hover" sx={style} key="1">
                         Inspection Details
-                        
+
                     </Typography>
                 </Breadcrumbs>
             </Stack>
@@ -182,18 +139,7 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction }) => {
                 </>
             )}
 
-            {userAction.some((action) => action.Action === "Property") && (
-                <>
-                    {detailPageId !== 0 && (
-                        <ActionButton
-                            iconsClick={iconsClick}
-                            icon={"fa-solid fa-gears"}
-                            caption={"Property"}
-                            iconName={"property"}
-                        />
-                    )}
-                </>
-            )}
+            
 
             <ActionButton
                 iconsClick={iconsClick}
@@ -228,7 +174,7 @@ const tableFields = [
         ErrorMessage: null,
         Field: 333,
         FieldDisplayType: "cell",
-        FieldName: "Equipent",
+        FieldName: "Name",
         FieldOrder: 1,
         FieldStructure: 5,
         FieldType: "",
@@ -274,7 +220,7 @@ const tableFields = [
         Behaviour: 1,
         CannotBeExported: false,
         CannotBeImported: false,
-        Caption: "S",
+        Caption: " S / NS / NA / SE ",
         CharacterCasing: 0,
         ColumnSpan: 0,
         CopyfromParent: false,
@@ -284,8 +230,8 @@ const tableFields = [
         EditableinCustomerPortal: false,
         ErrorMessage: null,
         Field: 334,
-        FieldDisplayType: "risk",
-        FieldName: "s",
+        FieldDisplayType: "check type",
+        FieldName: "iData",
         FieldOrder: 2,
         FieldStructure: 5,
         FieldType: "",
@@ -320,177 +266,7 @@ const tableFields = [
         WordWrap: false,
 
     },
-    {
-        AllowDate: 0,
-        AllowDateName: null,
-        AllowManualIncrement: false,
-        AuditTrail: false,
-        AvailableInMobileApp: false,
-        AvailableinCustomerPortal: false,
-        BannerText: null,
-        Behaviour: 1,
-        CannotBeExported: false,
-        CannotBeImported: false,
-        Caption: "NS",
-        CharacterCasing: 0,
-        ColumnSpan: 0,
-        CopyfromParent: false,
-        Default: false,
-        DefaultValue: null,
-        DonotAllowSpecialChar: false,
-        EditableinCustomerPortal: false,
-        ErrorMessage: null,
-        Field: 334,
-        FieldDisplayType: "risk",
-        FieldName: "ns",
-        FieldOrder: 2,
-        FieldStructure: 5,
-        FieldType: "",
-        FilterCondition: null,
-        Hidden: false,
-        HiddenInGroup: false,
-        HideLeftPane: false,
-        InformationField: false,
-        InternalStdField: true,
-        // LinkTag: MastersTagId.Unit,
-        Mandatory: true,
-        MandatoryInGroup: false,
-        MandatoryInRevision: false,
-        MaxSize: 0,
-        MaximumValue: null,
-        MergeField: false,
-        MinimumValue: null,
-        Negative: false,
-        NumberList: null,
-        PreLoadValuesOnDemand: false,
-        ReadOnly: false,
-        RegularExpression: "",
-        Removed: false,
-        RowSpan: 0,
-        ScrollBar: 0,
-        TabName: "General",
-        Tag: 20,
-        ToolTip: null,
-        View: 95,
-        ViewCaption: "dipin2",
-        Visible: false,
-        WordWrap: false,
-
-    },
-    {
-        AllowDate: 0,
-        AllowDateName: null,
-        AllowManualIncrement: false,
-        AuditTrail: false,
-        AvailableInMobileApp: false,
-        AvailableinCustomerPortal: false,
-        BannerText: null,
-        Behaviour: 1,
-        CannotBeExported: false,
-        CannotBeImported: false,
-        Caption: "NA",
-        CharacterCasing: 0,
-        ColumnSpan: 0,
-        CopyfromParent: false,
-        Default: false,
-        DefaultValue: null,
-        DonotAllowSpecialChar: false,
-        EditableinCustomerPortal: false,
-        ErrorMessage: null,
-        Field: 334,
-        FieldDisplayType: "risk",
-        FieldName: "na",
-        FieldOrder: 2,
-        FieldStructure: 5,
-        FieldType: "",
-        FilterCondition: null,
-        Hidden: false,
-        HiddenInGroup: false,
-        HideLeftPane: false,
-        InformationField: false,
-        InternalStdField: true,
-        // LinkTag: MastersTagId.Unit,
-        Mandatory: true,
-        MandatoryInGroup: false,
-        MandatoryInRevision: false,
-        MaxSize: 0,
-        MaximumValue: null,
-        MergeField: false,
-        MinimumValue: null,
-        Negative: false,
-        NumberList: null,
-        PreLoadValuesOnDemand: false,
-        ReadOnly: false,
-        RegularExpression: "",
-        Removed: false,
-        RowSpan: 0,
-        ScrollBar: 0,
-        TabName: "General",
-        Tag: 20,
-        ToolTip: null,
-        View: 95,
-        ViewCaption: "dipin2",
-        Visible: false,
-        WordWrap: false,
-
-    },
-    {
-        AllowDate: 0,
-        AllowDateName: null,
-        AllowManualIncrement: false,
-        AuditTrail: false,
-        AvailableInMobileApp: false,
-        AvailableinCustomerPortal: false,
-        BannerText: null,
-        Behaviour: 1,
-        CannotBeExported: false,
-        CannotBeImported: false,
-        Caption: "SE",
-        CharacterCasing: 0,
-        ColumnSpan: 0,
-        CopyfromParent: false,
-        Default: false,
-        DefaultValue: null,
-        DonotAllowSpecialChar: false,
-        EditableinCustomerPortal: false,
-        ErrorMessage: null,
-        Field: 334,
-        FieldDisplayType: "risk",
-        FieldName: "se",
-        FieldOrder: 2,
-        FieldStructure: 5,
-        FieldType: "",
-        FilterCondition: null,
-        Hidden: false,
-        HiddenInGroup: false,
-        HideLeftPane: false,
-        InformationField: false,
-        InternalStdField: true,
-        // LinkTag: MastersTagId.Unit,
-        Mandatory: true,
-        MandatoryInGroup: false,
-        MandatoryInRevision: false,
-        MaxSize: 0,
-        MaximumValue: null,
-        MergeField: false,
-        MinimumValue: null,
-        Negative: false,
-        NumberList: null,
-        PreLoadValuesOnDemand: false,
-        ReadOnly: false,
-        RegularExpression: "",
-        Removed: false,
-        RowSpan: 0,
-        ScrollBar: 0,
-        TabName: "General",
-        Tag: 20,
-        ToolTip: null,
-        View: 95,
-        ViewCaption: "dipin2",
-        Visible: false,
-        WordWrap: false,
-
-    },
+    
     {
         AllowDate: 0,
         AllowDateName: null,
@@ -513,7 +289,7 @@ const tableFields = [
         ErrorMessage: null,
         Field: 334,
         FieldDisplayType: "Text Box",
-        FieldName: "Remarks",
+        FieldName: "sRemarks",
         FieldOrder: 3,
         FieldStructure: 5,
         FieldType: "text",
@@ -549,7 +325,7 @@ const tableFields = [
         RoundOff: null
 
     },
-    
+
 
 ]
 
@@ -558,81 +334,222 @@ export default function InspDetails({
     detailPageId: summaryId,
     userAction,
     disabledDetailed,
-    group,
-    groupSelection,
+    productId,
+    backId,
+    setId
 }) {
+   
+    const currentDate = new Date().toISOString().split("T")[0];
+
+    const [formData, setFormData] = useState({
+        Id:null,
+        Product:null,
+        List:null,
+        OwnerName: null,
+        OfficeAddress: "",
+        EquipmentLocation: null,
+        DateOfInspection: null,
+        PreviousInspectionReport: null,
+        TestMethod: null,
+        ExpiryDate: null,
+        LastProofLoadTest: null,
+        CalibratedTestEquipment: null,
+        ClientTestEquipment: null,
+        InspectionInformation: {},
+    });
     const [mainDetails, setMainDetails] = useState({});
-    const [companyList, setCompanyList] = useState([]);
-    const [unitInfo, setUnitInfo] = useState([]);
     const [detailPageId, setDetailPageId] = useState(summaryId);
     const [confirmAlert, setConfirmAlert] = useState(false);
     const [confirmData, setConfirmData] = useState({});
     const [confirmType, setConfirmType] = useState(null);
-    const { gettaglist, upsertstockcount } = stockCountApis();
-    const [baseUnit, setBaseUnit] = useState({});
-    const [property, setProperty] = useState(false);
     const [expanded, setExpanded] = useState(1);//Accordion open
-    const [tableBody, setTableBody] = useState(InspectionData);
-    console.log('table detail',tableBody);
-    
+    const [tableBody, setTableBody] = useState();
+
+
+    //----Fields-----
+    const [viewFields, setViewFields] = useState([])
+    const [fieldsWithStructure, setFieldsWithStructure] = useState([]);
+    const [groupedFields, setgroupedFields] = useState([])
+
+
+    console.log('table detail', tableBody);
+
     const { showAlert } = useAlert();
     const {
-        gettagdetails,
-        deletetag,
-        checkexistenceintag,
-        gettagparentlist,
-        upsertproductmaster,
-        updateproductproperties,
-        updatetagparent,
-    } = masterApis();
+        GetInspectionFields,getInspectionDetails,upsertInspection,deleteInspection
+    } = inspectionApis();
+
+
 
     useEffect(() => {
         const fetchData = async () => {
-            await tagDetails();
-        };
-        fetchData();
-    }, [detailPageId]);
+            try {
+                setFormData({
+                    Id:detailPageId,
+                    Product:null,
+                    List:null,
+                    OwnerName: null,
+                    OfficeAddress: "",
+                    EquipmentLocation: null,
+                    DateOfInspection: currentDate,
+                    PreviousInspectionReport: null,
+                    TestMethod: null,
+                    ExpiryDate: null,
+                    LastProofLoadTest: null,
+                    CalibratedTestEquipment: null,
+                    ClientTestEquipment: null,
+                    TestDate:null,
+                    InspectionInformation:{},
+                })
+                setFieldsWithStructure([])
+                const response = await GetInspectionFields({
+                    Id:productId
+                })
+                if (response.status == "Success") {
+                    let fieldsData = JSON.parse(response?.result);
+                    console.log('field view', fieldsData);
 
-    const tagDetails = async () => {
-        try {
-            if (detailPageId == 0) {
-                handleNew();
-            } else {
-                const response = await gettagdetails({
-                    id: detailPageId,
-                    tagId: 11,
-                });
-                if (response?.status === "Success") {
-                    const myObject = JSON.parse(response?.result);
-                    const baseUnitArray = myObject?.UnitInfo.filter(
-                        (item) => item.Baseunit === true
-                    );
-                    const nonBaseUnitArray = myObject?.UnitInfo.filter(
-                        (item) => item.Baseunit === false
-                    );
-                    setMainDetails(myObject?.TagInfo[0]);
-                    setCompanyList([...myObject?.EntityInfo, { BE: 0, BE_Name: null }]);
-                    setUnitInfo(
-                        nonBaseUnitArray?.length
-                            ? nonBaseUnitArray
-                            : [
-                                {
-                                    Barcode: null,
-                                    Conversion: null,
-                                    Unit: null,
-                                    Unit_Name: null,
-                                },
-                            ]
-                    );
-                    setBaseUnit(baseUnitArray[0]);
-                } else {
-                    handleNew();
+                    setViewFields(fieldsData)
+
+                    fieldsData.forEach((field) => {
+                        const {FieldName,FieldDisplayType } = field;
+              
+                        const fieldDisplayType = FieldDisplayType.toLowerCase();
+                         let processedValue;
+                        if (fieldDisplayType === "date") {
+                          processedValue = currentDate; 
+                          setFormData((prevFormData) => ({
+                            ...prevFormData,
+                            InspectionInformation: {
+                              ...prevFormData.InspectionInformation, // Spread the previous details to retain other properties
+                              [FieldName]: processedValue, // Dynamically update the property
+                            },
+                          }));
+                          // Set today's date if no default
+                        }
+                         
+                      });
+
+                      if (detailPageId > 0) {
+                        await fetchDetail(); // Call the fetchDetail function after viewFields are set
+                      }  
+
                 }
+                else{
+                    setViewFields([]);
+                    setFormData({
+                        Id:detailPageId,
+                        OwnerName: null,
+                        Product:null,
+                        List:null,
+                        OfficeAddress: "",
+                        EquipmentLocation: null,
+                        DateOfInspection: null,
+                        PreviousInspectionReport: null,
+                        TestMethod: null,
+                        ExpiryDate: null,
+                        LastProofLoadTest: null,
+                        CalibratedTestEquipment: null,
+                        ClientTestEquipment: null,
+                        TestDate:null,
+                        InspectionInformation: {},
+                    })
+                    setFieldsWithStructure([]) 
+                }
+            } catch (error) {
+                setViewFields([]);
+                setFormData({
+                    Id:detailPageId,
+                    OwnerName: null,
+                    Product:null,
+                    List:null,
+                    OfficeAddress: "",
+                    EquipmentLocation: null,
+                    DateOfInspection: null,
+                    PreviousInspectionReport: null,
+                    TestMethod: null,
+                    ExpiryDate: null,
+                    LastProofLoadTest: null,
+                    CalibratedTestEquipment: null,
+                    ClientTestEquipment: null,
+                    TestDate:null,
+                    InspectionInformation: {},
+                })
+                setFieldsWithStructure([])
             }
-        } catch (error) {
-            throw error;
+        };
+        if(productId){  
+           fetchData();
         }
-    };
+    }, [productId,detailPageId]);
+
+
+    useEffect(() => { 
+
+        const groupedFields1 = viewFields.reduce((acc, field) => {
+            const tabKey = field.TabName || ''; // Check if TabName is empty or null
+            // Continue grouping non-FieldStructure 5 fields
+            if (!acc[tabKey]) {
+                acc[tabKey] = [];
+            }
+            acc[tabKey].push(field);
+            return acc;
+        }, {});
+
+       
+        setgroupedFields(groupedFields1)
+        setExpanded(Object.keys(groupedFields1)[0])
+        // Now you have your tagDetailsAccumulator with unsorted fields in the first array, sorted by FieldOrder
+
+    }, [viewFields]);
+
+
+    const fetchDetail =async()=>{
+        try {
+    
+        
+        
+           //  const response = await gettagdetails({id:detailPageId,tagId:menuObj?.TagId ,languageId:currentLanguage})
+            const response = await getInspectionDetails({id:detailPageId})
+            if(response.status =="Success"){
+             
+         
+             const result = JSON.parse(response?.result)
+             console.log('inp get detail',result);
+
+             let updatedData = {
+                ...formData,
+                ...result,
+                InspectionInformation:result?.InspectionInformation?? {}
+             }
+             
+          
+           
+            console.log('updata88',updatedData);
+            
+             setFormData(updatedData)
+             setTableBody(result?.Examination)
+             
+            }
+            
+            
+        } catch (error) {
+          handleclose()
+        }
+       }
+
+
+
+
+
+
+
+
+
+
+   
+
+   
 
     //Accordion 
     const handleChange = (panel) => (event, isExpanded) => {
@@ -655,45 +572,12 @@ export default function InspDetails({
             Type: null,
             Type_Name: null,
         });
-        setCompanyList([{ BE: 0, BE_Name: null }]);
-        setUnitInfo([
-            {
-                Barcode: null,
-                Conversion: null,
-                Unit: null,
-                Unit_Name: null,
-            },
-        ]);
-        setBaseUnit({
-            Barcode: null,
-            Baseunit: true,
-            Conversion: null,
-            Id: 0,
-            Unit: null,
-            Unit_Name: null,
-        });
         setDetailPageId(0);
     };
 
-    useEffect(() => {
-        if (!baseUnit?.Unit) {
-            setUnitInfo([
-                {
-                    Barcode: null,
-                    Conversion: null,
-                    Unit: null,
-                    Unit_Name: null,
-                },
-            ]);
-        }
-    }, [baseUnit?.Unit]);
+   
 
-    function hasDuplicateBarcode(data) {
-        return data.some(
-            (item, index, array) =>
-                array.findIndex((el) => el.Barcode === item.Barcode) !== index
-        );
-    }
+    
 
     const handleIconsClick = async (value) => {
         switch (value.trim()) {
@@ -705,48 +589,10 @@ export default function InspDetails({
                 break;
             case "save":
                 const emptyFields = [];
-                if (!mainDetails?.Name) emptyFields.push("Name");
-                if (!mainDetails.Code) emptyFields.push("Code");
-                if (!mainDetails.Category) emptyFields.push("Category");
-                if (!mainDetails.Type) emptyFields.push("Type");
-                if (!baseUnit?.Unit) emptyFields.push("Base Unit");
-                if (!baseUnit?.Barcode) emptyFields.push("Bar Code");
-                const filteredCompanyList = companyList
-                    .filter((item) => item.BE && item.BE !== 0) // Filter out items where BE is 0 or not present
-                    .map((item) => ({ be: item.BE }));
-                if (!filteredCompanyList?.length) emptyFields.push("Entity");
+                
+                
                 if (emptyFields.length > 0) {
                     showAlert("info", `Please Provide ${emptyFields[0]}`);
-                    return;
-                }
-                let checkDataMissing = false;
-                if (unitInfo?.length > 1) {
-                    checkDataMissing = unitInfo.some(
-                        (item) => !item?.Unit || !item?.Conversion || !item?.Barcode
-                    );
-                } else if (unitInfo?.length === 1) {
-                    if (
-                        unitInfo.some(
-                            (item) => !item?.Unit && !item?.Conversion && !item?.Barcode
-                        )
-                    ) {
-                        checkDataMissing = false;
-                    } else {
-                        // If no completely empty items, check if all items are valid
-                        checkDataMissing = !unitInfo.some(
-                            (item) => item?.Unit && item?.Conversion && item?.Barcode
-                        );
-                    }
-                } else {
-                    checkDataMissing = false;
-                }
-
-                if (checkDataMissing) {
-                    showAlert("info", `Please fill the unit table row`);
-                    return;
-                }
-                if (hasDuplicateBarcode([...unitInfo, baseUnit])) {
-                    showAlert("info", `Please fill unique barcode`);
                     return;
                 }
                 setConfirmData({ message: "Save", type: "success" });
@@ -758,9 +604,6 @@ export default function InspDetails({
                 setConfirmType("delete");
                 setConfirmAlert(true);
                 break;
-            case "property":
-                handleProperty();
-                break;
             default:
                 break;
         }
@@ -768,66 +611,62 @@ export default function InspDetails({
     // Handlers for your icons
 
     const handleclose = () => {
-        setPageRender(1);
+        setId(backId)
+        setPageRender(3);
     };
 
     const handleSave = async () => {
-        const filteredCompanyList = companyList
-            .filter((item) => item.BE && item.BE !== 0) // Filter out items where BE is 0 or not present
-            .map((item) => ({ be: item.BE }));
-        const filteredUnitInfo = unitInfo?.map((item) => ({
-            unit: item?.Unit,
-            conversion: item?.Conversion,
-            barcode: item?.Barcode,
-            baseUnit: item?.Baseunit,
-        }));
-        const updateUnit =
-            filteredUnitInfo?.length === 1 && !filteredUnitInfo[0]?.unit
-                ? []
-                : filteredUnitInfo;
-        const saveData = {
-            id: mainDetails?.Id,
-            name: mainDetails?.Name,
-            code: mainDetails?.Code,
-            altName: mainDetails?.AltName,
-            type: mainDetails?.Type,
-            category: mainDetails?.Category,
-            // warehouse: mainDetails?.Id,
-            parent: mainDetails?.Parent,
-            group: group !== 0 ? true : mainDetails?.Group,
-            disableBatch: mainDetails?.Type !== 3 ? mainDetails?.DisableBatch : true,
-            disableSerialNo:
-                mainDetails?.Type !== 3 ? mainDetails?.DisableSerialNo : true,
-            unitInfo: [
-                {
-                    unit: baseUnit?.Unit,
-                    conversion: null,
-                    barcode: baseUnit?.Barcode,
-                    baseUnit: baseUnit?.Baseunit,
-                },
-                ...updateUnit,
-            ],
-            entityInfo: filteredCompanyList,
-        };
-        const response = await upsertproductmaster(saveData);
-        if (response.status === "Success") {
-            if (group === 2) {
-                const parentPayload = groupSelection?.map((item) => ({
-                    id: item,
-                }));
-                const parentData = {
-                    tagId: 11,
-                    parentId: Number(response?.result),
-                    ids: parentPayload,
+
+        const updatedChildData = tableBody.map((obj) => {
+            return obj?.items?.map((list) => {
+                return {
+                    slNo: list.Id,
+                    subCategory: list.Category,
+                    data: list.iData,
+                    remarks: list.sRemarks,
                 };
-                const respone2 = await updatetagparent(parentData);
-            }
-            showAlert("success", response?.message);
-            handleNew();
-            const actionExists = userAction.some((action) => action.Action === "New");
-            if (!actionExists) {
-                setPageRender(1);
-            }
+            });
+        }).flat();
+
+        const hasDataZero = updatedChildData.some(
+            (item) => item.data === 0
+          );
+          if(hasDataZero)
+          {
+                showAlert("info","Ensure complete Data")
+          }
+
+          if(!hasDataZero)
+          {
+            const saveData = {
+                id: formData?.Id,
+                product: formData?.Product,
+                list: formData?.List,
+                dateOfInspection: formData?.DateOfInspection,
+                expiryDate: formData?.ExpiryDate,
+                // inspectionType: formData?.,
+                previousInspectionReport: formData?.PreviousInspectionReport,
+                testMethod: formData?.TestMethod,
+                calibratedTestEquipment: formData?.CalibratedTestEquipment,
+                clientTestEquipment: formData?.ClientTestEquipment,
+                testDate: formData?.TestDate,
+                inspectionInformation:[formData?.InspectionInformation], 
+                examination: updatedChildData,
+            };
+            console.log('insp sva data',saveData);
+            
+            const response = await upsertInspection(saveData);
+            if (response.status === "Success") {
+    
+                showAlert("success", response?.message);
+                // handleNew();
+                const actionExists = userAction.some((action) => action.Action === "New");
+                if (!actionExists) {
+                    handleclose();
+                }
+            
+          }
+        
         }
     };
 
@@ -858,7 +697,7 @@ export default function InspDetails({
     //Delete alert open
     const deleteClick = async () => {
         let response;
-        response = await deletetag([{ id: detailPageId }], 11);
+        response = await deleteInspection([{ id: detailPageId }]);
         if (response?.status === "Success") {
             showAlert("success", response?.message);
             handleNew();
@@ -869,64 +708,16 @@ export default function InspDetails({
         }
     };
 
-    const handleDeleteRow = (index) => {
-        if (companyList?.length <= 1) {
-            setCompanyList([{ BE: 0, BE_Name: null }]);
-        } else {
-            setCompanyList((prev) => prev.filter((_, i) => i !== index));
-        }
-    };
+  
 
-    const handleMasterExist = async (type) => {
-        try {
-            const response = await checkexistenceintag({
-                tagId: 11,
-                id: mainDetails?.Id,
-                name: type === 1 ? mainDetails?.Name : mainDetails?.Code,
-                type: type,
-            });
-            if (response.status === "Success") {
-                return true;
-            } else {
-                return false;
-            }
-        } catch (error) {
-            return false;
-        }
-    };
+    
 
-    const handleProperty = () => {
-        setConfirmData({
-            message: `You want to Activate/Inactivate the property.`,
-            type: "info",
-            header: "Property",
-        });
-        setProperty(true);
-    };
+    
 
-    const handlePropertyConfirmation = async (status) => {
-        const propertyPayload = [
-            {
-                id: detailPageId,
-            },
-        ];
+    
 
-        const saveData = {
-            status: status,
-            ids: propertyPayload,
-        };
-        try {
-            const response = await updateproductproperties(saveData);
-
-            if (response?.status === "Success") {
-                showAlert("success", response?.message);
-                setConfirmData({});
-            }
-        } catch (error) {
-        } finally {
-            setProperty(false);
-        }
-    };
+    
+  console.log('insp summ93',formData);
 
     return (
         <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
@@ -941,7 +732,7 @@ export default function InspDetails({
                     flexWrap: "wrap",
                 }}
             >
-                <BasicBreadcrumbs group={group} />
+                <BasicBreadcrumbs />
                 <DefaultIcons
                     detailPageId={detailPageId}
                     iconsClick={handleIconsClick}
@@ -967,7 +758,7 @@ export default function InspDetails({
                         display: "flex",
                         flexDirection: "column",
                         paddingTop: "10px",
-                        gap: '50px'
+                        gap: '20px'
                     }}
                 >
                     <Box
@@ -995,8 +786,8 @@ export default function InspDetails({
                             type={"text"}
                             disabled={false}
                             mandatory={true}
-                            value={mainDetails}
-                            setValue={setMainDetails}
+                            value={formData}
+                            setValue={setFormData}
                             onBlurAction={() => handleMasterExist(1)}
                             maxLength={100}
                         />
@@ -1019,72 +810,105 @@ export default function InspDetails({
                         }} >
                             <UserInputField
                                 label={"Owner Name"}
-                                name={"OwnerName"}
+                                name={"Owner"}
                                 type={"text"}
                                 disabled={false}
                                 mandatory={true}
-                                value={mainDetails}
-                                setValue={setMainDetails}
+                                value={formData}
+                                setValue={setFormData}
                                 onBlurAction={() => handleMasterExist(2)}
                                 maxLength={100}
                             />
                             <UserInputField
                                 label={"Office Address"}
-                                name={"OfficeAddress"}
+                                name={"Address"}
                                 type={"text"}
                                 disabled={false}
                                 mandatory={true}
-                                value={mainDetails}
-                                setValue={setMainDetails}
+                                value={formData}
+                                setValue={setFormData}
                                 onBlurAction={() => handleMasterExist(2)}
                                 maxLength={100}
                             />
                             <UserInputField
                                 label={"Equipment Location"}
-                                name={"EquipmentLocation"}
+                                name={"Location"}
                                 type={"text"}
                                 disabled={false}
                                 mandatory={true}
-                                value={mainDetails}
-                                setValue={setMainDetails}
+                                value={formData}
+                                setValue={setFormData}
                                 onBlurAction={() => handleMasterExist(2)}
                                 maxLength={100}
                             />
-                            
-        
-                           
 
-                            
                         </Box>
 
 
 
                     </Box>
                     <CustomizedAccordions
-                                    // icons="fa-solid fa-briefcase"
-                                    label={'Inspection Details'}
-                                    type={1}
-                                    expanded={expanded === 0}
-                                    onChange={handleChange(0)}
-                                >
-                                   <InspDetailsTab mainDetails={mainDetails} setMainDetails={setMainDetails}/>
-                                </CustomizedAccordions>
+                        // icons="fa-solid fa-briefcase"
+                        label={'Inspection Details'}
+                        type={1}
+                        expanded={expanded === 1}
+                        onChange={handleChange(1)}
+                    >
+                        <InspDetailsTab formData={formData} setFormData={setFormData} />
+                    </CustomizedAccordions>
+
+
+
+
+                    {viewFields.length > 0 && (
+                        <>
+                            {Object.keys(groupedFields).map((tabKey) => {
+                                // Check the FieldStructure of the first field in each group
+                                const fieldStructure = groupedFields[tabKey]?.[0]?.FieldStructure;
+
+                             
+                                    return (
+                                        <TabFields
+                                            key={tabKey}
+                                            fields={groupedFields[tabKey]} // Pass fields belonging to this tab
+                                            expanded={expanded === tabKey}
+                                            onChange={handleChange(tabKey)}
+                                            formData={formData?.InspectionInformation}
+                                            setFormData={ (data)=>setFormData((prevFormData) => ({
+                                                ...prevFormData,
+                                                InspectionInformation: data
+                                              }))}
+                                            // language={currentLanguageName}
+                                            // tagDetails={menuObj}
+                                            fieldStructure={fieldStructure}
+                                            // handleTagSwitch={!preview ? handleTagSwitch : false}
+                                            disabledDetailed={disabledDetailed}
+                                            userAction={userAction}
+                                            // fetchDetailTagInfo={fetchDetailTagInfo}
+                                            detailScreeniId={formData.iId}
+                                        />
+                                    );
+                                  
+                            })}
+                        </>
+                    )}
+
                     <Box>
                         {tableBody?.map((list, index) => (
                             <>
                                 <CustomizedAccordions
                                     // icons="fa-solid fa-briefcase"
-                                    label={list?.Name}
+                                    label={list?.Category_Name}
                                     type={1}
                                     expanded={expanded === index + 1}
                                     onChange={handleChange(index + 1)}
                                 >
-                                    <InspBodyTable fields={tableFields} tableData={list?.Data} settableData={setTableBody} preview={false} typeName={list?.Name} />
+                                    <InspBodyTable fields={tableFields} tableData={list?.items} settableData={setTableBody} preview={false} typeName={list?.Name} />
                                 </CustomizedAccordions>
                             </>
                         ))}
 
-                        
+
                     </Box>
 
                 </Box>
@@ -1097,13 +921,7 @@ export default function InspDetails({
                 submite={handleConfirmSubmit}
             />
 
-            {/* <MasterProductConfirmation
-        handleClose={() => setProperty(false)}
-        open={property}
-        data={confirmData}
-        submite={handlePropertyConfirmation}
-        selectedDatas={detailPageId ? detailPageId : null}
-      /> */}
+            
         </Box>
     );
 }

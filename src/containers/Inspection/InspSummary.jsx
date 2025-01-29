@@ -4,7 +4,6 @@ import Breadcrumbs from "@mui/material/Breadcrumbs";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import ActionButton from "../../component/Buttons/ActionButton";
 import { useAlert } from "../../component/Alerts/AlertContext";
-import SummaryTable from "../../component/Table/SummaryTable";
 import { primaryColor } from "../../config/config";
 import ConfirmationAlert from "../../component/Alerts/ConfirmationAlert";
 import { masterApis } from "../../service/Master/master";
@@ -12,6 +11,9 @@ import { masterApis } from "../../service/Master/master";
 import ExcelExport from "../../component/Excel/Excel";
 import { identity } from "lodash";
 import { summaryData } from "../../config";
+import { allocationApis } from "../../service/Allocation/allocation";
+import InspSummaryTable from "../../component/Table/InspSummaryTable";
+import { inspectionApis } from "../../service/Inspection/inspection";
 
 function BasicBreadcrumbs() {
   const style = {
@@ -48,7 +50,7 @@ function BasicBreadcrumbs() {
           aria-label="breadcrumb"
         >
           <Typography underline="hover" sx={style} key="1">
-            Inspection Summary
+            Inspection Product list
           </Typography>
         </Breadcrumbs>
       </Stack>
@@ -69,14 +71,14 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
         scrollbarWidth: "thin",
       }}
     >
-      {userAction.some((action) => action.Action === "New") && (
+      {/* {userAction.some((action) => action.Action === "New") && (
         <ActionButton
           iconsClick={iconsClick}
           icon={"fa-solid fa-plus"}
           caption={"New"}
           iconName={"new"}
         />
-      )}
+      )} */}
       {userAction.some((action) => action.Action === "Edit") && (
         <ActionButton
           iconsClick={iconsClick}
@@ -110,32 +112,6 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
             iconName={"view"}
           />
         )}
-      {userAction.some((action) => action.Action === "Property") && (
-        <ActionButton
-          iconsClick={iconsClick}
-          icon={"fa-solid fa-gears"}
-          caption={"Property"}
-          iconName={"property"}
-        />
-      )}
-
-      {userAction.some((action) => action.Action === "Group") && (
-        <ActionButton
-          iconsClick={iconsClick}
-          icon={"fa-solid fa-user-group"}
-          caption={"Group"}
-          iconName={"group"}
-        />
-      )}
-
-      {userAction.some((action) => action.Action === "Add Group") && (
-        <ActionButton
-          iconsClick={iconsClick}
-          icon={"fa-solid fa-user-plus"}
-          caption={"Add Group"}
-          iconName={"addGroup"}
-        />
-      )}
       <ActionButton
         iconsClick={iconsClick}
         icon={"fa-solid fa-xmark"}
@@ -150,14 +126,16 @@ export default function InspSummary({
   setPageRender,
   setId,
   userAction,
-  setGroup,
-  setGroupSelection,
+  Id,
+  setProductId,
+  setBackId
 }) {
   const [rows, setRows] = React.useState([]); //To Pass in Table
   const [displayLength, setdisplayLength] = React.useState(25); // Show Entries
   const [pageNumber, setpageNumber] = React.useState(1); //Table current page number
   const [changesTriggered, setchangesTriggered] = React.useState(false); //Any changes made like delete, add new role then makes it true for refreshing the table
   const [selectedDatas, setselectedDatas] = React.useState([]); //selected rows details
+  const [selectedProduct, setselectedProduct] = React.useState([]);
   const [totalRows, settotalRows] = useState(null); // Total rows of Api response
   const [refreshFlag, setrefreshFlag] = React.useState(true); //To take data from Data base
   const [searchKey, setsearchKey] = useState(""); //Table Searching
@@ -167,8 +145,8 @@ export default function InspSummary({
   const [confirmData, setConfirmData] = useState({}); //To pass alert data
   const latestSearchKeyRef = useRef(searchKey);
   const [property, setProperty] = useState(false);
-  const { gettagsummary, deletetag, updateproductproperties, gettagurl } =
-    masterApis();
+  const { getInspectionSummary} =
+    inspectionApis();
   const [groupId, setGroupId] = useState(0);
   const [parentList, setParentList] = useState([]);
   const longPressTriggeredRef = useRef(false); // Persist flag
@@ -180,41 +158,32 @@ export default function InspSummary({
   //Role Summary
   const fetchRoleSummary = async () => {
     setselectedDatas([]);
-    setGroup(0);
     const currentSearchKey = latestSearchKeyRef.current;
     
     try {
-      // const response = await gettagsummary({
-      //   tagId: 11,
-      //   refreshFlag: refreshFlag,
-      //   pageNumber: pageNumber,
-      //   pageSize: displayLength,
-      //   searchString: currentSearchKey,
-      //   groupId: groupId,
-      // });
-
+      const response = await getInspectionSummary({
+        allocation: Id,
+        pageNo: pageNumber,
+        pageSize: displayLength,
+        search: currentSearchKey,
+      });
+      setBackId(Id)
       setrefreshFlag(false);
-      // if (
-      //   response?.status === "Success" &&
-      //   currentSearchKey === latestSearchKeyRef.current
-      // ) {
-      //   const myObject = JSON.parse(response?.result);
+      if (
+        response?.status === "Success" &&
+        currentSearchKey === latestSearchKeyRef.current
+      ) {
+        const myObject = JSON.parse(response?.result);
 
-      //   setRows(myObject?.Data );
+        setRows(myObject?.Data );
 
-      //   const totalRows = myObject?.PageSummary[0].TotalRows;
-      //   const totalPages = myObject?.PageSummary[0].TotalPages;
+        const totalRows = myObject?.Metadata.TotalRows;
+        const totalPages = myObject?.Metadata.TotalPages;
 
-      //   settotalRows(totalRows);
-      //   setTotalPages(totalPages);
-      // }
-      if(summaryData)
-      {
-        
-        setRows(summaryData)
-        settotalRows(summaryData.length);
-        setTotalPages(1);
+        settotalRows(totalRows);
+        setTotalPages(totalPages);
       }
+      
       
       else {
         setRows([]);
@@ -235,13 +204,12 @@ export default function InspSummary({
   }, [pageNumber, displayLength, searchKey, changesTriggered, groupId]);
 
 
-  useEffect(()=>{
-    handleParentGroup(0) 
-  },[])
+ 
 
-  const handleRowDoubleClick = (rowiId) => {
+  const handleRowDoubleClick = (rowiId,row) => {
     if (rowiId > 0) {
       setId(rowiId);
+      setProductId(row?.Product)
       setPageRender(2);
     }
   };
@@ -253,6 +221,9 @@ export default function InspSummary({
 
   const handleSelectedRowsChange = (selectedRowsData) => {
     setselectedDatas(selectedRowsData);
+  };
+  const handleSelectedRowsChangeProduct = (selectedRowsData) => {
+    setselectedProduct(selectedRowsData);
   };
   const resetChangesTrigger = () => {
     setGroupId(0);
@@ -286,19 +257,6 @@ export default function InspSummary({
       case "view":
         handleAdd("edit");
         break;
-      case "property":
-        handleProperty();
-        break;
-      case "addGroup":
-        handleAddGroup(1);
-        break;
-      case "group":
-        if (!selectedDatas?.length) {
-          showAlert("info", "Please Select row for Group");
-          return;
-        }
-        handleAddGroup(2);
-        break;
       case "excel":
         handleExcelExport();
         break;
@@ -310,23 +268,13 @@ export default function InspSummary({
   };
 
   const handleclose = () => {
-    window.history.back();
+    setPageRender(1);
   };
 
-  const handleAddGroup = (type) => {
-    if (type === 2) {
-      setGroupSelection(selectedDatas);
-    } else {
-      setGroupSelection([]);
-    }
-    setGroup(type);
-    setId(0);
-    setPageRender(2);
-  };
+  
 
   // Handlers for your icons
   const handleAdd = (value) => {
-    setGroup(0);
     if (value === "edit") {
       if (selectedDatas.length !== 1) {
         showAlert(
@@ -338,6 +286,7 @@ export default function InspSummary({
         return;
       }
       setId(selectedDatas[0]);
+      setProductId(selectedProduct[0]);
     } else {
       setId(0);
     }
@@ -354,49 +303,9 @@ export default function InspSummary({
     handleConfrimOpen();
   };
 
-  const handleProperty = () => {
-    if (selectedDatas.length === 0) {
-      showAlert("info", "Select rows to Active/Inactive");
-      return;
-    }
-    setConfirmData({
-      message: `You want to Activate/Inactivate the property.`,
-      type: "info",
-      header: "Property",
-    });
-    setProperty(true);
-  };
+  
 
-  const handlePropertyConfirmation = async (status) => {
-    let propertyPayload;
-    if (selectedDatas?.length === 1) {
-      propertyPayload = [
-        {
-          id: selectedDatas[0],
-        },
-      ];
-    } else {
-      propertyPayload = selectedDatas.map((item) => ({
-        id: item,
-      }));
-    }
-    const saveData = {
-      status: status,
-      ids: propertyPayload,
-    };
-    try {
-      const response = await updateproductproperties(saveData);
-      if (response?.status === "Success") {
-        showAlert("success", response?.message);
-      }
-    } catch (error) {
-    } finally {
-      setrefreshFlag(true);
-      setselectedDatas([]);
-      setchangesTriggered(true);
-      setProperty(false);
-    }
-  };
+  
 
   //To delete
   const handledeleteRole = async () => {
@@ -455,7 +364,6 @@ export default function InspSummary({
       if (isHighlighted) {
         setGroupId(row?.Id);
         setPageRender(1);
-        handleParentGroup(row?.Id)
       } else {
         setGroupId(0);
       }
@@ -470,19 +378,7 @@ export default function InspSummary({
     }
   };
  
-  const handleParentGroup = async (id) => {
-    const response = await gettagurl({
-      id: id,
-      tagId: 11,
-    });
-    setGroupId(id)
-   if(response?.status === "Success"){
-     const myObject = JSON.parse(response?.result)
-     setParentList(myObject)
-   }else{
-    setParentList([])
-   }
-  };
+  
   
   return (
     <>
@@ -502,7 +398,7 @@ export default function InspSummary({
           <DefaultIcons iconsClick={handleIconsClick} userAction={userAction} />
         </Box>
         <Box sx={{ width: "100%", overflowX: "auto", paddingBottom: "10px" }}>
-          <SummaryTable
+          <InspSummaryTable
             rows={rows}
             //onExportData={handleExportData}
             onDisplayLengthChange={handleDisplayLengthChange}
@@ -512,12 +408,12 @@ export default function InspSummary({
             changesTriggered={changesTriggered}
             setchangesTriggered={resetChangesTrigger}
             onSelectedRowsChange={handleSelectedRowsChange}
+            onSelectedProductChange={handleSelectedRowsChangeProduct}
             onRowDoubleClick={handleRowDoubleClick}
             totalRows={totalRows}
             //   currentTheme={currentTheme}
             handleLongPressStart={handleLongPressStart}
             handleLongPressEnd={handleLongPressEnd}
-            handleParentGroup={handleParentGroup}
             parentList={parentList}
             totalPages={totalPages}
             hardRefresh={hardRefresh}

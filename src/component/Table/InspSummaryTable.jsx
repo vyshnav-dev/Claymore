@@ -34,8 +34,6 @@ import {
   selectedColor,
   thirdColor,
 } from "../../config/config";
-import UserAutoComplete from "../AutoComplete/UserAutoComplete";
-import { masterApis } from "../../service/Master/master";
 
 const iconsExtraSx = {
   fontSize: "0.8rem",
@@ -46,7 +44,7 @@ const iconsExtraSx = {
   marginRight: 1,
 };
 
-export default function FormBodyTable(props) {
+export default function InspSummaryTable(props) {
   const {
     rows,
     totalPages,
@@ -54,45 +52,43 @@ export default function FormBodyTable(props) {
     IdName,
     handleLongPressStart,
     handleLongPressEnd,
-    handleParentGroup,
     parentList,
-    mainDetails,
-    setMainDetails,
-    userData,
-    getcategorylist,
-    getproductlist
   } = props;
   const [selected, setSelected] = React.useState([]);
+  const [selectedPd, setSelectedPd] = React.useState([]);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(25);
   const [searchTerm, setSearchTerm] = React.useState("");
   const [filteredRows, setFilteredRows] = React.useState([]);
   const [columns, setColumns] = React.useState([]);
 
- 
-
-  const excludedFields = [IdName, "Group", "GroupId", "TotalRows"];
+  const profileDateFieldsArray = profileDateFields
+  .split(",")
+  .map((field) => field.trim()); 
+  const excludedFields = [ "Group", "GroupId","TotalRows","UserName"];
 
   //To apply some filters on table rows
   const initialColumns =
     rows && rows.length > 0
       ? Object.keys(rows[0])
-        .filter((key) => !excludedFields.includes(key))
-        .map((key) => ({
-          id: key,
-          label:
-            key.charAt(0).toUpperCase() +
-            key
-              .slice(1)
-              .replace(/([A-Z])/g, " $1")
-              .trim(), // Format label as readable text
-          minWidth: 100, // Set default minWidth for all columns
-          maxWidth: 200,
-        }))
+          .filter((key) => !excludedFields.includes(key))
+          .map((key) => ({
+            id: key,
+            label:
+              key.charAt(0).toUpperCase() +
+              key
+                .slice(1)
+                .replace(/([A-Z])/g, " $1")
+                .trim(), // Format label as readable text
+            minWidth: 100, // Set default minWidth for all columns
+            maxWidth: 200,
+          }))
       : [];
   React.useEffect(() => {
     setColumns(initialColumns);
   }, [rows]);
+
+  
 
   //To expand column on mouse dragging
   const handleResize = (index, event) => {
@@ -159,17 +155,26 @@ export default function FormBodyTable(props) {
   const handleClick = (event, row) => {
     const selectedIndex = selected.indexOf(row[IdName]);
     let newSelected = [];
+    const selectedIndexpd = selectedPd.indexOf(row['Product']);
+    let newSelectedPd = [];
+    
 
-    if (selectedIndex === -1) {
+    if (selectedIndex === -1 || selectedIndexpd === -1) {
       newSelected = newSelected.concat(selected, row[IdName]); // Add the entire row object
+      newSelectedPd = newSelectedPd.concat(selectedPd, row['Product']); // Add the entire row object
     } else {
       newSelected = [
         ...selected.slice(0, selectedIndex),
         ...selected.slice(selectedIndex + 1),
       ];
+      newSelectedPd = [
+        ...selectedPd.slice(0, selectedIndexpd),
+        ...selectedPd.slice(selectedIndexpd + 1),
+      ];
     }
 
     setSelected(newSelected);
+    setSelectedPd(newSelectedPd);
   };
 
   //To change page //remove event if Nan comes in pagination
@@ -202,6 +207,10 @@ export default function FormBodyTable(props) {
   React.useEffect(() => {
     props.onSelectedRowsChange(selected);
   }, [selected]);
+
+  React.useEffect(() => {
+    props.onSelectedProductChange(selectedPd);
+  }, [selectedPd]);
 
   //To convert date and time to dd/mm/yyyy format
   const convertToLocaleDateString = (dateString) => {
@@ -279,7 +288,7 @@ export default function FormBodyTable(props) {
         </FormControl>
 
         <div
-          style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 3 }}
+          style={{ display: "flex", alignItems: "center", flexWrap: "wrap" }}
         >
           <Tooltip title="Refresh">
             <IconButton onClick={hardRefresh} sx={iconsExtraSx}>
@@ -296,31 +305,6 @@ export default function FormBodyTable(props) {
               <FullscreenIcon />
             </IconButton>
           </Tooltip>
-          <Box sx={{ display: 'flex', flexWrap: "wrap", gap: .5, mb: 1 }}>
-            <UserAutoComplete
-              apiKey={getproductlist}
-              formData={mainDetails}
-              setFormData={setMainDetails}
-              label={"Product"}
-              autoId={"product"}
-              required={true}
-              formDataName={"ProductName"}
-              formDataiId={"Product"}
-            />
-
-            <UserAutoComplete
-                apiKey={getcategorylist}
-              formData={mainDetails}
-              setFormData={setMainDetails}
-              label={"Category"}
-              autoId={"category"}
-              required={true}
-              formDataName={"Category_Name"}
-              formDataiId={"Category"}
-              Product={mainDetails?.Product}
-            />
-          </Box>
-
           <TextField
             margin="normal"
             size="small"
@@ -365,7 +349,7 @@ export default function FormBodyTable(props) {
           />
         </div>
       </div>
-      <div
+      {/* <div
         style={{
           marginBottom: "10px",
           display: "flex",
@@ -381,7 +365,7 @@ export default function FormBodyTable(props) {
           <React.Fragment key={parent.Id}>
             <Typography
               variant="body2"
-              onClick={() => handleParentGroup(parent.Id)}
+              // onClick={() => handleParentGroup(parent.Id)}
               style={{
                 cursor: "pointer",
                 // You can style the text
@@ -394,7 +378,7 @@ export default function FormBodyTable(props) {
             )}
           </React.Fragment>
         ))}
-      </div>
+      </div> */}
       {filteredRows && filteredRows.length > 0 ? (
         <Paper sx={{ width: "100%", mb: 1 }}>
           {/* <EnhancedTableToolbar numSelected={selected.length} /> */}
@@ -440,8 +424,8 @@ export default function FormBodyTable(props) {
                       />
                     </TableCell>
                   ))}
-
-
+                  
+                  
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -451,14 +435,14 @@ export default function FormBodyTable(props) {
                     <TableRow
                       key={`${row[IdName]}-${index}`}
                       onClick={(event) => handleClick(event, row)}
-                      onMouseDown={(event) => handleLongPressStart(event, row)}
+                      // onMouseDown={(event) => handleLongPressStart(event, row)}
                       onMouseUp={handleLongPressEnd}
                       onMouseLeave={handleLongPressEnd} // In case the user drags out of the row
-                      onTouchStart={(event) => handleLongPressStart(event, row)} // For mobile
+                      // onTouchStart={(event) => handleLongPressStart(event, row)} // For mobile
                       onTouchEnd={handleLongPressEnd}
                       role="checkbox"
                       aria-checked={isItemSelected}
-                      onDoubleClick={() => props.onRowDoubleClick(row[IdName])}
+                      onDoubleClick={() => props.onRowDoubleClick(row[IdName],row)}
                       tabIndex={-1}
                       sx={{
                         cursor: "pointer",
@@ -466,8 +450,8 @@ export default function FormBodyTable(props) {
                         backgroundColor: isItemSelected
                           ? selectedColor
                           : index % 2 === 1
-                            ? thirdColor
-                            : null,
+                          ? thirdColor
+                          : null,
                       }}
                     >
                       {/* <TableCell sx={{ padding: "0px",textAlign:"center" }}>
@@ -499,15 +483,15 @@ export default function FormBodyTable(props) {
                             key={column.id}
                             style={{ minWidth: column.minWidth }}
                           >
-                            {profileDateFields.includes(column.label)
+                            {profileDateFieldsArray.includes(column.label)
                               ? convertToLocaleDateString(row[column.id])
                               : row[column.id] === null
-                                ? ""
-                                : `${row[column.id]}`}
+                              ? ""
+                              : `${row[column.id]}`}
                           </TableCell>
                         </Tooltip>
                       ))}
-                    </TableRow>
+                      </TableRow>
                   );
                 })}
               </TableBody>

@@ -31,19 +31,15 @@ import UserInputField from "../../component/InputFields/UserInputField";
 import { stockCountApis } from "../../service/Transaction/stockcount";
 import { masterApis } from "../../service/Master/master";
 
-// import { MDBIcon } from "mdb-react-ui-kit";
-// import MasterSelectionAutoComplete from "../MasterWarehouse/MasterSelectionAutoComplete";
-// import UserAutoComplete from "../../../component/AutoComplete/UserAutoComplete";
-// import UserAutoCompleteManual from "../../../component/AutoComplete/UserAutoCompleteManual";
-// import ChecKBoxLabel from "../../../component/CheckBox/CheckBoxLabel";
-// import MasterParentAutoComplete from "../../../component/AutoComplete/MasterAutoComplete/MasterParentAutoComplete";
-// import MasterProductUnitInfo from "./MasterProductUnitInfo";
-// import MasterProductConfirmation from "./MasterProductConfirmation";
+
 import { Info } from "@mui/icons-material";
 import CustomizedAccordions from "../../component/Accordion/Accordion";
 import RiskBodyTable from "./RiskBodyTable";
 import { assessmentData, locationType } from "../../config";
 import InputCommon from "../../component/InputFields/InputCommon";
+import { allocationApis } from "../../service/Allocation/allocation";
+import UserAutoComplete from "../../component/AutoComplete/UserAutoComplete";
+import { inspectionApis } from "../../service/Inspection/inspection";
 const currentDate = new Date().toISOString().split("T")[0];
 function CustomTabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -92,7 +88,7 @@ CustomTabPanel.propTypes = {
     value: PropTypes.number.isRequired,
 };
 
-function BasicBreadcrumbs({ group }) {
+function BasicBreadcrumbs() {
     const style = {
         display: "flex",
         alignItems: "center",
@@ -126,8 +122,7 @@ function BasicBreadcrumbs({ group }) {
                     aria-label="breadcrumb"
                 >
                     <Typography underline="hover" sx={style} key="1">
-                        Risk Assessment Details{" "}
-                        {group === 1 ? "(Add Group)" : group === 2 ? "(Group)" : null}
+                        Risk Assessment Details
                     </Typography>
                 </Breadcrumbs>
             </Stack>
@@ -146,7 +141,7 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction }) => {
                 scrollbarWidth: "thin",
             }}
         >
-            {userAction.some(
+            {/* {userAction.some(
                 (action) => action.Action === "New" && detailPageId !== 0
             ) && (
                     <ActionButton
@@ -155,7 +150,7 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction }) => {
                         caption={"New"}
                         iconName={"new"}
                     />
-                )}
+                )} */}
             {userAction.some(
                 (action) =>
                     (action.Action === "New" && detailPageId === 0) ||
@@ -181,19 +176,26 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction }) => {
                 </>
             )}
 
-            {userAction.some((action) => action.Action === "Property") && (
-                <>
-                    {detailPageId !== 0 && (
-                        <ActionButton
-                            iconsClick={iconsClick}
-                            icon={"fa-solid fa-gears"}
-                            caption={"Property"}
-                            iconName={"property"}
-                        />
-                    )}
-                </>
-            )}
+            
 
+            <ActionButton
+                iconsClick={iconsClick}
+                icon={"fa-solid fa-circle-arrow-left"}
+                caption={"Prev"}
+                iconName={"prev"}
+            />
+            <ActionButton
+                iconsClick={iconsClick}
+                icon={"fa-solid fa-circle-arrow-right"}
+                caption={"Next"}
+                iconName={"next"}
+            />
+            <ActionButton
+                iconsClick={iconsClick}
+                icon={"fa-solid fa-print"}
+                caption={"Print"}
+                iconName={"print"}
+            />
             <ActionButton
                 iconsClick={iconsClick}
                 icon={"fa-solid fa-xmark"}
@@ -227,7 +229,7 @@ const tableFields = [
         ErrorMessage: null,
         Field: 333,
         FieldDisplayType: "cell",
-        FieldName: "Type",
+        FieldName: "Data_Description",
         FieldOrder: 1,
         FieldStructure: 5,
         FieldType: "",
@@ -284,7 +286,7 @@ const tableFields = [
         ErrorMessage: null,
         Field: 334,
         FieldDisplayType: "risk",
-        FieldName: "Risk",
+        FieldName: "RiskData",
         FieldOrder: 2,
         FieldStructure: 5,
         FieldType: "",
@@ -442,33 +444,26 @@ export default function RiskAssesmentDetails({
     detailPageId: summaryId,
     userAction,
     disabledDetailed,
-    group,
-    groupSelection,
 }) {
+
+    const {
+        GetTechnicianList
+    } = allocationApis();
+
+    const userData = JSON.parse(localStorage.getItem("ClaymoreUserData"))[0];
     const [mainDetails, setMainDetails] = useState({});
-    const [companyList, setCompanyList] = useState([]);
-    const [unitInfo, setUnitInfo] = useState([]);
     const [detailPageId, setDetailPageId] = useState(summaryId);
     const [confirmAlert, setConfirmAlert] = useState(false);
     const [confirmData, setConfirmData] = useState({});
     const [confirmType, setConfirmType] = useState(null);
-    const { gettaglist, upsertstockcount } = stockCountApis();
-    const [baseUnit, setBaseUnit] = useState({});
-    const [property, setProperty] = useState(false);
     const [expanded, setExpanded] = useState(1);//Accordion open
-    const [tableBody, setTableBody] = useState(assessmentData);
-    console.log('table detail',tableBody);
-    
+    const [tableBody, setTableBody] = useState([]);
     const { showAlert } = useAlert();
     const {
-        gettagdetails,
-        deletetag,
-        checkexistenceintag,
-        gettagparentlist,
-        upsertproductmaster,
-        updateproductproperties,
-        updatetagparent,
-    } = masterApis();
+        GetRiskAssesmentDetails,
+        UpsertRiskAssesment,
+        deleteRiskAssesment
+    } = inspectionApis();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -482,36 +477,17 @@ export default function RiskAssesmentDetails({
             if (detailPageId == 0) {
                 handleNew();
             } else {
-                const response = await gettagdetails({
+                const response = await GetRiskAssesmentDetails({
                     id: detailPageId,
-                    tagId: 11,
                 });
                 if (response?.status === "Success") {
                     const myObject = JSON.parse(response?.result);
-                    const baseUnitArray = myObject?.UnitInfo.filter(
-                        (item) => item.Baseunit === true
-                    );
-                    const nonBaseUnitArray = myObject?.UnitInfo.filter(
-                        (item) => item.Baseunit === false
-                    );
-                    setMainDetails(myObject?.TagInfo[0]);
-                    setCompanyList([...myObject?.EntityInfo, { BE: 0, BE_Name: null }]);
-                    setUnitInfo(
-                        nonBaseUnitArray?.length
-                            ? nonBaseUnitArray
-                            : [
-                                {
-                                    Barcode: null,
-                                    Conversion: null,
-                                    Unit: null,
-                                    Unit_Name: null,
-                                },
-                            ]
-                    );
-                    setBaseUnit(baseUnitArray[0]);
-                } else {
+                    setMainDetails(myObject?.Header);
+                    setTableBody(myObject?.riskAssessments)
+                    
+                  } else {
                     handleNew();
-                }
+                  }
             }
         } catch (error) {
             throw error;
@@ -525,59 +501,22 @@ export default function RiskAssesmentDetails({
 
     const handleNew = async () => {
         setMainDetails({
-            AltName: null,
-            DisableBatch: false,
-            Category: null,
-            Category_Name: null,
-            Group: false,
-            Code: null,
-            Id: detailPageId,
-            Name: null,
-            Parent: null,
-            Parent_Name: null,
-            DisableSerialNo: false,
-            Type: null,
-            Type_Name: null,
+            Id:0,
+            JobOrderNo: null,
+            Client_Name: null,
+            Allocation:null,
+            FileNo:null,
+            Location: null,
+            Date: null,
+            Inspector: null,
+            Inspector_Name: null,    
         });
-        setCompanyList([{ BE: 0, BE_Name: null }]);
-        setUnitInfo([
-            {
-                Barcode: null,
-                Conversion: null,
-                Unit: null,
-                Unit_Name: null,
-            },
-        ]);
-        setBaseUnit({
-            Barcode: null,
-            Baseunit: true,
-            Conversion: null,
-            Id: 0,
-            Unit: null,
-            Unit_Name: null,
-        });
+        
         setDetailPageId(0);
     };
 
-    useEffect(() => {
-        if (!baseUnit?.Unit) {
-            setUnitInfo([
-                {
-                    Barcode: null,
-                    Conversion: null,
-                    Unit: null,
-                    Unit_Name: null,
-                },
-            ]);
-        }
-    }, [baseUnit?.Unit]);
-
-    function hasDuplicateBarcode(data) {
-        return data.some(
-            (item, index, array) =>
-                array.findIndex((el) => el.Barcode === item.Barcode) !== index
-        );
-    }
+   
+   
 
     const handleIconsClick = async (value) => {
         switch (value.trim()) {
@@ -589,50 +528,18 @@ export default function RiskAssesmentDetails({
                 break;
             case "save":
                 const emptyFields = [];
-                if (!mainDetails?.Name) emptyFields.push("Name");
-                if (!mainDetails.Code) emptyFields.push("Code");
-                if (!mainDetails.Category) emptyFields.push("Category");
-                if (!mainDetails.Type) emptyFields.push("Type");
-                if (!baseUnit?.Unit) emptyFields.push("Base Unit");
-                if (!baseUnit?.Barcode) emptyFields.push("Bar Code");
-                const filteredCompanyList = companyList
-                    .filter((item) => item.BE && item.BE !== 0) // Filter out items where BE is 0 or not present
-                    .map((item) => ({ be: item.BE }));
-                if (!filteredCompanyList?.length) emptyFields.push("Entity");
+                // if (!mainDetails?.Inspector) emptyFields.push("Inspector"); 
+                // if (!mainDetails?.Date) emptyFields.push("Date"); 
+                // if (!mainDetails?.JobOrderNo) emptyFields.push("Job OrderNo"); 
+                // if (!mainDetails?.Client_Name) emptyFields.push("Client"); 
+                // if (!mainDetails?.FileNo) emptyFields.push("File No"); 
+                // if (!mainDetails?.Location) emptyFields.push("Location"); 
                 if (emptyFields.length > 0) {
                     showAlert("info", `Please Provide ${emptyFields[0]}`);
                     return;
                 }
-                let checkDataMissing = false;
-                if (unitInfo?.length > 1) {
-                    checkDataMissing = unitInfo.some(
-                        (item) => !item?.Unit || !item?.Conversion || !item?.Barcode
-                    );
-                } else if (unitInfo?.length === 1) {
-                    if (
-                        unitInfo.some(
-                            (item) => !item?.Unit && !item?.Conversion && !item?.Barcode
-                        )
-                    ) {
-                        checkDataMissing = false;
-                    } else {
-                        // If no completely empty items, check if all items are valid
-                        checkDataMissing = !unitInfo.some(
-                            (item) => item?.Unit && item?.Conversion && item?.Barcode
-                        );
-                    }
-                } else {
-                    checkDataMissing = false;
-                }
-
-                if (checkDataMissing) {
-                    showAlert("info", `Please fill the unit table row`);
-                    return;
-                }
-                if (hasDuplicateBarcode([...unitInfo, baseUnit])) {
-                    showAlert("info", `Please fill unique barcode`);
-                    return;
-                }
+                
+               
                 setConfirmData({ message: "Save", type: "success" });
                 setConfirmType("save");
                 setConfirmAlert(true);
@@ -656,63 +563,58 @@ export default function RiskAssesmentDetails({
     };
 
     const handleSave = async () => {
-        const filteredCompanyList = companyList
-            .filter((item) => item.BE && item.BE !== 0) // Filter out items where BE is 0 or not present
-            .map((item) => ({ be: item.BE }));
-        const filteredUnitInfo = unitInfo?.map((item) => ({
-            unit: item?.Unit,
-            conversion: item?.Conversion,
-            barcode: item?.Barcode,
-            baseUnit: item?.Baseunit,
-        }));
-        const updateUnit =
-            filteredUnitInfo?.length === 1 && !filteredUnitInfo[0]?.unit
-                ? []
-                : filteredUnitInfo;
-        const saveData = {
-            id: mainDetails?.Id,
-            name: mainDetails?.Name,
-            code: mainDetails?.Code,
-            altName: mainDetails?.AltName,
-            type: mainDetails?.Type,
-            category: mainDetails?.Category,
-            // warehouse: mainDetails?.Id,
-            parent: mainDetails?.Parent,
-            group: group !== 0 ? true : mainDetails?.Group,
-            disableBatch: mainDetails?.Type !== 3 ? mainDetails?.DisableBatch : true,
-            disableSerialNo:
-                mainDetails?.Type !== 3 ? mainDetails?.DisableSerialNo : true,
-            unitInfo: [
-                {
-                    unit: baseUnit?.Unit,
-                    conversion: null,
-                    barcode: baseUnit?.Barcode,
-                    baseUnit: baseUnit?.Baseunit,
-                },
-                ...updateUnit,
-            ],
-            entityInfo: filteredCompanyList,
-        };
-        const response = await upsertproductmaster(saveData);
-        if (response.status === "Success") {
-            if (group === 2) {
-                const parentPayload = groupSelection?.map((item) => ({
-                    id: item,
-                }));
-                const parentData = {
-                    tagId: 11,
-                    parentId: Number(response?.result),
-                    ids: parentPayload,
+
+        const updatedChildData = tableBody.map((obj) => {
+            return obj?.items?.map((list) => {
+                return {
+                    slNo: list.SlNo,
+                    data: list.Id,
+                    risk: list.RiskData,
+                    description: list.Description,
+                    riskLevel: list.RiskLevel,
                 };
-                const respone2 = await updatetagparent(parentData);
+            });
+        }).flat();
+
+        const hasRiskZero = updatedChildData.some(
+            (item) => item.risk === 0
+          );
+        const hasRiskLevelZero = updatedChildData.some(
+            (item) => item.riskLevel === 0
+          );
+          if(hasRiskZero)
+          {
+                showAlert("info","Ensure complete Risk")
+          }
+          if(hasRiskLevelZero)
+          {
+                showAlert("info","Ensure complete RiskLevel")
+          }
+
+          if(!hasRiskZero && !hasRiskLevelZero)
+          {
+            const saveData = {
+                Id: mainDetails?.Id,
+                allocation: mainDetails?.Allocation,
+                date: mainDetails?.Date,
+                inspector: mainDetails?.Inspector,
+                fileNo: mainDetails?.FileNo,
+                details: updatedChildData,     
+            };
+    
+            console.log('risk save',saveData);
+            
+            const response = await UpsertRiskAssesment(saveData);
+            if (response.status === "Success") {
+                showAlert("success", response?.message);
+                handleNew();
+                // setPageRender(1);
+                const actionExists = userAction.some((action) => action.Action === "New");
+                if (!actionExists) {
+                    setPageRender(1);
+                }
             }
-            showAlert("success", response?.message);
-            handleNew();
-            const actionExists = userAction.some((action) => action.Action === "New");
-            if (!actionExists) {
-                setPageRender(1);
-            }
-        }
+          }    
     };
 
     //confirmation
@@ -742,7 +644,7 @@ export default function RiskAssesmentDetails({
     //Delete alert open
     const deleteClick = async () => {
         let response;
-        response = await deletetag([{ id: detailPageId }], 11);
+        response = await deleteRiskAssesment([{ id: detailPageId }]);
         if (response?.status === "Success") {
             showAlert("success", response?.message);
             handleNew();
@@ -753,64 +655,16 @@ export default function RiskAssesmentDetails({
         }
     };
 
-    const handleDeleteRow = (index) => {
-        if (companyList?.length <= 1) {
-            setCompanyList([{ BE: 0, BE_Name: null }]);
-        } else {
-            setCompanyList((prev) => prev.filter((_, i) => i !== index));
-        }
-    };
+    
 
-    const handleMasterExist = async (type) => {
-        try {
-            const response = await checkexistenceintag({
-                tagId: 11,
-                id: mainDetails?.Id,
-                name: type === 1 ? mainDetails?.Name : mainDetails?.Code,
-                type: type,
-            });
-            if (response.status === "Success") {
-                return true;
-            } else {
-                return false;
-            }
-        } catch (error) {
-            return false;
-        }
-    };
+    
 
-    const handleProperty = () => {
-        setConfirmData({
-            message: `You want to Activate/Inactivate the property.`,
-            type: "info",
-            header: "Property",
-        });
-        setProperty(true);
-    };
+   
 
-    const handlePropertyConfirmation = async (status) => {
-        const propertyPayload = [
-            {
-                id: detailPageId,
-            },
-        ];
+    
 
-        const saveData = {
-            status: status,
-            ids: propertyPayload,
-        };
-        try {
-            const response = await updateproductproperties(saveData);
-
-            if (response?.status === "Success") {
-                showAlert("success", response?.message);
-                setConfirmData({});
-            }
-        } catch (error) {
-        } finally {
-            setProperty(false);
-        }
-    };
+    console.log('tbody',tableBody);
+    
 
     return (
         <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
@@ -825,7 +679,7 @@ export default function RiskAssesmentDetails({
                     flexWrap: "wrap",
                 }}
             >
-                <BasicBreadcrumbs group={group} />
+                <BasicBreadcrumbs />
                 <DefaultIcons
                     detailPageId={detailPageId}
                     iconsClick={handleIconsClick}
@@ -854,36 +708,6 @@ export default function RiskAssesmentDetails({
                         gap: '50px'
                     }}
                 >
-                    <Box
-                        sx={{
-                            display: "flex",
-                            width: "100%",
-                            flexDirection: "column",
-                            justifyContent: "flex-start", // Changed from center to flex-start
-                            padding: 1,
-                            gap: "10px",
-                            boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)",
-
-                            flexWrap: "wrap",
-                            "@media (max-width: 768px)": {
-                                gap: "10px", // Reduced width for small screens
-                            },
-                            "@media (max-width: 420px)": {
-                                gap: "2px", // Reduced width for small screens
-                            },
-                        }}
-                    >
-                        <UserInputField
-                            label={"Doc No"}
-                            name={"DocNo"}
-                            type={"text"}
-                            disabled={false}
-                            mandatory={true}
-                            value={mainDetails}
-                            setValue={setMainDetails}
-                            onBlurAction={() => handleMasterExist(1)}
-                            maxLength={100}
-                        />
 
                         <Box sx={{
                             display: "flex",
@@ -902,14 +726,23 @@ export default function RiskAssesmentDetails({
                             },
                         }} >
                             <UserInputField
+                                label={"Job Order No"}
+                                name={"JobOrderNo"}
+                                type={"text"}
+                                disabled={true}
+                                mandatory={true}
+                                value={mainDetails}
+                                setValue={setMainDetails}
+                                maxLength={100}
+                            />
+                            <UserInputField
                                 label={"Client"}
-                                name={"Client"}
+                                name={"Client_Name"}
                                 type={"text"}
                                 disabled={false}
                                 mandatory={true}
                                 value={mainDetails}
                                 setValue={setMainDetails}
-                                onBlurAction={() => handleMasterExist(2)}
                                 maxLength={100}
                             />
                             <UserInputField
@@ -920,32 +753,30 @@ export default function RiskAssesmentDetails({
                                 mandatory={true}
                                 value={mainDetails}
                                 setValue={setMainDetails}
-                                onBlurAction={() => handleMasterExist(2)}
                                 maxLength={100}
                             />
-                            <UserInputField
+                            <UserAutoComplete
+                                apiKey={GetTechnicianList}
+                                formData={mainDetails}
+                                setFormData={setMainDetails}
                                 label={"Inspector"}
-                                name={"Inspector"}
-                                type={"text"}
-                                disabled={false}
-                                mandatory={true}
-                                value={mainDetails}
-                                setValue={setMainDetails}
-                                onBlurAction={() => handleMasterExist(2)}
-                                maxLength={100}
+                                autoId={"Inspector"}
+                                required={false}
+                                formDataName={"Inspector_Name"}
+                                formDataiId={"Inspector"}
+                                User={userData?.UserId}
                             />
                             <UserInputField
                                 label={"Work Order/File No"}
-                                name={"WorkOrder"}
+                                name={"FileNo"}
                                 type={"text"}
                                 disabled={false}
                                 mandatory={true}
                                 value={mainDetails}
                                 setValue={setMainDetails}
-                                onBlurAction={() => handleMasterExist(2)}
                                 maxLength={100}
                             />
-        
+
                             <UserInputField
                                 label={"Date"}
                                 name={"Date"}
@@ -954,16 +785,12 @@ export default function RiskAssesmentDetails({
                                 mandatory={true}
                                 value={mainDetails}
                                 setValue={setMainDetails}
-                                onBlurAction={() => handleMasterExist(2)}
                                 maxLength={100}
                             />
 
-                            
+
                         </Box>
 
-
-
-                    </Box>
                     <Box>
                         {tableBody?.map((list, index) => (
                             <>
@@ -971,10 +798,13 @@ export default function RiskAssesmentDetails({
                                     // icons="fa-solid fa-briefcase"
                                     label={list?.Name}
                                     type={1}
-                                    expanded={expanded === index + 1}
-                                    onChange={handleChange(index + 1)}
+                                    expanded={expanded === index }
+                                    onChange={handleChange(index)}
                                 >
-                                    <RiskBodyTable fields={tableFields} tableData={list?.Data} settableData={setTableBody} preview={false} typeName={list?.Name} />
+                                   
+                                      <RiskBodyTable fields={tableFields} tableData={list.items} settableData={setTableBody} preview={false} typeName={list?.Name} />  
+                                    
+                                    
                                 </CustomizedAccordions>
                             </>
                         ))}
@@ -1000,13 +830,7 @@ export default function RiskAssesmentDetails({
                 submite={handleConfirmSubmit}
             />
 
-            {/* <MasterProductConfirmation
-        handleClose={() => setProperty(false)}
-        open={property}
-        data={confirmData}
-        submite={handlePropertyConfirmation}
-        selectedDatas={detailPageId ? detailPageId : null}
-      /> */}
+            
         </Box>
     );
 }

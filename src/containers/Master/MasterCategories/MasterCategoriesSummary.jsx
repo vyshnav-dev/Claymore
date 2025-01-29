@@ -8,7 +8,6 @@ import SummaryTable from "../../../component/Table/SummaryTable";
 import { primaryColor } from "../../../config/config";
 import ConfirmationAlert from "../../../component/Alerts/ConfirmationAlert";
 import { masterApis } from "../../../service/Master/master";
-// import MasterProductConfirmation from "./MasterProductConfirmation";
 import ExcelExport from "../../../component/Excel/Excel";
 import { identity } from "lodash";
 
@@ -56,7 +55,6 @@ function BasicBreadcrumbs() {
 }
 
 const DefaultIcons = ({ iconsClick, userAction }) => {
-  const hasEditAction = userAction.some((action) => action.Name === "Edit");
   return (
     <Box
       sx={{
@@ -100,41 +98,8 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
           iconName={"delete"}
         />
       )}
-      {!hasEditAction &&
-        userAction.some((action) => action.Name === "View") && (
-          <ActionButton
-            iconsClick={iconsClick}
-            icon={"fa-solid fa-eye"}
-            caption={"View"}
-            iconName={"view"}
-          />
-        )}
-      {userAction.some((action) => action.Action === "Property") && (
-        <ActionButton
-          iconsClick={iconsClick}
-          icon={"fa-solid fa-gears"}
-          caption={"Property"}
-          iconName={"property"}
-        />
-      )}
-
-      {userAction.some((action) => action.Action === "Group") && (
-        <ActionButton
-          iconsClick={iconsClick}
-          icon={"fa-solid fa-user-group"}
-          caption={"Group"}
-          iconName={"group"}
-        />
-      )}
-
-      {userAction.some((action) => action.Action === "Add Group") && (
-        <ActionButton
-          iconsClick={iconsClick}
-          icon={"fa-solid fa-user-plus"}
-          caption={"Add Group"}
-          iconName={"addGroup"}
-        />
-      )}
+      
+      
       <ActionButton
         iconsClick={iconsClick}
         icon={"fa-solid fa-xmark"}
@@ -150,7 +115,6 @@ export default function MasterCategoriesSummary({
   setId,
   userAction,
   setGroup,
-  setGroupSelection,
 }) {
   const [rows, setRows] = React.useState([]); //To Pass in Table
   const [displayLength, setdisplayLength] = React.useState(25); // Show Entries
@@ -165,8 +129,7 @@ export default function MasterCategoriesSummary({
   const [confirmAlert, setConfirmAlert] = useState(false); //To handle alert open
   const [confirmData, setConfirmData] = useState({}); //To pass alert data
   const latestSearchKeyRef = useRef(searchKey);
-  const [property, setProperty] = useState(false);
-  const { gettagsummary, deletetag, updateproductproperties, gettagurl } =
+  const { GetCategorySummary, deleteCategory, updateproductproperties, gettagurl } =
     masterApis();
   const [groupId, setGroupId] = useState(0);
   const [parentList, setParentList] = useState([]);
@@ -182,13 +145,10 @@ export default function MasterCategoriesSummary({
     const currentSearchKey = latestSearchKeyRef.current;
 
     try {
-      const response = await gettagsummary({
-        tagId: 11,
-        refreshFlag: refreshFlag,
-        pageNumber: pageNumber,
+      const response = await GetCategorySummary({
+        pageNo: pageNumber,
         pageSize: displayLength,
-        searchString: currentSearchKey,
-        groupId: groupId,
+        search: currentSearchKey,
       });
 
       setrefreshFlag(false);
@@ -200,8 +160,8 @@ export default function MasterCategoriesSummary({
 
         setRows(myObject?.Data);
 
-        const totalRows = myObject?.PageSummary[0].TotalRows;
-        const totalPages = myObject?.PageSummary[0].TotalPages;
+        const totalRows = myObject?.Metadata?.TotalRows;
+        const totalPages = myObject?.Metadata?.TotalPages;
 
         settotalRows(totalRows);
         setTotalPages(totalPages);
@@ -224,9 +184,7 @@ export default function MasterCategoriesSummary({
   }, [pageNumber, displayLength, searchKey, changesTriggered, groupId]);
 
 
-  useEffect(()=>{
-    handleParentGroup(0) 
-  },[])
+
 
   const handleRowDoubleClick = (rowiId) => {
     if (rowiId > 0) {
@@ -272,22 +230,6 @@ export default function MasterCategoriesSummary({
       case "delete":
         deleteClick();
         break;
-      case "view":
-        handleAdd("edit");
-        break;
-      case "property":
-        handleProperty();
-        break;
-      case "addGroup":
-        handleAddGroup(1);
-        break;
-      case "group":
-        if (!selectedDatas?.length) {
-          showAlert("info", "Please Select row for Group");
-          return;
-        }
-        handleAddGroup(2);
-        break;
       case "excel":
         handleExcelExport();
         break;
@@ -302,16 +244,7 @@ export default function MasterCategoriesSummary({
     window.history.back();
   };
 
-  const handleAddGroup = (type) => {
-    if (type === 2) {
-      setGroupSelection(selectedDatas);
-    } else {
-      setGroupSelection([]);
-    }
-    setGroup(type);
-    setId(0);
-    setPageRender(2);
-  };
+  
 
   // Handlers for your icons
   const handleAdd = (value) => {
@@ -343,49 +276,9 @@ export default function MasterCategoriesSummary({
     handleConfrimOpen();
   };
 
-  const handleProperty = () => {
-    if (selectedDatas.length === 0) {
-      showAlert("info", "Select rows to Active/Inactive");
-      return;
-    }
-    setConfirmData({
-      message: `You want to Activate/Inactivate the property.`,
-      type: "info",
-      header: "Property",
-    });
-    setProperty(true);
-  };
+ 
 
-  const handlePropertyConfirmation = async (status) => {
-    let propertyPayload;
-    if (selectedDatas?.length === 1) {
-      propertyPayload = [
-        {
-          id: selectedDatas[0],
-        },
-      ];
-    } else {
-      propertyPayload = selectedDatas.map((item) => ({
-        id: item,
-      }));
-    }
-    const saveData = {
-      status: status,
-      ids: propertyPayload,
-    };
-    try {
-      const response = await updateproductproperties(saveData);
-      if (response?.status === "Success") {
-        showAlert("success", response?.message);
-      }
-    } catch (error) {
-    } finally {
-      setrefreshFlag(true);
-      setselectedDatas([]);
-      setchangesTriggered(true);
-      setProperty(false);
-    }
-  };
+  
 
   //To delete
   const handledeleteRole = async () => {
@@ -394,7 +287,7 @@ export default function MasterCategoriesSummary({
     }));
 
     try {
-      let response = await deletetag(deletePayload, 11);
+      let response = await deleteCategory(deletePayload);
 
       if (response?.status === "Success") {
         showAlert("success", response?.message);
@@ -418,7 +311,7 @@ export default function MasterCategoriesSummary({
 
   const handleExcelExport = async () => {
     try {
-      const response = await gettagsummary({
+      const response = await GetCategorySummary({
         tagId: 11,
         refreshFlag: true,
         pageNumber: 0,
@@ -459,19 +352,7 @@ export default function MasterCategoriesSummary({
     }
   };
  
-  const handleParentGroup = async (id) => {
-    const response = await gettagurl({
-      id: id,
-      tagId: 11,
-    });
-    setGroupId(id)
-   if(response?.status === "Success"){
-     const myObject = JSON.parse(response?.result)
-     setParentList(myObject)
-   }else{
-    setParentList([])
-   }
-  };
+  
   return (
     <>
       <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
@@ -505,7 +386,7 @@ export default function MasterCategoriesSummary({
             //   currentTheme={currentTheme}
             handleLongPressStart={handleLongPressStart}
             handleLongPressEnd={handleLongPressEnd}
-            handleParentGroup={handleParentGroup}
+            // handleParentGroup={handleParentGroup}
             parentList={parentList}
             totalPages={totalPages}
             hardRefresh={hardRefresh}
@@ -518,13 +399,6 @@ export default function MasterCategoriesSummary({
           data={confirmData}
           submite={handledeleteRole}
         />
-        {/* <MasterProductConfirmation
-          handleClose={() => setProperty(false)}
-          open={property}
-          data={confirmData}
-          submite={handlePropertyConfirmation}
-          selectedDatas={selectedDatas?.length === 1 ? selectedDatas[0] : null}
-        /> */}
       </Box>
     </>
   );

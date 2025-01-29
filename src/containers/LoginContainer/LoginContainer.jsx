@@ -15,7 +15,7 @@ import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import Loader from "../../component/Loader/Loader";
 import ValidationAlert from "../../component/Alerts/ValidationAlert";
 import claymore from "/Images/Claymore-.png";
-import sangsolution from "/Images/sangsolution.png";
+import sangsolution from "/Images/CSSC logo.jpg";
 import { encrypt } from "../../service/Security/encryptionUtils";
 
 
@@ -111,8 +111,9 @@ export default function LoginContainer() {
       const encryptedPassword = await encrypt(formData.password); // Encrypt the password
       const submitData = {
         ...formData,
-        entity: 1,
-        password: encryptedPassword
+        entityId: 1,
+        password: encryptedPassword,
+        channelId:2
       };
 
       const response = await loginLogin(submitData);
@@ -203,10 +204,7 @@ export default function LoginContainer() {
 
           }}
         >
-          <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", mb: 5, gap: 2 }}>
-            <img alt="Logo" src={sangsolution} style={{ width: 80, height: 80 }} />
-            <Typography sx={{ fontSize: "26px" }}>CLAYMORE</Typography>
-          </Box>
+          
 
           <Box
             sx={{
@@ -218,6 +216,9 @@ export default function LoginContainer() {
               boxShadow: "0px 4px 10px rgba(0,0,0,0.3)",
             }}
           >
+            <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", mb: 5, gap: 2 }}>
+            <img alt="Logo" src={sangsolution} style={{ width: 180, height: 120 }} />
+          </Box>
             <form onSubmit={handleFormSubmit}>
               <Box mb={errors.loginName ? 1 : 3}>
                 <TextField

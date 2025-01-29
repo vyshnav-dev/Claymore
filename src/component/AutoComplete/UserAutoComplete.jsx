@@ -23,7 +23,9 @@ export default function UserAutoComplete({
   required,
   disable,
   tagId,
-  beId
+  beId,
+  User,
+  Product
 }) {
   const [iTypeF2, setiTypeF2] = useState(1);
   const [searchkey, setsearchkey] = useState("");
@@ -58,10 +60,10 @@ export default function UserAutoComplete({
     }
     try {
       const response = await apiKey({
-        searchString:searchKey,
-        type: iTypeF2,
-        beId,
-        tagId
+        Search:searchKey,
+        Type: iTypeF2,
+        User,
+        Product
       });
       const results = JSON.parse(response?.result);
       setMenu(results || []);
