@@ -23,8 +23,8 @@ import AckContainer from "./containers/Acknowedgement/AckContainer";
 import PDContainer from "./containers/Master/ProductDescripton/PDContainer";
 import FormBodyContainer from "./containers/Master/MasterBody/FormBodyContainer";
 import InspContainer from "./containers/Inspection/InspContainer";
-import ApproveContainer from "./containers/Approve/ApproveContainer";
 import AllocatedContainer from "./containers/Allocated/AllocatedContainer";
+import ClosingStockReportContainer from "./containers/Report/ClosingStockReport/ClosingStockReportContainer";
 
 export default function RoutePath() {
   const location = useLocation();
@@ -180,7 +180,7 @@ export default function RoutePath() {
               path="/approve"
               element={
                 <ProtectedRoute>
-                  <ApproveContainer/>
+                   <InspContainer />
                 </ProtectedRoute>
               }
             />
@@ -190,6 +190,14 @@ export default function RoutePath() {
               element={
                 <ProtectedRoute>
                   <TimeRecordContainer/>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/joborder"
+              element={
+                <ProtectedRoute>
+                  <ClosingStockReportContainer/>
                 </ProtectedRoute>
               }
             />

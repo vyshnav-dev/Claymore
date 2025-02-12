@@ -176,9 +176,9 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction }) => {
                 </>
             )}
 
-            
 
-            <ActionButton
+
+            {/* <ActionButton
                 iconsClick={iconsClick}
                 icon={"fa-solid fa-circle-arrow-left"}
                 caption={"Prev"}
@@ -189,7 +189,7 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction }) => {
                 icon={"fa-solid fa-circle-arrow-right"}
                 caption={"Next"}
                 iconName={"next"}
-            />
+            /> */}
             <ActionButton
                 iconsClick={iconsClick}
                 icon={"fa-solid fa-print"}
@@ -446,9 +446,7 @@ export default function RiskAssesmentDetails({
     disabledDetailed,
 }) {
 
-    const {
-        GetTechnicianList
-    } = allocationApis();
+    const currentDate = new Date().toISOString().split("T")[0];
 
     const userData = JSON.parse(localStorage.getItem("ClaymoreUserData"))[0];
     const [mainDetails, setMainDetails] = useState({});
@@ -456,13 +454,16 @@ export default function RiskAssesmentDetails({
     const [confirmAlert, setConfirmAlert] = useState(false);
     const [confirmData, setConfirmData] = useState({});
     const [confirmType, setConfirmType] = useState(null);
-    const [expanded, setExpanded] = useState(1);//Accordion open
+    const [expanded, setExpanded] = useState(0);//Accordion open
     const [tableBody, setTableBody] = useState([]);
     const { showAlert } = useAlert();
     const {
         GetRiskAssesmentDetails,
         UpsertRiskAssesment,
-        deleteRiskAssesment
+        deleteRiskAssesment,
+        getFormdata,
+        getriskjoborderdetails,
+        getAssignjoborderlist
     } = inspectionApis();
 
     useEffect(() => {
@@ -483,11 +484,11 @@ export default function RiskAssesmentDetails({
                 if (response?.status === "Success") {
                     const myObject = JSON.parse(response?.result);
                     setMainDetails(myObject?.Header);
-                    setTableBody(myObject?.riskAssessments)
-                    
-                  } else {
+                    setTableBody(myObject?.RiskAssessments)
+
+                } else {
                     handleNew();
-                  }
+                }
             }
         } catch (error) {
             throw error;
@@ -501,22 +502,48 @@ export default function RiskAssesmentDetails({
 
     const handleNew = async () => {
         setMainDetails({
-            Id:0,
+            Id: 0,
             JobOrderNo: null,
             Client_Name: null,
-            Allocation:null,
-            FileNo:null,
+            Allocation: null,
+            FileNo: null,
             Location: null,
-            Date: null,
+            Date: currentDate,
             Inspector: null,
-            Inspector_Name: null,    
+            Inspector_Name: null,
         });
-        
         setDetailPageId(0);
+
+        const response = await getFormdata();
+        if (response?.status === "Success") {
+            const myObject = JSON.parse(response?.result);
+            setTableBody(myObject)
+
+        }
     };
 
-   
-   
+    useEffect(() => {
+
+        const fetchHeadData = async () =>{
+            const response = await getriskjoborderdetails({
+                allocation: mainDetails?.Allocation
+            });
+            if (response?.status === "Success") {
+                const myObject = JSON.parse(response?.result);
+                setMainDetails({
+                    ...mainDetails,
+                    ...myObject[0],
+                    Date: currentDate,
+                });
+            }
+        }
+        fetchHeadData();
+      
+    }, [mainDetails?.Allocation])
+    
+
+
+
 
     const handleIconsClick = async (value) => {
         switch (value.trim()) {
@@ -528,18 +555,17 @@ export default function RiskAssesmentDetails({
                 break;
             case "save":
                 const emptyFields = [];
-                // if (!mainDetails?.Inspector) emptyFields.push("Inspector"); 
-                // if (!mainDetails?.Date) emptyFields.push("Date"); 
-                // if (!mainDetails?.JobOrderNo) emptyFields.push("Job OrderNo"); 
-                // if (!mainDetails?.Client_Name) emptyFields.push("Client"); 
+                if (!mainDetails?.Date) emptyFields.push("Date");
+                if (!mainDetails?.JobOrderNo) emptyFields.push("Job OrderNo");
+                if (!mainDetails?.Client_Name) emptyFields.push("Client");
                 // if (!mainDetails?.FileNo) emptyFields.push("File No"); 
-                // if (!mainDetails?.Location) emptyFields.push("Location"); 
+                if (!mainDetails?.Location) emptyFields.push("Location");
                 if (emptyFields.length > 0) {
                     showAlert("info", `Please Provide ${emptyFields[0]}`);
                     return;
                 }
-                
-               
+
+
                 setConfirmData({ message: "Save", type: "success" });
                 setConfirmType("save");
                 setConfirmAlert(true);
@@ -565,7 +591,7 @@ export default function RiskAssesmentDetails({
     const handleSave = async () => {
 
         const updatedChildData = tableBody.map((obj) => {
-            return obj?.items?.map((list) => {
+            return obj?.Items?.map((list) => {
                 return {
                     slNo: list.SlNo,
                     data: list.Id,
@@ -578,32 +604,28 @@ export default function RiskAssesmentDetails({
 
         const hasRiskZero = updatedChildData.some(
             (item) => item.risk === 0
-          );
+        );
         const hasRiskLevelZero = updatedChildData.some(
             (item) => item.riskLevel === 0
-          );
-          if(hasRiskZero)
-          {
-                showAlert("info","Ensure complete Risk")
-          }
-          if(hasRiskLevelZero)
-          {
-                showAlert("info","Ensure complete RiskLevel")
-          }
+        );
+        if (hasRiskZero) {
+            showAlert("info", "Ensure complete Risk")
+        }
+        if (hasRiskLevelZero) {
+            showAlert("info", "Ensure complete RiskLevel")
+        }
 
-          if(!hasRiskZero && !hasRiskLevelZero)
-          {
+        if (!hasRiskZero && !hasRiskLevelZero) {
             const saveData = {
                 Id: mainDetails?.Id,
                 allocation: mainDetails?.Allocation,
                 date: mainDetails?.Date,
                 inspector: mainDetails?.Inspector,
                 fileNo: mainDetails?.FileNo,
-                details: updatedChildData,     
+                details: updatedChildData,
             };
-    
-            console.log('risk save',saveData);
-            
+
+
             const response = await UpsertRiskAssesment(saveData);
             if (response.status === "Success") {
                 showAlert("success", response?.message);
@@ -614,7 +636,7 @@ export default function RiskAssesmentDetails({
                     setPageRender(1);
                 }
             }
-          }    
+        }
     };
 
     //confirmation
@@ -655,16 +677,6 @@ export default function RiskAssesmentDetails({
         }
     };
 
-    
-
-    
-
-   
-
-    
-
-    console.log('tbody',tableBody);
-    
 
     return (
         <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
@@ -709,87 +721,88 @@ export default function RiskAssesmentDetails({
                     }}
                 >
 
-                        <Box sx={{
-                            display: "flex",
-                            width: "100%",
-                            flexDirection: "row",
-                            justifyContent: "flex-start", // Changed from center to flex-start
-                            padding: 1,
-                            gap: "10px",
+                    <Box sx={{
+                        display: "flex",
+                        width: "100%",
+                        flexDirection: "row",
+                        justifyContent: "flex-start", // Changed from center to flex-start
+                        padding: 1,
+                        gap: "10px",
 
-                            flexWrap: "wrap",
-                            "@media (max-width: 768px)": {
-                                gap: "10px", // Reduced width for small screens
-                            },
-                            "@media (max-width: 420px)": {
-                                gap: "2px", // Reduced width for small screens
-                            },
-                        }} >
-                            <UserInputField
-                                label={"Job Order No"}
-                                name={"JobOrderNo"}
-                                type={"text"}
-                                disabled={true}
-                                mandatory={true}
-                                value={mainDetails}
-                                setValue={setMainDetails}
-                                maxLength={100}
-                            />
-                            <UserInputField
-                                label={"Client"}
-                                name={"Client_Name"}
-                                type={"text"}
-                                disabled={false}
-                                mandatory={true}
-                                value={mainDetails}
-                                setValue={setMainDetails}
-                                maxLength={100}
-                            />
-                            <UserInputField
-                                label={"Location"}
-                                name={"Location"}
-                                type={"text"}
-                                disabled={false}
-                                mandatory={true}
-                                value={mainDetails}
-                                setValue={setMainDetails}
-                                maxLength={100}
-                            />
-                            <UserAutoComplete
-                                apiKey={GetTechnicianList}
-                                formData={mainDetails}
-                                setFormData={setMainDetails}
-                                label={"Inspector"}
-                                autoId={"Inspector"}
-                                required={false}
-                                formDataName={"Inspector_Name"}
-                                formDataiId={"Inspector"}
-                                User={userData?.UserId}
-                            />
-                            <UserInputField
-                                label={"Work Order/File No"}
-                                name={"FileNo"}
-                                type={"text"}
-                                disabled={false}
-                                mandatory={true}
-                                value={mainDetails}
-                                setValue={setMainDetails}
-                                maxLength={100}
-                            />
+                        flexWrap: "wrap",
+                        "@media (max-width: 768px)": {
+                            gap: "10px", // Reduced width for small screens
+                        },
+                        "@media (max-width: 420px)": {
+                            gap: "2px", // Reduced width for small screens
+                        },
+                    }} >
+                        
+                        <UserAutoComplete
+                            apiKey={getAssignjoborderlist}
+                            formData={mainDetails}
+                            setFormData={setMainDetails}
+                            label={"Job Order No"}
+                            autoId={"Allocation"}
+                            required={false}
+                            formDataName={"JobOrderNo"}
+                            formDataiId={"Allocation"}
+                            criteria={1}
+                        />
+                        <UserInputField
+                            label={"Client"}
+                            name={"Client_Name"}
+                            type={"text"}
+                            disabled={false}
+                            mandatory={true}
+                            value={mainDetails}
+                            setValue={setMainDetails}
+                            maxLength={100}
+                        />
+                        <UserInputField
+                            label={"Location"}
+                            name={"Location"}
+                            type={"text"}
+                            disabled={false}
+                            mandatory={true}
+                            value={mainDetails}
+                            setValue={setMainDetails}
+                            maxLength={100}
+                        />
+                        <UserInputField
+                            label={"Inspector"}
+                            name={"Inspector_Name"}
+                            type={"text"}
+                            disabled={false}
+                            mandatory={true}
+                            value={mainDetails}
+                            setValue={setMainDetails}
+                            maxLength={100}
+                        />
+                        <UserInputField
+                            label={"Work Order/File No"}
+                            name={"FileNo"}
+                            type={"text"}
+                            disabled={false}
+                            mandatory={true}
+                            value={mainDetails}
+                            setValue={setMainDetails}
+                            maxLength={100}
+                        />
 
-                            <UserInputField
-                                label={"Date"}
-                                name={"Date"}
-                                type={"date"}
-                                disabled={false}
-                                mandatory={true}
-                                value={mainDetails}
-                                setValue={setMainDetails}
-                                maxLength={100}
-                            />
+                        <UserInputField
+                            label={"Date"}
+                            name={"Date"}
+                            type={"date"}
+                            disabled={false}
+                            mandatory={true}
+                            value={mainDetails}
+                            setValue={setMainDetails}
+                            maxLength={100}
+                        />
 
 
-                        </Box>
+                    </Box>
 
                     <Box>
                         {tableBody?.map((list, index) => (
@@ -797,27 +810,17 @@ export default function RiskAssesmentDetails({
                                 <CustomizedAccordions
                                     // icons="fa-solid fa-briefcase"
                                     label={list?.Name}
-                                    type={1}
-                                    expanded={expanded === index }
+                                    expanded={expanded === index}
                                     onChange={handleChange(index)}
                                 >
-                                   
-                                      <RiskBodyTable fields={tableFields} tableData={list.items} settableData={setTableBody} preview={false} typeName={list?.Name} />  
-                                    
-                                    
+
+                                    <RiskBodyTable fields={tableFields} tableData={list.Items} settableData={setTableBody} preview={false} typeName={list?.Name} />
+
+
                                 </CustomizedAccordions>
                             </>
                         ))}
 
-                        {/* <CustomizedAccordions
-                            // icons="fa-solid fa-briefcase"
-                            label="General12"
-                            type={1}
-                            expanded={expanded === 2}
-                            onChange={handleChange(2)}
-                        >
-
-                        </CustomizedAccordions> */}
                     </Box>
 
                 </Box>
@@ -830,7 +833,7 @@ export default function RiskAssesmentDetails({
                 submite={handleConfirmSubmit}
             />
 
-            
+
         </Box>
     );
 }

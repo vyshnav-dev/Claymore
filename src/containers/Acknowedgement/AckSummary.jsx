@@ -49,7 +49,7 @@ function BasicBreadcrumbs() {
           aria-label="breadcrumb"
         >
           <Typography underline="hover" sx={style} key="1">
-          Acknowledgement Summary
+          Acknowledgement 
           </Typography>
         </Breadcrumbs>
       </Stack>
@@ -327,18 +327,16 @@ export default function AckSummary({
 
   const handleExcelExport = async () => {
     try {
-      const response = await gettagsummary({
-        tagId: 11,
-        refreshFlag: true,
+      const response = await getAcknowledgementSummary({
         pageNumber: 0,
         pageSize: 0,
-        searchString: "",
+        search: "",
       });
       const excludedFields = ["Id"];
       const filteredRows = JSON.parse(response?.result)?.Data;
 
       await ExcelExport({
-        reportName: "Bin Summary",
+        reportName: "Acknowledgement",
         filteredRows,
         excludedFields,
       });

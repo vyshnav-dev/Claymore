@@ -48,7 +48,6 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
         textOverflow: "ellipsis",
     }
     const { GetTechnicianList } = allocationApis()
-    console.log('sel22', selected);
 
     const userData = JSON.parse(localStorage.getItem("ClaymoreUserData"))[0];
 
@@ -68,8 +67,6 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
                 });
                 if (response?.status === "Success") {
                     const myObject = JSON.parse(response.result);
-                    console.log('mmmkkk',myObject);
-                    
                     const detail = myObject?.jobOrderDetails
                     if (detail) {
                         const formattedDate = detail.Date?.split("T")[0];
@@ -83,8 +80,6 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
 
                         // Update the other states with the response data
                         setProducts(myObject?.ProductDetails || []);
-                        console.log('rrrrr',myObject?.InspectorDetails);
-                        
                         setFormData({
                             details: myObject?.InspecotrDetails
                         });
@@ -101,10 +96,6 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
 
         fetchData();
     }, [selected]);
-
-    console.log('qqqqq',formData);
-    
-
     const handleNew = () => {
         setMainDetails({
             JobOrderNo: '',
@@ -112,9 +103,6 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
             Client_Name: null,
         })
     }
-
-    console.log('uuuu', mainDetails);
-
 
     const handleSave = async () => {
         const emptyFields = [];
@@ -130,7 +118,6 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
             date: mainDetails?.Date,
             details: formData?.details,
         }
-        console.log('save', saveData);
 
         const response = await UpsertJobOrderAllocation(saveData)
         if (response?.status === "Success") {
@@ -141,8 +128,6 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
         }
 
     };
-    console.log('multi main', formData);
-
     return (
         <>
             <DialogContent>
@@ -159,6 +144,7 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
                             value={mainDetails}
                             setValue={setMainDetails}
                             maxLength={100}
+                            width={200}
                         />
                         <UserInputField
                             label={"Date"}
@@ -169,6 +155,7 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
                             value={mainDetails}
                             setValue={setMainDetails}
                             maxLength={100}
+                            width={200}
                         />
                         <UserInputField
                             label={"Client"}
@@ -179,13 +166,14 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
                             value={mainDetails}
                             setValue={setMainDetails}
                             maxLength={100}
+                            width={200}
                         />
 
                     </Box>
 
-                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
-                        <TableContainer component={Paper} sx={{ maxHeight: '180px', maxWidth: '300px', overflowY: 'auto', mt: 2 }}>
-                            <Table stickyHeader size="small" sx={{ maxWidth: '300px' }}>
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2,maxHeight:'200px',minHeight:'200px' }}>
+                        <TableContainer component={Paper} sx={{ maxHeight: '180px', maxWidth: '370px', overflowY: 'auto', mt: 2,scrollbarWidth:'thin' }}>
+                            <Table stickyHeader size="small" sx={{ minWidth: '300px',maxWidth:'300px' }}>
                                 <TableHead>
                                     <TableRow>
                                         <TableCell sx={{ ...headerCellStyle }}>Product</TableCell>
@@ -229,7 +217,8 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
                 </Box>
 
             </DialogContent>
-            <DialogActions>
+            
+            <DialogActions >
                 <NormalButton action={handleCloseModal} label="Cancel" />
                 <NormalButton action={handleSave} label="Ok" />
             </DialogActions>

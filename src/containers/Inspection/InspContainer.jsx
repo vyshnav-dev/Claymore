@@ -10,6 +10,11 @@ export default function InspContainer() {
   const [page, setPage] = useState(1);
   const [id, setId] = useState(0);
   const [backId, setBackId] = useState(0);
+  const [mainDetails, setMainDetails] = useState({
+    Allocation: null,
+    JobOrderNo: null,
+  });
+  const [newId,setNewId] = useState(false);
   const [productId, setProductId] = useState(0);
   const [menuIdLocal, setmenuIdLocal] = useState(null);
   const [userAction, setuserAction] = useState([]);
@@ -32,6 +37,7 @@ export default function InspContainer() {
           screenId: menuIdLocal,
         });
         const data = JSON.parse(response?.result);
+
         setuserAction(data);
       } catch (error) {
         navigate("/home");
@@ -49,17 +55,21 @@ export default function InspContainer() {
           Id={id}
           userAction={userAction}
           screenId={menuId}
- 
+          menuIdLocal={menuIdLocal}
         />
-      ):page === 3 ? (
+      ) : page === 3 ? (
         <InspSummary
-        setPageRender={setPage}
-        setId={setId}
-        Id={id}
-        userAction={userAction}
-        screenId={menuId}
-        setProductId={setProductId}
-        setBackId={setBackId}
+          setPageRender={setPage}
+          setId={setId}
+          Id={id}
+          userAction={userAction}
+          screenId={menuId}
+          setProductId={setProductId}
+          setBackId={setBackId}
+          menuIdLocal={menuIdLocal}
+          mainDetails={mainDetails}
+          setMainDetails={setMainDetails}
+          setNewId={setNewId}
         />
       ) : page === 2 ? (
         <InspDetails
@@ -69,6 +79,9 @@ export default function InspContainer() {
           productId={productId}
           backId={backId}
           setId={setId}
+          mainDetails={mainDetails}
+          setMainDetails={setMainDetails}
+          newId={newId}
         />
       ) : null}
     </>

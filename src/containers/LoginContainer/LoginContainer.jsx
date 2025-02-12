@@ -113,7 +113,7 @@ export default function LoginContainer() {
         ...formData,
         entityId: 1,
         password: encryptedPassword,
-        channelId:2
+        channelId:1
       };
 
       const response = await loginLogin(submitData);

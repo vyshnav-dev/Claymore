@@ -110,20 +110,10 @@ const allocationApis = () => {
 
   //#region Allocated Job Orders product list
 
-  const getjoborderproductlistsummary = async (payload) => {
-    try {
-      const response = await makeAuthorizedRequestBase(
-        "get",
-        "allocation/getjoborderproductlistsummary",
-        payload,
-        true
-      );
-      return response;
-    } catch (error) {
-      throw error;
-    }
-  };
+  
 
+
+  
   
 
   return {
@@ -134,7 +124,6 @@ const allocationApis = () => {
     UpsertJobOrderAllocation,
     GetAllocatedJobOrderSummary,
     GetAllocatedJobOrderDetails,
-    getjoborderproductlistsummary
   }
 }
 

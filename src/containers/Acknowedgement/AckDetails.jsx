@@ -233,7 +233,6 @@ export default function AckDetails({
                     const myObject = JSON.parse(response?.result);
                     if (myObject) {
                         const formattedDate = myObject[0]?.TargetDateOfClosure?.split("T")[0];
-                        console.log('format',formattedDate);
                         
                         // Update the main details with the formatted date
                         setMainDetails( {

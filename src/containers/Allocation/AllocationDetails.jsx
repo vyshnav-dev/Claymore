@@ -594,9 +594,6 @@ export default function AllocationDetails({
         }
     };
 
-    console.log('main',mainDetails);
-    
-
     return (
         <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
             <Box

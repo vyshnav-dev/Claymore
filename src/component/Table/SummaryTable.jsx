@@ -50,6 +50,7 @@ export default function SummaryTable(props) {
     totalPages,
     hardRefresh,
     IdName,
+    statusName,
     handleLongPressStart,
     handleLongPressEnd,
     parentList,
@@ -64,7 +65,7 @@ export default function SummaryTable(props) {
   const profileDateFieldsArray = profileDateFields
   .split(",")
   .map((field) => field.trim()); 
-  const excludedFields = [ IdName,"Group", "GroupId","TotalRows","UserName"];
+  const excludedFields = [ statusName,"Group", "GroupId","TotalRows","UserName","Time","Id"];
 
   //To apply some filters on table rows
   const initialColumns =

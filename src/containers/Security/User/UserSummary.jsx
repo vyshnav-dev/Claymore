@@ -156,9 +156,7 @@ export default function UserSummary({ setPageRender, setId, userAction }) {
         currentSearchKey === latestSearchKeyRef.current
       ) {
         const myObject = JSON.parse(response?.result);
-        console.log('my',myObject);
-        
-
+       
         setRows(myObject?.Data);
 
         
@@ -329,7 +327,6 @@ export default function UserSummary({ setPageRender, setId, userAction }) {
     } catch (error) { }
   };
 
-  console.log('rows',rows);
   const handleLongPressStart = () => { }
 
   return (

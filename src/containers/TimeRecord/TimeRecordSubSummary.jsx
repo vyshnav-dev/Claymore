@@ -328,18 +328,17 @@ export default function TimeRecordSubSummary({
 
   const handleExcelExport = async () => {
     try {
-      const response = await gettagsummary({
-        tagId: 11,
-        refreshFlag: true,
+      const response = await GetTimeSheetSummary({
+        allocation:Id,
         pageNumber: 0,
         pageSize: 0,
-        searchString: "",
+        search: "",
       });
       const excludedFields = ["Id"];
       const filteredRows = JSON.parse(response?.result)?.Data;
 
       await ExcelExport({
-        reportName: "Bin Summary",
+        reportName: "Site Time Records",
         filteredRows,
         excludedFields,
       });

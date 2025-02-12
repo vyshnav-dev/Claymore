@@ -159,11 +159,8 @@ const SearchBox = React.memo(({ initialItems, search ,handleSelectedIds, params,
   }
 };
   
-console.log('iitial',initialItems);
-
-  
   return (
-    <Box sx={{ display: "flex", flexDirection: "column",gap:2 }}>
+    <Box className='new1' sx={{ display: "flex", flexDirection: "column",gap:2 }}>
       <InputWrapper  colors={'black'} id="inputwrapperSB">
         {search && (
           <div  className="IpWD1">

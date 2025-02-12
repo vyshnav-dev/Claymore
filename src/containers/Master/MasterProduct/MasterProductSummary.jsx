@@ -55,7 +55,7 @@ function BasicBreadcrumbs() {
 }
 
 const DefaultIcons = ({ iconsClick, userAction }) => {
-  const hasEditAction = userAction.some((action) => action.Name === "Edit");
+  // const hasEditAction = userAction.some((action) => action.Name === "Edit");
   return (
     <Box
       sx={{
@@ -99,7 +99,7 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
           iconName={"delete"}
         />
       )}
-      {!hasEditAction &&
+      {/* {!hasEditAction &&
         userAction.some((action) => action.Name === "View") && (
           <ActionButton
             iconsClick={iconsClick}
@@ -107,33 +107,8 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
             caption={"View"}
             iconName={"view"}
           />
-        )}
-      {userAction.some((action) => action.Action === "Property") && (
-        <ActionButton
-          iconsClick={iconsClick}
-          icon={"fa-solid fa-gears"}
-          caption={"Property"}
-          iconName={"property"}
-        />
-      )}
-
-      {userAction.some((action) => action.Action === "Group") && (
-        <ActionButton
-          iconsClick={iconsClick}
-          icon={"fa-solid fa-user-group"}
-          caption={"Group"}
-          iconName={"group"}
-        />
-      )}
-
-      {userAction.some((action) => action.Action === "Add Group") && (
-        <ActionButton
-          iconsClick={iconsClick}
-          icon={"fa-solid fa-user-plus"}
-          caption={"Add Group"}
-          iconName={"addGroup"}
-        />
-      )}
+        )} */}
+      
       <ActionButton
         iconsClick={iconsClick}
         icon={"fa-solid fa-xmark"}

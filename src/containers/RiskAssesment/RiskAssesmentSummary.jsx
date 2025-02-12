@@ -48,7 +48,7 @@ function BasicBreadcrumbs() {
           aria-label="breadcrumb"
         >
           <Typography underline="hover" sx={style} key="1">
-            Risk Assesment Summary
+            Risk Assessment 
           </Typography>
         </Breadcrumbs>
       </Stack>
@@ -69,14 +69,14 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
         scrollbarWidth: "thin",
       }}
     >
-      {/* {userAction.some((action) => action.Action === "New") && (
+      {userAction.some((action) => action.Action === "New") && (
         <ActionButton
           iconsClick={iconsClick}
           icon={"fa-solid fa-plus"}
           caption={"New"}
           iconName={"new"}
         />
-      )} */}
+      )}
       {userAction.some((action) => action.Action === "Edit") && (
         <ActionButton
           iconsClick={iconsClick}
@@ -321,18 +321,16 @@ export default function RiskAssesmentSummary({
 
   const handleExcelExport = async () => {
     try {
-      const response = await gettagsummary({
-        tagId: 11,
-        refreshFlag: true,
+      const response = await GetRisAssesmentSummary({
         pageNumber: 0,
         pageSize: 0,
-        searchString: "",
+        search: "",
       });
       const excludedFields = ["Id"];
       const filteredRows = JSON.parse(response?.result)?.Data;
 
       await ExcelExport({
-        reportName: "Bin Summary",
+        reportName: "Risk Assessment",
         filteredRows,
         excludedFields,
       });

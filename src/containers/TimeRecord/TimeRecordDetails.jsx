@@ -229,7 +229,6 @@ export default function TimeRecordDetails({
                 });
                 if (response?.status === "Success") {
                     const myObject = JSON.parse(response?.result);
-                    console.log('timesheet', myObject);
                     if (myObject) {
                         const formattedDate = myObject[0]?.DateOfInspection?.split("T")[0];
 
@@ -248,7 +247,6 @@ export default function TimeRecordDetails({
                         };
                     });
 
-                    console.log('Updated BodyData:', updatedBodyData);
                     setTableBody(updatedBodyData); // Assuming you have a state for bodyData
                 } else {
                     handleNew();
@@ -307,12 +305,22 @@ export default function TimeRecordDetails({
                 break;
             case "save":
                 const emptyFields = [];
-                // if (!mainDetails?.Name) emptyFields.push("Name");
-                // if (!mainDetails.Code) emptyFields.push("Code");
-                // if (!mainDetails.Category) emptyFields.push("Category");
-                // if (!mainDetails.Type) emptyFields.push("Type");
-                // if (!baseUnit?.Unit) emptyFields.push("Base Unit");
-                // if (!baseUnit?.Barcode) emptyFields.push("Bar Code");
+                // if (!mainDetails?.CSSCReportNo) emptyFields.push("CSSC Report No");
+                // if (!mainDetails?.PurchaseOrderNo) emptyFields.push("Purchase Order No");
+                // if (!mainDetails?.Inspector) emptyFields.push("Inspector");
+                // if (!mainDetails?.DateOfInspection) emptyFields.push("Date Of Inspection");
+                // if (!mainDetails?.TimeArrived) emptyFields.push("Time Arrived");
+                // if (!mainDetails?.TimeLeft) emptyFields.push("Time Left");
+                // if (!mainDetails?.SiteHour) emptyFields.push("Site Hour");
+                // if (!mainDetails?.TravelHour) emptyFields.push("Travel Hour");
+                // if (!mainDetails?.TotalTime) emptyFields.push("Total Time");
+                // if (!mainDetails?.Comments) emptyFields.push("Comments");
+                // if (!mainDetails?.Client_Name) emptyFields.push("Client Name");
+                // if (!mainDetails?.Address) emptyFields.push("Address");
+                // if (!mainDetails?.Contact) emptyFields.push("Contact");
+                // if (!mainDetails?.Location) emptyFields.push("Location");
+                // if (!mainDetails?.EqpDescription) emptyFields.push("Equipment Description");
+                // if (!mainDetails?.CustomerAcceptanceCertificate) emptyFields.push("Customer Acceptance Certificate");
                 if (emptyFields.length > 0) {
                     showAlert("info", `Please Provide ${emptyFields[0]}`);
                     return;
@@ -339,7 +347,7 @@ export default function TimeRecordDetails({
 
     const handleSave = async () => {
         const isAnyScopeOfWorkSelected = scopeOfWork.some((field) => mainDetails[field] === true);
-        
+
         if (!isAnyScopeOfWorkSelected) {
             showAlert("info", "Please select at least one field in Scope of Work .");
             return; // Stop further execution if no field is selected
@@ -366,19 +374,16 @@ export default function TimeRecordDetails({
             loadTest: mainDetails?.LoadTest,
             witness: mainDetails?.Witness,
             verification: mainDetails?.Verification,
-            functionalTest:mainDetails?.FunctionalTest,
-            inspector: mainDetails?.Inspector,
+            functionalTest: mainDetails?.FunctionalTest,
+            // inspector: mainDetails?.Inspector,
             customerAcceptanceCertificate: mainDetails?.CustomerAcceptanceCertificate,
         };
-
-        console.log('inside save', tableBody);
 
         tableBody?.forEach((item) => {
             if (saveData) {
                 saveData[item.key] = item.Checked; // Assign Checked value to the corresponding key in saveData
             }
         });
-        console.log('9999', saveData);
 
         const response = await UpsertTimeSheet(saveData);
         if (response.status === "Success") {
@@ -449,16 +454,6 @@ export default function TimeRecordDetails({
             }
         }
     };
-
-
-
-
-
-
-
-
-
-    console.log('dt', tableBody);
 
 
     return (
@@ -626,16 +621,15 @@ export default function TimeRecordDetails({
 
 
 
-                            <UserAutoComplete
-                                apiKey={GetTechnicianList}
-                                formData={mainDetails}
-                                setFormData={setMainDetails}
+                            <UserInputField
                                 label={"Inspector"}
-                                autoId={"Inspector"}
-                                required={false}
-                                formDataName={"Inspector_Name"}
-                                formDataiId={"Inspector"}
-                                User={userData?.UserId}
+                                name={"Inspector_Name"}
+                                type={"text"}
+                                disabled={false}
+                                mandatory={true}
+                                value={mainDetails}
+                                setValue={setMainDetails}
+                                maxLength={100}
                             />
 
                             <UserInputField
@@ -901,7 +895,7 @@ export default function TimeRecordDetails({
                             width: "100%",
                             flexDirection: "row",
                             justifyContent: "flex-start", // Changed from center to flex-start
-                            padding: 1,
+                            padding: 0,
                             gap: "10px",
 
                             flexWrap: "wrap",
@@ -918,43 +912,28 @@ export default function TimeRecordDetails({
                                     sx={{
                                         display: 'flex',
                                         flexWrap: 'wrap',
-                                        width: '500px',
+                                        width: '450px',
                                         height: '40%',
+                                        alignItems: 'center',
                                     }}
                                 >
                                     {/* Caption Box */}
-                                    <Box
-                                        sx={{
-                                            border: '1px solid',
-                                            width: 'auto',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                        }}
-                                    >
-                                        <Typography sx={{ p: 1 }}>{item.caption}</Typography>
-                                    </Box>
+
+                                    <Typography sx={{ p: 1 }}>{item.caption} : </Typography>
+
 
                                     {/* Switch Box */}
-                                    <Box
-                                        sx={{
-                                            border: '1px solid',
-                                            width: '30%',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'space-between',
-                                            padding: '0 10px',
-                                        }}
-                                    >
-                                        <Typography>No</Typography>
-                                        <Switch
-                                            checked={item.Checked === 1} // If Checked is 1, switch is "Yes"
-                                            onChange={() =>
-                                                handleChangeValue(item.key, { Checked: item.Checked === 1 ? 0 : 1 }) // Toggle between 0 and 1
-                                            }
-                                            color='info'
-                                        />
-                                        <Typography>Yes</Typography>
-                                    </Box>
+
+                                    <Typography>No</Typography>
+                                    <Switch
+                                        checked={item.Checked === 1} // If Checked is 1, switch is "Yes"
+                                        onChange={() =>
+                                            handleChangeValue(item.key, { Checked: item.Checked === 1 ? 0 : 1 }) // Toggle between 0 and 1
+                                        }
+                                        color='info'
+                                    />
+                                    <Typography>Yes</Typography>
+
                                 </Box>
                             ))}
 

@@ -45,7 +45,6 @@ function Header() {
 
   const userData = JSON.parse(localStorage.getItem("ClaymoreUserData"))[0];
 
-  console.log('user',userData);
   
 
   React.useEffect(() => {
@@ -55,11 +54,9 @@ function Header() {
   const fetchData = async () => {
     const response = await getscreensforuser();
     
-    console.log(response);
     if (response?.status === "Success") {
       const myObject = JSON.parse(response.result);
-      console.log(myObject);
-     
+   
       setMenu(myObject);
   
     }
@@ -76,7 +73,6 @@ function Header() {
   };
 
   const handleSubMenu = (event, Id) => {
-    console.log('id',Id);
     const parentArray = menu?.some((list) => list?.Parent === Id?.ScreenId)
     if(!parentArray)
     {
@@ -109,11 +105,9 @@ function Header() {
     setAnchorElUser(null);
   };
 
-  console.log('outer menu',menu);
-
+  
   const handleClickEvent = async (menu) => {
-    console.log('menu',menu);
-    
+
     if (menu?.Parent === 6) {
       if (menu?.ScreenId === 24) {
         navigate("/user", { state: menu});
@@ -155,7 +149,15 @@ function Header() {
       }else if (menu?.ScreenId === 33) {
         navigate("/allocated", { state: menu });
       }
-    } else {
+    }
+    else if(menu?.Parent === 34){
+      if (menu?.ScreenId === 35) {
+        navigate("/joborder", { state: menu});
+      }else if (menu?.ScreenId === 36) {
+        navigate("/allocated", { state: menu });
+      }
+    }
+    else {
       navigate("/home");
     }
     handleMenuList();
@@ -165,11 +167,6 @@ function Header() {
     if (id === 5) {
       navigate("/home");
     }
-    else if(id === 25)
-      {
-        navigate("/allocation", { state:menu });
-        setAnchorElNav(null);
-      }
     else if(id === 31)
       {
         navigate("/approve", { state:menu });

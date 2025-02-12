@@ -197,38 +197,38 @@ const InspBodyTable = ({ fields, tableData, settableData, Batch, setBatch, previ
             // }
             // else 
             if (field.FieldDisplayType == "check type"){
-                let newArray = updatedRows.find((item)=>item.Name === typeName)
+                let newArray = updatedRows.find((item)=>item.Category_Name === typeName)
                 
-                const Data1 = [...newArray.items]
+                const Data1 = [...newArray.Items]
                 Data1[index] = {
                     ...Data1[index],
                     [field.FieldName]: data
                 };
                 newArray = {
                     ...newArray,
-                    items:Data1
+                    Items:Data1
                 }
-                let typeIndex = updatedRows.findIndex((item)=>item.Name === typeName)
+                let typeIndex = updatedRows.findIndex((item)=>item.Category_Name === typeName)
                 updatedRows[typeIndex] = {
                     ...newArray
                 };
             }
             else if (data) {
-
+                
                 const { name, value } = data
 
-                let newArray = updatedRows.find((item)=>item.Name === typeName)
-                const Data1 = [...newArray.items]
+                let newArray = updatedRows.find((item)=>item.Category_Name === typeName)
+                const Data1 = [...newArray.Items]
                 Data1[index] = {
                     ...Data1[index],
                     [name]: value
                 };
                 newArray = {
                     ...newArray,
-                    items:Data1
+                    Items:Data1
                 }
                 
-                let typeIndex = updatedRows.findIndex((item)=>item.Name === typeName)
+                let typeIndex = updatedRows.findIndex((item)=>item.Category_Name === typeName)
                 updatedRows[typeIndex] = {
                     ...newArray
                 };
@@ -616,7 +616,7 @@ const MemoizedTableRow = ({ row, index, rowClick, handleRowChange, bodyCell, fie
                             padding: "5px",
                             borderRadius: "4px",
                             display: 'flex',
-                            justifyContent: 'center',
+                            justifyContent: 'start',
                             width: field.RowSpan ? `${250 * field.RowSpan}px` : "100%",
                         }}
                     >

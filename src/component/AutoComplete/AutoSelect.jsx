@@ -38,9 +38,9 @@ const AutoSelect = ({
 
   // Effect to set the formDataName based on formDataiId
   useEffect(() => {
-    if (formData[formDataiId]) {
+    if (formData[formDataiId] && !formData[formDataName]) {
       // Find the corresponding Name from Menu using formDataiId
-      const selectedOption = Menu?.find((item) => item.Id === formData[formDataiId]);
+      const selectedOption = Menu?.find((item) => item.Id == formData[formDataiId]);
 
       // Set the formDataName if the selected option is found
       if (selectedOption) {
@@ -50,7 +50,7 @@ const AutoSelect = ({
         });
       }
     }
-  }, [formData[formDataiId]]);
+  }, [formData[formDataiId],formData[formDataName]]);
 
   const handleAutocompleteChange = (event, newValue) => {
     if (disabled) {

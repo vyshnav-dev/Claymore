@@ -12,6 +12,7 @@ export let baseUrlMob = null
 export let rowsPerSheet = null;
 export let IMAGE_URL = null;
 export let allowedExtensionsReceipt = null
+export let allowedExtensionsTagAttachments = null
 export let MastersTagId = null
 export let TransactionData = null
 export let FixedValues = null
@@ -40,6 +41,7 @@ export const getConfig = () => {
     rowsPerSheet = config.rowsPerSheet
     IMAGE_URL = config.IMAGE_URL
     allowedExtensionsReceipt = config.allowedExtensionsReceipt
+    allowedExtensionsTagAttachments = config.allowedExtensionsTagAttachments
     MastersTagId = config1.MastersTagId
     TransactionData = config1.TransactionData
     FixedValues = config1.FixedValues

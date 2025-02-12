@@ -262,7 +262,6 @@ export default function PDDetails({
         setPageRender(1);
     };
 
-    console.log('formdata', formData);
 
     const handleIconsClick = async (value) => {
         switch (value.trim()) {
@@ -393,7 +392,6 @@ export default function PDDetails({
         }
     };
 
-    console.log('prod', products);
 
 
     return (

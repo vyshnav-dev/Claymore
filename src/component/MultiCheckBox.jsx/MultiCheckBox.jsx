@@ -20,9 +20,6 @@ function MultiCheckBox({ formData, setFormData, tagId, sFieldName, label, isMand
   const [searchTerm, setsearchTerm] = useState("")
   const [loading, setLoading] = useState(false)
 
-  console.log('serch', formData);
-
-
   useEffect(() => {
     const fetchMultidataEntity = async () => {
       setLoading(true)
@@ -38,7 +35,6 @@ function MultiCheckBox({ formData, setFormData, tagId, sFieldName, label, isMand
 
 
         const results = JSON.parse(response?.result);
-        console.log('obj nameyu', objectName);
 
         // Preserve selected items (formData[objectName]) and merge with new results
         const selectedItems = formData[objectName]?.map((item) => item[sFieldName]) || [];
@@ -60,10 +56,6 @@ function MultiCheckBox({ formData, setFormData, tagId, sFieldName, label, isMand
           selected: selectedItems.includes(item.Id),  // Mark as selected if already in formData
         }));
         // }
-
-        console.log('merg', mergedItems);
-
-
         // setcompanyList(mergedItems || []);
         setcompanyList((prevList) => (JSON.stringify(prevList) !== JSON.stringify(mergedItems) ? mergedItems : prevList));
       } catch (error) {
@@ -84,8 +76,6 @@ function MultiCheckBox({ formData, setFormData, tagId, sFieldName, label, isMand
   // Handling selected IDs and mapping them under the TagEntity key
   const handleSelectedIds = useCallback(
     (selectedIds) => {
-      console.log('callback', selectedIds);
-
       setFormData((prevFormData) => ({
         ...prevFormData,
         [objectName]: selectedIds, // Store under TagEntity
@@ -93,8 +83,6 @@ function MultiCheckBox({ formData, setFormData, tagId, sFieldName, label, isMand
     },
     [setFormData, objectName]
   );
-
-  console.log('companylist', companyList);
 
 
 
@@ -108,7 +96,7 @@ function MultiCheckBox({ formData, setFormData, tagId, sFieldName, label, isMand
 
 
   return (
-    <div>
+    <>
       <Loader loader={loading} loaderClose={() => setLoading(false)} />
       {companyList && (
         <div className="checkboxmainD1">
@@ -143,7 +131,7 @@ function MultiCheckBox({ formData, setFormData, tagId, sFieldName, label, isMand
           </div>
         </div>
       )}
-    </div>
+    </>
   )
 }
 

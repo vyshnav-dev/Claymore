@@ -79,11 +79,10 @@ export default function CustomizedAccordions({
 }) {
   // const { currentTheme } = useCustomTheme();
   // const theme = useTheme();
-  console.log('log',expanded);
   
   return (
     <div>
-      <Accordion  onChange={onChange}>
+      <Accordion expanded={expanded} onChange={onChange}>
         <AccordionSummary
           aria-controls="panel1d-content"
           id="panel1d-header"

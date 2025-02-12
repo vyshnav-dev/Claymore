@@ -3,7 +3,8 @@ import { Box, Checkbox, Tooltip, Typography, } from '@mui/material';
 
 
 const CheckBoxTag = ({ checked, onChange,label,disabled,columnSpan=0 ,width=250}) => {
-
+  
+  const checkedValue = checked === true || checked === "true"; // Ensure boolean conversion
 
     const handleKeyDown = (event) => {
       if(disabled){
@@ -16,7 +17,7 @@ const CheckBoxTag = ({ checked, onChange,label,disabled,columnSpan=0 ,width=250}
           ...event,
           target: {
             ...event.target,
-            checked: !checked, // Toggle the current checked state
+            checked: !checkedValue, // Toggle the current checked state
           },
         });
       }
@@ -49,7 +50,7 @@ const CheckBoxTag = ({ checked, onChange,label,disabled,columnSpan=0 ,width=250}
           </Typography>
         </Tooltip>
         <Checkbox
-          checked={checked}
+          checked={checkedValue}
           onChange={onChange}
           onKeyDown={handleKeyDown}
           tabIndex={0}

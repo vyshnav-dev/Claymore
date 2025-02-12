@@ -49,7 +49,7 @@ function BasicBreadcrumbs() {
           aria-label="breadcrumb"
         >
           <Typography underline="hover" sx={style} key="1">
-             Job Orders
+            Time sheet Job Orders
           </Typography>
         </Breadcrumbs>
       </Stack>
@@ -161,6 +161,7 @@ export default function TimeRecordSummary({
         pageNo: pageNumber,
         pageSize: displayLength,
         search: currentSearchKey,
+        type:1,
       });
 
       setrefreshFlag(false);
@@ -324,18 +325,17 @@ export default function TimeRecordSummary({
 
   const handleExcelExport = async () => {
     try {
-      const response = await gettagsummary({
-        tagId: 11,
-        refreshFlag: true,
+      const response = await GetAllocatedJobOrderSummary({
+        type:1,
         pageNumber: 0,
         pageSize: 0,
-        searchString: "",
+        search: "",
       });
       const excludedFields = ["Id"];
       const filteredRows = JSON.parse(response?.result)?.Data;
 
       await ExcelExport({
-        reportName: "Bin Summary",
+        reportName: "Time sheet Job Orders",
         filteredRows,
         excludedFields,
       });
@@ -402,6 +402,7 @@ export default function TimeRecordSummary({
             totalPages={totalPages}
             hardRefresh={hardRefresh}
             IdName={"Id"}
+            statusName={'Status'}
           />
         </Box>
         <ConfirmationAlert

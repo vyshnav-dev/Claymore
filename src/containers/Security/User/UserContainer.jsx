@@ -29,8 +29,6 @@ export default function UserContainer() {
     const fetchUserActions = async () => {
       try {
         const response = await getuseractionsforscreen({ ScreenId: menuIdLocal });
-        console.log('action res', response);
-
         const data = JSON.parse(response?.result);
         setuserAction(data);
       } catch (error) {

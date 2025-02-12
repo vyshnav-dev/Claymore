@@ -249,7 +249,7 @@ export default function UserDetails({
       UserType: 0,
       UserTypeName: "",
       ImagePath: "",
-      Inspector:''
+      Inspector: ''
     });
     setDetailPageId(0);
     setImageUpload(null);
@@ -268,23 +268,38 @@ export default function UserDetails({
         break;
       case "save":
         const emptyFields = [];
-        if (!mainDetails.LoginName) emptyFields.push("Login Name");
         // const result = await handleUserExist();
         // if (!result) {
         //   return; // If the user exists, stop further execution
         // }
-        if (!mainDetails.Employee) emptyFields.push("Employee Name");
+        let namePattern = /[A-Za-z]/;
+
+        if (!mainDetails.Employee) {
+          emptyFields.push("Employee Name");
+        } else if (!namePattern.test(mainDetails.Employee)) {
+          showAlert("info", "Employee must contain at least one letter.");
+          return;
+        }
+        
+        if (!mainDetails.LoginName) {
+          emptyFields.push("Login Name");
+        } else if (!namePattern.test(mainDetails.LoginName)) {
+          showAlert("info", "Login Name must contain at least one letter.");
+          return;
+        }
         if (!mainDetails.Role) emptyFields.push("Role");
         if (!mainDetails.Email) emptyFields.push("Email");
         if (!emailRegex.test(mainDetails?.Email))
           emptyFields.push("Valid Email");
+        if (!mainDetails.Inspector) emptyFields.push("Technician");
         if (!mainDetails.Password && detailPageId === 0)
           emptyFields.push("Password");
         if (!mainDetails.CPassword && detailPageId === 0)
           emptyFields.push("Confirm Password");
+        if (!mainDetails.Timezone) emptyFields.push("Time Zone");
         if (!mainDetails.UserType) emptyFields.push("User Type");
-        if (!mainDetails.Mobile) emptyFields.push("Mobile No");
-        if (!mainDetails.Phone) emptyFields.push("Phone No");
+        // if (!mainDetails.Mobile) emptyFields.push("Mobile No");
+        // if (!mainDetails.Phone) emptyFields.push("Phone No");
         if (mainDetails.Mobile && !/^[0-9]{10,15}$/.test(mainDetails.Mobile))
           emptyFields.push("Valid Mobile Number");
         if (mainDetails.Phone && !/^[0-9]{10,15}$/.test(mainDetails.Phone))
@@ -348,7 +363,7 @@ export default function UserDetails({
       mobile: mainDetails?.Mobile,
       userType: mainDetails?.UserType,
       role: mainDetails?.Role,
-      inspector:mainDetails?.Inspector,
+      inspector: mainDetails?.Inspector,
       password: detailPageId === 0 ? encryptedPassword : "",
     };
 
@@ -454,8 +469,6 @@ export default function UserDetails({
     const response = await deleteuserfile(id, mainDetails?.Photo);
   }
 
-  console.log('main dtail', mainDetails);
-
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
@@ -519,7 +532,7 @@ export default function UserDetails({
           >
 
             <InputCommon
-              label={"User Name"}
+              label={"Employee Name"}
               name={"Employee"}
               type={"text"}
               mandatory={true}
@@ -580,7 +593,7 @@ export default function UserDetails({
               formDataName={"Role_Name"}
               formDataiId={"Role"}
             />
-            
+
             <InputCommon
               label={"Email Id"}
               name={"Email"}
@@ -603,7 +616,7 @@ export default function UserDetails({
               required={false}
               formDataName={"Inspector_Name"}
               formDataiId={"Inspector"}
-              User={userData?.UserId}
+              criteria={1}
             />
             {detailPageId === 0 && (
               <>
@@ -674,25 +687,7 @@ export default function UserDetails({
               value={mainDetails}
               setValue={setMainDetails}
             />
-            {/* <InputCommon
-              key={"Mobile"}
-              label={"Mobile"}
-              value={mainDetails.Mobile}
-              name={"Mobile"}
-              setValue={(data) => {
-                const { name, value } = data
-                setMainDetails({ ...mainDetails, [name]: value })
-              }}
-              languageName={"english"}
-              key1={`Mobile`}
-              mandatory={false}
-              disabled={false}
-              type={"text"}
-              maxLength={100}
-
-
-
-            /> */}
+            
 
             <UserInputField
               label={"Phone"}

@@ -24,6 +24,9 @@ import InspBodyTable from "./InspBodyTable";
 import InspDetailsTab from "./InspDetailsTab";
 import { inspectionApis } from "../../service/Inspection/inspection";
 import TabFields from "./TabFields";
+import Loader from "../../component/Loader/Loader";
+import ApproveConfirmation from "./ApproveConfirmation";
+import TagFileTab from "./TagFileTab";
 const currentDate = new Date().toISOString().split("T")[0];
 function CustomTabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -36,7 +39,7 @@ function CustomTabPanel(props) {
             aria-labelledby={`simple-tab-${index}`}
             {...other}
         >
-            {value === index && <Box sx={{ p: 1 }}>{children}</Box>}
+            {value == index && <Box sx={{ p: 1 }}>{children}</Box>}
         </div>
     );
 }
@@ -93,6 +96,7 @@ function BasicBreadcrumbs() {
     );
 }
 const DefaultIcons = ({ iconsClick, detailPageId, userAction }) => {
+    const hasAproove = userAction.some((action) => action.Action == "Authorise");
     return (
         <Box
             sx={{
@@ -104,8 +108,9 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction }) => {
                 scrollbarWidth: "thin",
             }}
         >
-            {userAction.some(
-                (action) => action.Action === "New" && detailPageId !== 0
+
+            {/* {userAction.some(
+                (action) => action.Action == "New" && detailPageId !== 0
             ) && (
                     <ActionButton
                         iconsClick={iconsClick}
@@ -113,11 +118,11 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction }) => {
                         caption={"New"}
                         iconName={"new"}
                     />
-                )}
+                )} */}
             {userAction.some(
                 (action) =>
-                    (action.Action === "New" && detailPageId === 0) ||
-                    (action.Action === "Edit" && detailPageId !== 0)
+                    (action.Action == "New" && detailPageId == 0) ||
+                    (action.Action == "Edit" && detailPageId !== 0 && !hasAproove)
             ) && (
                     <ActionButton
                         iconsClick={iconsClick}
@@ -126,7 +131,7 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction }) => {
                         iconName={"save"}
                     />
                 )}
-            {userAction.some((action) => action.Action === "Delete") && (
+            {userAction.some((action) => action.Action == "Delete") || !hasAproove && (
                 <>
                     {detailPageId != 0 ? (
                         <ActionButton
@@ -138,8 +143,30 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction }) => {
                     ) : null}
                 </>
             )}
+            {userAction.some((action) => action.Action == "Authorise") && (
+                <>
+                    {detailPageId != 0 ? (
+                        <>
+                            <ActionButton
+                                iconsClick={iconsClick}
+                                icon={"fa-solid fa-thumbs-up"}
+                                caption={"Approve"}
+                                iconName={"approve"}
+                            />
+                            <ActionButton
+                                iconsClick={iconsClick}
+                                icon={"fa-solid fa-ban"}
+                                caption={"Reject"}
+                                iconName={"reject"}
+                            />
+                        </>
+                    ) : null}
+                </>
+            )}
 
-            
+
+
+
 
             <ActionButton
                 iconsClick={iconsClick}
@@ -231,7 +258,7 @@ const tableFields = [
         ErrorMessage: null,
         Field: 334,
         FieldDisplayType: "check type",
-        FieldName: "iData",
+        FieldName: "Data",
         FieldOrder: 2,
         FieldStructure: 5,
         FieldType: "",
@@ -245,7 +272,7 @@ const tableFields = [
         Mandatory: true,
         MandatoryInGroup: false,
         MandatoryInRevision: false,
-        MaxSize: 0,
+        MaxSize: null,
         MaximumValue: null,
         MergeField: false,
         MinimumValue: null,
@@ -266,7 +293,7 @@ const tableFields = [
         WordWrap: false,
 
     },
-    
+
     {
         AllowDate: 0,
         AllowDateName: null,
@@ -289,7 +316,7 @@ const tableFields = [
         ErrorMessage: null,
         Field: 334,
         FieldDisplayType: "Text Box",
-        FieldName: "sRemarks",
+        FieldName: "Remarks",
         FieldOrder: 3,
         FieldStructure: 5,
         FieldType: "text",
@@ -336,15 +363,20 @@ export default function InspDetails({
     disabledDetailed,
     productId,
     backId,
-    setId
+    setId,
+    mainDetails,
+    setMainDetails,
+    newId,
 }) {
-   
+
+
     const currentDate = new Date().toISOString().split("T")[0];
 
     const [formData, setFormData] = useState({
-        Id:null,
-        Product:null,
-        List:null,
+        Id: null,
+        DocNo: null,
+        Product: null,
+        List: null,
         OwnerName: null,
         OfficeAddress: "",
         EquipmentLocation: null,
@@ -352,139 +384,225 @@ export default function InspDetails({
         PreviousInspectionReport: null,
         TestMethod: null,
         ExpiryDate: null,
-        LastProofLoadTest: null,
+        TestDate: null,
+        InspectionType: null,
+        InspectionType_Name: null,
         CalibratedTestEquipment: null,
         ClientTestEquipment: null,
         InspectionInformation: {},
+        Attachment: [],
     });
-    const [mainDetails, setMainDetails] = useState({});
+    const [mainDetails1, setMainDetails1] = useState({
+        Remarks: null,
+    });
     const [detailPageId, setDetailPageId] = useState(summaryId);
     const [confirmAlert, setConfirmAlert] = useState(false);
     const [confirmData, setConfirmData] = useState({});
     const [confirmType, setConfirmType] = useState(null);
-    const [expanded, setExpanded] = useState(1);//Accordion open
+    const [expanded, setExpanded] = useState("InspectionDetails");//Accordion open
     const [tableBody, setTableBody] = useState();
-
+    const [loading, setLoading] = useState(true);
+    const [docNo, setDocNo] = useState({
+        DocNo: null,
+    });
 
     //----Fields-----
     const [viewFields, setViewFields] = useState([])
     const [fieldsWithStructure, setFieldsWithStructure] = useState([]);
     const [groupedFields, setgroupedFields] = useState([])
 
+    // -----Aproove-----
+    const [selectedDatas, setselectedDatas] = React.useState([]); //selected rows details
+    const [property, setProperty] = useState(false);
+    const [itemLabel, setItemLabel] = useState('');
 
-    console.log('table detail', tableBody);
+    //TagAttachmentTab
+    const [dbTagAttachmentDetails, setdbTagAttachmentDetails] = useState([])
+
 
     const { showAlert } = useAlert();
     const {
-        GetInspectionFields,getInspectionDetails,upsertInspection,deleteInspection
+        GetInspectionFields, getexaminationform, getdocno, getjoborderheaddetails, getInspectionDetails, upsertInspection, deleteInspection, upsertApprove, uploadAttachfiles
     } = inspectionApis();
-
 
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 setFormData({
-                    Id:detailPageId,
-                    Product:null,
-                    List:null,
+                    Id: 0,
+                    DocNo: null,
+                    Product: null,
+                    List: null,
                     OwnerName: null,
                     OfficeAddress: "",
                     EquipmentLocation: null,
                     DateOfInspection: currentDate,
                     PreviousInspectionReport: null,
                     TestMethod: null,
-                    ExpiryDate: null,
-                    LastProofLoadTest: null,
+                    ExpiryDate: currentDate,
+                    InspectionType: null,
+                    InspectionType_Name: null,
                     CalibratedTestEquipment: null,
                     ClientTestEquipment: null,
-                    TestDate:null,
-                    InspectionInformation:{},
+                    TestDate: currentDate,
+                    InspectionInformation: {},
+                    Attachment: [],
                 })
+
+                if (newId) {
+                    const response = await getdocno({
+                        list: detailPageId
+                    })
+                    if (response.status == "Success") {
+                        const myObject = JSON.parse(response?.result);
+
+                        setFormData(prevState => ({
+                            ...prevState, // Retain previous values
+                            DocNo: myObject[0]?.DocNo,
+                            Product: myObject[0]?.Product,
+                            Product_Name: myObject[0]?.ProductName,
+                            List: detailPageId,
+                        }));
+                    }
+                    const response1 = await getjoborderheaddetails({
+                        allocation: mainDetails?.Allocation
+                    })
+                    if (response1.status == "Success") {
+                        const myObject = JSON.parse(response1?.result);
+                        setFormData(prevState => ({
+                            ...prevState, // Retain previous values
+                            Owner: myObject[0]?.Owner,
+                            Address: myObject[0]?.Address,
+                            Location: myObject[0]?.Location,
+                        }));
+
+                    }
+                }
                 setFieldsWithStructure([])
                 const response = await GetInspectionFields({
-                    Id:productId
+                    Id: productId
                 })
                 if (response.status == "Success") {
                     let fieldsData = JSON.parse(response?.result);
-                    console.log('field view', fieldsData);
-
                     setViewFields(fieldsData)
 
-                    fieldsData.forEach((field) => {
-                        const {FieldName,FieldDisplayType } = field;
-              
-                        const fieldDisplayType = FieldDisplayType.toLowerCase();
-                         let processedValue;
-                        if (fieldDisplayType === "date") {
-                          processedValue = currentDate; 
-                          setFormData((prevFormData) => ({
-                            ...prevFormData,
-                            InspectionInformation: {
-                              ...prevFormData.InspectionInformation, // Spread the previous details to retain other properties
-                              [FieldName]: processedValue, // Dynamically update the property
-                            },
-                          }));
-                          // Set today's date if no default
-                        }
-                         
-                      });
 
-                      if (detailPageId > 0) {
+                    if (newId) {
+
+                        fieldsData.forEach((field) => {
+                            const { FieldName, FieldDisplayType } = field;
+
+                            const fieldDisplayType = FieldDisplayType.toLowerCase();
+                            let processedValue;
+                            if (fieldDisplayType == "date") {
+                                processedValue = currentDate;
+                                setFormData((prevFormData) => ({
+                                    ...prevFormData,
+                                    InspectionInformation: {
+                                        ...prevFormData.InspectionInformation, // Spread the previous details to retain other properties
+                                        [FieldName]: processedValue, // Dynamically update the property
+                                    },
+                                }));
+                                // Set today's date if no default
+                            }
+                            if (fieldDisplayType == "switch") {
+                                processedValue = false;
+                                setFormData((prevFormData) => ({
+                                    ...prevFormData,
+                                    InspectionInformation: {
+                                        ...prevFormData.InspectionInformation, // Spread the previous details to retain other properties
+                                        [FieldName]: processedValue, // Dynamically update the property
+                                    },
+                                }));
+                                // Set today's date if no default
+                            }
+
+                        });
+                    }
+
+
+
+
+                    if (detailPageId > 0 && !newId) {
                         await fetchDetail(); // Call the fetchDetail function after viewFields are set
-                      }  
+                    }
 
                 }
-                else{
+                else {
                     setViewFields([]);
                     setFormData({
-                        Id:detailPageId,
+                        Id: 0,
+                        DocNo: null,
                         OwnerName: null,
-                        Product:null,
-                        List:null,
+                        Product: null,
+                        List: null,
                         OfficeAddress: "",
                         EquipmentLocation: null,
                         DateOfInspection: null,
                         PreviousInspectionReport: null,
                         TestMethod: null,
                         ExpiryDate: null,
-                        LastProofLoadTest: null,
+                        InspectionType: null,
+                        InspectionType_Name: null,
                         CalibratedTestEquipment: null,
                         ClientTestEquipment: null,
-                        TestDate:null,
+                        TestDate: null,
                         InspectionInformation: {},
+                        Attachment: [],
                     })
-                    setFieldsWithStructure([]) 
+                    setFieldsWithStructure([])
                 }
+
+                if (newId) {
+                    const response = await getexaminationform({
+                        product: productId
+                    })
+                    if (response.status == "Success") {
+                        let myObject = JSON.parse(response?.result);
+                        setTableBody(myObject)
+
+                    }
+                }
+
             } catch (error) {
                 setViewFields([]);
                 setFormData({
-                    Id:detailPageId,
+                    Id: 0,
+                    DocNo: null,
                     OwnerName: null,
-                    Product:null,
-                    List:null,
+                    Product: null,
+                    List: null,
                     OfficeAddress: "",
                     EquipmentLocation: null,
                     DateOfInspection: null,
                     PreviousInspectionReport: null,
                     TestMethod: null,
                     ExpiryDate: null,
-                    LastProofLoadTest: null,
+                    InspectionType: null,
+                    InspectionType_Name: null,
                     CalibratedTestEquipment: null,
                     ClientTestEquipment: null,
-                    TestDate:null,
+                    TestDate: null,
                     InspectionInformation: {},
+                    Attachment: [],
                 })
                 setFieldsWithStructure([])
             }
+            finally {
+                setLoading(false)
+                setExpanded("InspectionDetails")
+            }
         };
-        if(productId){  
-           fetchData();
+        if (productId) {
+            fetchData();
         }
-    }, [productId,detailPageId]);
+    }, [productId, detailPageId]);
 
 
-    useEffect(() => { 
+
+
+    useEffect(() => {
 
         const groupedFields1 = viewFields.reduce((acc, field) => {
             const tabKey = field.TabName || ''; // Check if TabName is empty or null
@@ -496,108 +614,108 @@ export default function InspDetails({
             return acc;
         }, {});
 
-       
+
         setgroupedFields(groupedFields1)
-        setExpanded(Object.keys(groupedFields1)[0])
+        // setExpanded(Object.keys(groupedFields1)[0])
         // Now you have your tagDetailsAccumulator with unsorted fields in the first array, sorted by FieldOrder
 
     }, [viewFields]);
 
 
-    const fetchDetail =async()=>{
+    const fetchDetail = async () => {
         try {
-    
-        
-        
-           //  const response = await gettagdetails({id:detailPageId,tagId:menuObj?.TagId ,languageId:currentLanguage})
-            const response = await getInspectionDetails({id:detailPageId})
-            if(response.status =="Success"){
-             
-         
-             const result = JSON.parse(response?.result)
-             console.log('inp get detail',result);
 
-             let updatedData = {
-                ...formData,
-                ...result,
-                InspectionInformation:result?.InspectionInformation?? {}
-             }
-             
-          
-           
-            console.log('updata88',updatedData);
-            
-             setFormData(updatedData)
-             setTableBody(result?.Examination)
-             
+
+
+            //  const response = await gettagdetails({id:detailPageId,tagId:menuObj?.TagId ,languageId:currentLanguage})
+            const response = await getInspectionDetails({ id: detailPageId })
+
+            if (response.status == "Success") {
+
+
+                const result = JSON.parse(response?.result)
+                let updatedData = {
+                    ...formData,
+                    ...result,
+                    InspectionInformation: result?.InspectionInformation ?? {}
+                }
+
+
+                setFormData(updatedData)
+                setTableBody(result?.Examination)
+                if (result?.Attachment?.length > 0) {
+                    setdbTagAttachmentDetails(result?.Attachment)
+                }
+
             }
-            
-            
+
+
         } catch (error) {
-          handleclose()
+            handleclose()
         }
-       }
+    }
 
-
-
-
-
-
-
-
-
-
-   
-
-   
 
     //Accordion 
     const handleChange = (panel) => (event, isExpanded) => {
         setExpanded(isExpanded ? panel : null);
     };
 
-    const handleNew = async () => {
-        setMainDetails({
-            AltName: null,
-            DisableBatch: false,
-            Category: null,
-            Category_Name: null,
-            Group: false,
-            Code: null,
-            Id: detailPageId,
-            Name: null,
-            Parent: null,
-            Parent_Name: null,
-            DisableSerialNo: false,
-            Type: null,
-            Type_Name: null,
+
+
+    // ---- Aproove method----
+
+    const handleProperty = (value) => {
+        // if (selectedDatas.length === 0) {
+        //     showAlert("info", "Select rows to Authorize");
+        //     return;
+        // }
+        setItemLabel(value)
+        setConfirmData({
+            message: `You want to Approve.`,
+            type: "info",
+            header: "Authorization",
         });
-        setDetailPageId(0);
+        setProperty(true);
     };
 
-   
 
-    
 
     const handleIconsClick = async (value) => {
         switch (value.trim()) {
             case "new":
-                handleNew();
+                // handleNew();
                 break;
             case "close":
                 handleclose();
                 break;
             case "save":
                 const emptyFields = [];
-                
-                
+                if (!formData?.DateOfInspection) emptyFields.push("Date Of Inspection");
+                if (!formData?.InspectionType) emptyFields.push("Inspection Type");
+                if (!formData?.PreviousInspectionReport) emptyFields.push("Previous Inspection Report");
+                if (!formData?.TestMethod) emptyFields.push("Test Method");
+                if (!formData?.ExpiryDate) emptyFields.push("Expiry Date");
+                if (!formData?.TestDate) emptyFields.push("Last Proof Load Test");
+                if (!formData?.CalibratedTestEquipment) emptyFields.push("Calibrated Test Equipment");
+                if (!formData?.ClientTestEquipment) emptyFields.push("Client Test Equipment");
                 if (emptyFields.length > 0) {
                     showAlert("info", `Please Provide ${emptyFields[0]}`);
                     return;
                 }
-                setConfirmData({ message: "Save", type: "success" });
-                setConfirmType("save");
-                setConfirmAlert(true);
+                const isValid = await validateFormData();
+                if (isValid) {
+                    setConfirmData({ message: "Save", type: "success" });
+                    setConfirmType("save");
+                    setConfirmAlert(true);
+                }
+
+                break;
+            case "approve":
+                handleProperty(value);
+                break;
+            case "reject":
+                handleProperty(value);
                 break;
             case "delete":
                 setConfirmData({ message: "Delete", type: "danger" });
@@ -611,71 +729,163 @@ export default function InspDetails({
     // Handlers for your icons
 
     const handleclose = () => {
-        setId(backId)
-        setPageRender(3);
+        if (detailPageId == 0) {
+            setPageRender(1);
+        }
+        else {
+            setId(backId)
+            setPageRender(3);
+        }
     };
+
+    const validateFormData = async () => {
+
+        for (const tabKey of Object.keys(groupedFields)) {
+            // Check the FieldStructure of the first field in each group
+            const tabCaption = groupedFields[tabKey]?.[0]?.TabCaption || tabKey; // Use TabCaption or fallback to tabKey
+
+
+            // For `TabFields` structure validation
+            for (const field of groupedFields[tabKey]) {
+                const { FieldName, Mandatory, Caption } = field;
+
+                const fieldValue = formData["InspectionInformation"][FieldName];
+
+
+                if (fieldValue === null || fieldValue === undefined || fieldValue === "") {
+                    setExpanded(tabKey)
+                    showAlert("info", `${Caption} is reqiured (${tabCaption})`);
+                    return false
+                }
+
+
+
+            }
+
+        }
+
+        return true;
+    }
 
     const handleSave = async () => {
 
         const updatedChildData = tableBody.map((obj) => {
-            return obj?.items?.map((list) => {
+            return obj?.Items?.map((list) => {
                 return {
-                    slNo: list.Id,
-                    subCategory: list.Category,
-                    data: list.iData,
-                    remarks: list.sRemarks,
+                    slNo: list.SlNo,
+                    subCategory: list.SubCategory,
+                    data: list.Data,
+                    remarks: list.Remarks,
                 };
             });
         }).flat();
 
-        const hasDataZero = updatedChildData.some(
-            (item) => item.data === 0
-          );
-          if(hasDataZero)
-          {
-                showAlert("info","Ensure complete Data")
-          }
+        const hasDataZero = updatedChildData?.some(
+            (item) => item.data == 0
+        );
 
-          if(!hasDataZero)
-          {
+        if (hasDataZero) {
+            showAlert("info", "Ensure complete Data")
+        }
+
+
+
+        if (!hasDataZero) {
+
+            const validFieldNames = new Set(viewFields.map(field => field.FieldName));
+
+            // Filter formData.InspectionInformation to keep only valid fields
+            const filteredInspectionInformation = Object.keys(formData?.InspectionInformation || {})
+                .filter(key => validFieldNames.has(key)) // Keep only keys that exist in viewFields
+                .reduce((obj, key) => {
+                    obj[key] = formData?.InspectionInformation[key];
+                    return obj;
+                }, {});
+            const inspectionInformationArray = [filteredInspectionInformation]
+
             const saveData = {
                 id: formData?.Id,
+                docNo: formData?.DocNo,
                 product: formData?.Product,
                 list: formData?.List,
                 dateOfInspection: formData?.DateOfInspection,
                 expiryDate: formData?.ExpiryDate,
-                // inspectionType: formData?.,
+                inspectionType: formData?.InspectionType,
                 previousInspectionReport: formData?.PreviousInspectionReport,
                 testMethod: formData?.TestMethod,
                 calibratedTestEquipment: formData?.CalibratedTestEquipment,
                 clientTestEquipment: formData?.ClientTestEquipment,
                 testDate: formData?.TestDate,
-                inspectionInformation:[formData?.InspectionInformation], 
+                inspectionInformation: inspectionInformationArray,
                 examination: updatedChildData,
+                attachments: formData?.Attachment || []
             };
-            console.log('insp sva data',saveData);
-            
+
+
             const response = await upsertInspection(saveData);
-            if (response.status === "Success") {
-    
+            if (response.status == "Success") {
+
                 showAlert("success", response?.message);
-                // handleNew();
-                const actionExists = userAction.some((action) => action.Action === "New");
-                if (!actionExists) {
-                    handleclose();
+
+                const detailId = Number(response.result)
+
+                const formDataFiles = new FormData();
+
+                let fileIndex = 0;
+                // Filter attachments that have a file and add them to the FormData
+                const attachmentsWithFiles = formData?.Attachment?.filter(attachment => attachment?.file);
+
+
+
+                if (attachmentsWithFiles.length > 0) {
+
+                    attachmentsWithFiles.forEach((attachment) => {
+                        if (attachment.file) {
+                            formDataFiles.append(
+                                `Attachments[${fileIndex}].SlNo`,
+                                attachment.SLNo
+                            );
+                            formDataFiles.append(
+                                `Attachments[${fileIndex}].previousFileName`,
+                                attachment.FileName
+                            );
+                            formDataFiles.append(
+                                `Attachments[${fileIndex}].FileContent`,
+                                attachment.file
+                            );
+                            fileIndex++;
+                        }
+                    });
+                    try {
+
+
+
+                        const uploadResponse = await uploadAttachfiles(detailId, formDataFiles);
+                        if (uploadResponse.status === 'Success') {
+                            showAlert('success', uploadResponse?.message);
+                        }
+                    } catch (error) {
+
+                    }
+
                 }
-            
-          }
-        
+                // handleNew();
+                // const actionExists = userAction.some((action) => action.Action == "New");
+                // if (!actionExists) {
+                handleclose();
+                // }
+
+            }
+
         }
     };
 
     //confirmation
 
     const handleConfirmSubmit = () => {
-        if (confirmType === "save") {
+        if (confirmType == "save") {
             handleSave();
-        } else if (confirmType === "delete") {
+        } else if (confirmType == "delete") {
             if (detailPageId == 0) {
                 setConfirmAlert(false);
                 setConfirmData({});
@@ -698,26 +908,42 @@ export default function InspDetails({
     const deleteClick = async () => {
         let response;
         response = await deleteInspection([{ id: detailPageId }]);
-        if (response?.status === "Success") {
+        if (response?.status == "Success") {
             showAlert("success", response?.message);
             handleNew();
-            const actionExists = userAction.some((action) => action.Action === "New");
+            const actionExists = userAction.some((action) => action.Action == "New");
             if (!actionExists) {
-                setPageRender(1);
+                handleclose();
             }
         }
     };
 
-  
+    const handlePropertyConfirmation = async (status) => {
+        if (status == 1) {
+            if (!mainDetails?.Remarks) {
+                showAlert("info", `Please Provide Remarks`);
+                return;
+            }
+        }
+        const saveData = {
+            status: status,
+            id: detailPageId,
+            list: formData?.List,
+            remarks: mainDetails1?.Remarks
+        };
+        try {
+            const response = await upsertApprove(saveData);
+            if (response?.status === "Success") {
+                showAlert("success", response?.message);
+                setMainDetails1({})
+            }
+        } catch (error) {
+        } finally {
+            setselectedDatas([]);
+            setProperty(false);
+        }
+    };
 
-    
-
-    
-
-    
-
-    
-  console.log('insp summ93',formData);
 
     return (
         <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
@@ -758,9 +984,10 @@ export default function InspDetails({
                         display: "flex",
                         flexDirection: "column",
                         paddingTop: "10px",
-                        gap: '20px'
+                        // gap: '20px'
                     }}
                 >
+
                     <Box
                         sx={{
                             display: "flex",
@@ -769,6 +996,7 @@ export default function InspDetails({
                             justifyContent: "flex-start", // Changed from center to flex-start
                             padding: 1,
                             gap: "10px",
+                            marginBottom: '20px',
                             boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)",
 
                             flexWrap: "wrap",
@@ -780,6 +1008,7 @@ export default function InspDetails({
                             },
                         }}
                     >
+                        <Typography sx={{ fontWeight: 'bold', }}>{formData?.Product_Name}</Typography>
                         <UserInputField
                             label={"Doc No"}
                             name={"DocNo"}
@@ -788,8 +1017,6 @@ export default function InspDetails({
                             mandatory={true}
                             value={formData}
                             setValue={setFormData}
-                            onBlurAction={() => handleMasterExist(1)}
-                            maxLength={100}
                         />
 
                         <Box sx={{
@@ -816,7 +1043,6 @@ export default function InspDetails({
                                 mandatory={true}
                                 value={formData}
                                 setValue={setFormData}
-                                onBlurAction={() => handleMasterExist(2)}
                                 maxLength={100}
                             />
                             <UserInputField
@@ -827,7 +1053,6 @@ export default function InspDetails({
                                 mandatory={true}
                                 value={formData}
                                 setValue={setFormData}
-                                onBlurAction={() => handleMasterExist(2)}
                                 maxLength={100}
                             />
                             <UserInputField
@@ -838,7 +1063,6 @@ export default function InspDetails({
                                 mandatory={true}
                                 value={formData}
                                 setValue={setFormData}
-                                onBlurAction={() => handleMasterExist(2)}
                                 maxLength={100}
                             />
 
@@ -847,14 +1071,14 @@ export default function InspDetails({
 
 
                     </Box>
+
                     <CustomizedAccordions
                         // icons="fa-solid fa-briefcase"
                         label={'Inspection Details'}
-                        type={1}
-                        expanded={expanded === 1}
-                        onChange={handleChange(1)}
+                        expanded={expanded == "InspectionDetails"}
+                        onChange={handleChange("InspectionDetails")}
                     >
-                        <InspDetailsTab formData={formData} setFormData={setFormData} />
+                        <InspDetailsTab key={999} formData={formData} setFormData={setFormData} />
                     </CustomizedAccordions>
 
 
@@ -866,52 +1090,66 @@ export default function InspDetails({
                                 // Check the FieldStructure of the first field in each group
                                 const fieldStructure = groupedFields[tabKey]?.[0]?.FieldStructure;
 
-                             
-                                    return (
-                                        <TabFields
-                                            key={tabKey}
-                                            fields={groupedFields[tabKey]} // Pass fields belonging to this tab
-                                            expanded={expanded === tabKey}
-                                            onChange={handleChange(tabKey)}
-                                            formData={formData?.InspectionInformation}
-                                            setFormData={ (data)=>setFormData((prevFormData) => ({
-                                                ...prevFormData,
-                                                InspectionInformation: data
-                                              }))}
-                                            // language={currentLanguageName}
-                                            // tagDetails={menuObj}
-                                            fieldStructure={fieldStructure}
-                                            // handleTagSwitch={!preview ? handleTagSwitch : false}
-                                            disabledDetailed={disabledDetailed}
-                                            userAction={userAction}
-                                            // fetchDetailTagInfo={fetchDetailTagInfo}
-                                            detailScreeniId={formData.iId}
-                                        />
-                                    );
-                                  
+
+                                return (
+                                    <TabFields
+                                        key={tabKey}
+                                        fields={groupedFields[tabKey]} // Pass fields belonging to this tab
+                                        expanded={expanded == tabKey}
+                                        onChange={handleChange(tabKey)}
+                                        formData={formData?.InspectionInformation}
+                                        setFormData={(data) => setFormData((prevFormData) => ({
+                                            ...prevFormData,
+                                            InspectionInformation: data
+                                        }))}
+                                        // language={currentLanguageName}
+                                        // tagDetails={menuObj}
+                                        fieldStructure={fieldStructure}
+                                        // handleTagSwitch={!preview ? handleTagSwitch : false}
+                                        disabledDetailed={disabledDetailed}
+                                        userAction={userAction}
+                                        // fetchDetailTagInfo={fetchDetailTagInfo}
+                                        detailScreeniId={formData.iId}
+                                    />
+                                );
+
                             })}
                         </>
                     )}
 
-                    <Box>
-                        {tableBody?.map((list, index) => (
-                            <>
-                                <CustomizedAccordions
-                                    // icons="fa-solid fa-briefcase"
-                                    label={list?.Category_Name}
-                                    type={1}
-                                    expanded={expanded === index + 1}
-                                    onChange={handleChange(index + 1)}
-                                >
-                                    <InspBodyTable fields={tableFields} tableData={list?.items} settableData={setTableBody} preview={false} typeName={list?.Name} />
-                                </CustomizedAccordions>
-                            </>
-                        ))}
 
+                    {tableBody?.map((list, index) => (
+                        <>
+                            <CustomizedAccordions
+                                // icons="fa-solid fa-briefcase"
+                                label={list?.Category_Name}
+                                expanded={expanded == list?.Category_Name}
+                                onChange={handleChange(list?.Category_Name)}
+                            >
+                                <InspBodyTable key={888} fields={tableFields} tableData={list?.Items} settableData={setTableBody} preview={false} typeName={list?.Category_Name} />
+                            </CustomizedAccordions>
+                        </>
+                    ))}
 
-                    </Box>
+                    <TagFileTab
+
+                        // fieldsWithStructure6={fieldsWithStructure6} // Pass fields belonging to this tab
+                        expanded={expanded === 6}
+                        onChange={handleChange(6)}
+                        formData={formData}
+                        setFormData={setFormData}
+                        // currentLanguageName={currentLanguageName}
+                        // menuObj={menuObj}
+                        // disabledDetailed={disabledDetailed}
+                        detailPageId={formData.Id}
+                        // handleTagSwitch={!preview ? handleTagSwitch : false}
+                        dbTagAttachmentDetails={dbTagAttachmentDetails}
+                        setdbTagAttachmentDetails={setdbTagAttachmentDetails}
+                    />
+
 
                 </Box>
+
             </Box>
 
             <ConfirmationAlert
@@ -920,8 +1158,17 @@ export default function InspDetails({
                 data={confirmData}
                 submite={handleConfirmSubmit}
             />
+            <ApproveConfirmation
+                handleClose={() => setProperty(false)}
+                open={property}
+                data={confirmData}
+                submite={handlePropertyConfirmation}
+                selectedDatas={selectedDatas?.length === 1 ? selectedDatas[0] : null}
+                itemLabel={itemLabel}
+                mainDetails={mainDetails1}
+                setMainDetails={setMainDetails1}
+            />
 
-            
         </Box>
     );
 }

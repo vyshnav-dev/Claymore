@@ -36,18 +36,21 @@ const TagAutoSelect = ({
   useEffect(() => {
     if (formData[formDataiId]) {
       // Find the corresponding Name from Menu using formDataiId
-      const selectedOption = Menu?.find((item) => item.Id === formData[formDataiId]);
+      const selectedOption = Menu?.find((item) => item.Id == formData[formDataiId]);
 
       // Set the formDataName if the selected option is found
+      
       if (selectedOption) {
         setFormData({
           ...formData,
-          [formDataName]: selectedOption.Name,  // Set the Name corresponding to the Id
+          [formDataName]: selectedOption.Name,
+          [formDataiId]: selectedOption.Id,   // Set the Name corresponding to the Id
         });
       }
     }
   }, [formData[formDataiId]]);
 
+  
   const handleAutocompleteChange = (event, newValue) => {
     if (disabled) {
       return;
@@ -73,6 +76,7 @@ const TagAutoSelect = ({
     const existingFormValue = formData[formDataName] || "";
 
     if (!existsInMenu && searchkey !== existingFormValue) { 
+      
       setFormData({
         ...formData,
         [formDataName]: "",

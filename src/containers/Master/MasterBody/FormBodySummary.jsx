@@ -388,8 +388,6 @@ export default function FormBodySummary({
     }
   };
 
-  
-  console.log('body main dtel', mainDetails);
 
   return (
     <>

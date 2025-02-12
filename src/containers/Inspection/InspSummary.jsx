@@ -15,7 +15,7 @@ import { allocationApis } from "../../service/Allocation/allocation";
 import InspSummaryTable from "../../component/Table/InspSummaryTable";
 import { inspectionApis } from "../../service/Inspection/inspection";
 
-function BasicBreadcrumbs() {
+function BasicBreadcrumbs({mId}) {
   const style = {
     display: "flex",
     alignItems: "center",
@@ -50,7 +50,7 @@ function BasicBreadcrumbs() {
           aria-label="breadcrumb"
         >
           <Typography underline="hover" sx={style} key="1">
-            Inspection Product list
+            { mId !== 31 ? 'Inspection Product list ' :'Approve Product list'}
           </Typography>
         </Breadcrumbs>
       </Stack>
@@ -59,7 +59,7 @@ function BasicBreadcrumbs() {
 }
 
 const DefaultIcons = ({ iconsClick, userAction }) => {
-  const hasEditAction = userAction.some((action) => action.Name === "Edit");
+  const hasEditAction = userAction?.some((action) => action.Name === "Edit");
   return (
     <Box
       sx={{
@@ -79,7 +79,7 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
           iconName={"new"}
         />
       )} */}
-      {userAction.some((action) => action.Action === "Edit") && (
+      {userAction?.some((action) => action.Action === "Edit") && (
         <ActionButton
           iconsClick={iconsClick}
           icon={"fa-solid fa-pen"}
@@ -87,7 +87,7 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
           iconName={"edit"}
         />
       )}
-      {userAction.some((action) => action.Action === "Excel") && (
+      {userAction?.some((action) => action.Action === "Excel") && (
         <ActionButton
           iconsClick={iconsClick}
           icon={"fa-solid fa-file-excel"}
@@ -95,7 +95,7 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
           iconName={"excel"}
         />
       )}
-      {userAction.some((action) => action.Action === "Delete") && (
+      {userAction?.some((action) => action.Action === "Delete") && (
         <ActionButton
           iconsClick={iconsClick}
           icon={"trash"}
@@ -104,7 +104,7 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
         />
       )}
       {!hasEditAction &&
-        userAction.some((action) => action.Name === "View") && (
+        userAction?.some((action) => action.Name === "View") && (
           <ActionButton
             iconsClick={iconsClick}
             icon={"fa-solid fa-eye"}
@@ -128,8 +128,14 @@ export default function InspSummary({
   userAction,
   Id,
   setProductId,
-  setBackId
+  setBackId,
+  menuIdLocal,
+  mainDetails,
+  setMainDetails,
+  setNewId
 }) {
+
+  
   const [rows, setRows] = React.useState([]); //To Pass in Table
   const [displayLength, setdisplayLength] = React.useState(25); // Show Entries
   const [pageNumber, setpageNumber] = React.useState(1); //Table current page number
@@ -144,8 +150,8 @@ export default function InspSummary({
   const [confirmAlert, setConfirmAlert] = useState(false); //To handle alert open
   const [confirmData, setConfirmData] = useState({}); //To pass alert data
   const latestSearchKeyRef = useRef(searchKey);
-  const [property, setProperty] = useState(false);
-  const { getInspectionSummary} =
+  
+  const { getInspectionSummary,deleteInspection,getAssignjoborderlist,getjoborderproductlistsummary} =
     inspectionApis();
   const [groupId, setGroupId] = useState(0);
   const [parentList, setParentList] = useState([]);
@@ -154,19 +160,49 @@ export default function InspSummary({
 
   const longPressThreshold = 500;
 
-
   //Role Summary
   const fetchRoleSummary = async () => {
     setselectedDatas([]);
     const currentSearchKey = latestSearchKeyRef.current;
-    
+    let Type;
+    if(menuIdLocal == 31)
+    {
+      Type = 2;
+    }
+    else if(menuIdLocal == 29){
+      Type = 1;
+    }
+    else{
+      return;
+    }
     try {
-      const response = await getInspectionSummary({
-        allocation: Id,
-        pageNo: pageNumber,
-        pageSize: displayLength,
-        search: currentSearchKey,
-      });
+
+      let response;
+      if(!Id){
+        if(mainDetails?.Allocation)
+        {
+          setNewId(true)
+        }
+        response = await getjoborderproductlistsummary({
+          id: mainDetails?.Allocation ,
+          pageNo: pageNumber,
+          pageSize: displayLength,
+          search: currentSearchKey,
+        });
+      }
+      else{
+        setNewId(false);
+        response = await getInspectionSummary({
+          allocation: Id ,
+          pageNo: pageNumber,
+          pageSize: displayLength,
+          search: currentSearchKey,
+          type:Type
+        });
+      }
+      // setMainDetails({
+      //   Allocation:Id
+      // })
       setBackId(Id)
       setrefreshFlag(false);
       if (
@@ -201,7 +237,7 @@ export default function InspSummary({
 
   React.useEffect(() => {
     fetchRoleSummary(); // Initial data fetch
-  }, [pageNumber, displayLength, searchKey, changesTriggered, groupId]);
+  }, [pageNumber, displayLength, searchKey, changesTriggered,mainDetails?.Allocation]);
 
 
  
@@ -268,6 +304,8 @@ export default function InspSummary({
   };
 
   const handleclose = () => {
+    setMainDetails({})
+    setNewId(false)
     setPageRender(1);
   };
 
@@ -314,7 +352,7 @@ export default function InspSummary({
     }));
 
     try {
-      let response = await deletetag(deletePayload, 11);
+      let response = await deleteInspection(deletePayload);
 
       if (response?.status === "Success") {
         showAlert("success", response?.message);
@@ -337,19 +375,30 @@ export default function InspSummary({
   };
 
   const handleExcelExport = async () => {
+    let Type;
+    if(menuIdLocal == 31)
+    {
+      Type = 2;
+    }
+    else if(menuIdLocal == 29){
+      Type = 1;
+    }
+    else{
+      return;
+    }
     try {
-      const response = await gettagsummary({
-        tagId: 11,
-        refreshFlag: true,
+      const response = await getInspectionSummary({
+        allocation: Id,
         pageNumber: 0,
         pageSize: 0,
-        searchString: "",
+        search: "",
+        type:Type
       });
       const excludedFields = ["Id"];
       const filteredRows = JSON.parse(response?.result)?.Data;
 
       await ExcelExport({
-        reportName: "Bin Summary",
+        reportName:  menuIdLocal !== 31 ? 'Inspection Product list ' :'Approve Product list',
         filteredRows,
         excludedFields,
       });
@@ -394,7 +443,7 @@ export default function InspSummary({
             flexWrap: "wrap",
           }}
         >
-          <BasicBreadcrumbs />
+          <BasicBreadcrumbs mId={menuIdLocal}  />
           <DefaultIcons iconsClick={handleIconsClick} userAction={userAction} />
         </Box>
         <Box sx={{ width: "100%", overflowX: "auto", paddingBottom: "10px" }}>
@@ -417,7 +466,12 @@ export default function InspSummary({
             parentList={parentList}
             totalPages={totalPages}
             hardRefresh={hardRefresh}
-            IdName={"Id"}
+            IdName={"Id"} 
+            statusName={menuIdLocal !== 31 ?"Status":''}
+            getAssignjoborderlist={getAssignjoborderlist}
+            mainDetails={mainDetails}
+            setMainDetails={setMainDetails}
+            id={Id}
           />
         </Box>
         <ConfirmationAlert
@@ -426,13 +480,7 @@ export default function InspSummary({
           data={confirmData}
           submite={handledeleteRole}
         />
-        {/* <MasterProductConfirmation
-          handleClose={() => setProperty(false)}
-          open={property}
-          data={confirmData}
-          submite={handlePropertyConfirmation}
-          selectedDatas={selectedDatas?.length === 1 ? selectedDatas[0] : null}
-        /> */}
+       
       </Box>
     </>
   );

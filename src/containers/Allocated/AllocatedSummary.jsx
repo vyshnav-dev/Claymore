@@ -80,12 +80,12 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
           iconName={"new"}
         />
       )} */}
-      {userAction.some((action) => action.Action === "Edit") && (
+      {userAction.some((action) => action.Action === "Allocate") && (
         <ActionButton
           iconsClick={iconsClick}
           icon={"fa-solid fa-person-circle-plus"}
-          caption={"Edit"}
-          iconName={"edit"}
+          caption={"Allocate"}
+          iconName={"allocate"}
         />
       )}
       {userAction.some((action) => action.Action === "Excel") && (
@@ -216,7 +216,7 @@ export default function AllocatedSummary({
   const handleRowDoubleClick = (rowiId) => {
     if (rowiId > 0) {
       setId(rowiId);
-      setPageRender(2);
+      setAddMenu(true);
     }
   };
 
@@ -250,8 +250,8 @@ export default function AllocatedSummary({
       case "new":
         handleAdd("new");
         break;
-      case "edit":
-        handleAdd("edit");
+      case "allocate":
+        handleAdd("allocate");
         break;
       case "delete":
         deleteClick();
@@ -277,13 +277,13 @@ export default function AllocatedSummary({
 
   // Handlers for your icons
   const handleAdd = (value) => {
-    if (value === "edit") {
+    if (value === "allocate") {
       if (selectedDatas.length !== 1) {
         showAlert(
           "info",
           selectedDatas.length === 0
             ? "Select row to Edit "
-            : "Can't Edit Multiple Role"
+            : "Can't Allocate Multiple Job Order"
         );
         return;
       }
@@ -341,18 +341,16 @@ export default function AllocatedSummary({
 
   const handleExcelExport = async () => {
     try {
-      const response = await gettagsummary({
-        tagId: 11,
-        refreshFlag: true,
+      const response = await GetAllocatedJobOrderSummary({
         pageNumber: 0,
         pageSize: 0,
-        searchString: "",
+        search: "",
       });
       const excludedFields = ["Id"];
       const filteredRows = JSON.parse(response?.result)?.Data;
 
       await ExcelExport({
-        reportName: "Bin Summary",
+        reportName: "Allocated Job Orders",
         filteredRows,
         excludedFields,
       });

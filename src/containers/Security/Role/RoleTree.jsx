@@ -48,7 +48,6 @@ export default function RoleTree({ menuAction, id, handleChild }) {
 
   // Fetch actions based on selected screen
   const handleAction = async (screenId, isGroup) => {
-    console.log('scrnid', screenId, isGroup);
 
     setAction([])
     if (isGroup) {

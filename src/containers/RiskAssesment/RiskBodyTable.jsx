@@ -95,14 +95,14 @@ const RiskBodyTable = ({ fields, tableData, settableData, preview = false, langu
 
                 let newArray = updatedRows.find((item) => item.Name === typeName)
 
-                const Data1 = [...newArray.items]
+                const Data1 = [...newArray.Items]
                 Data1[index] = {
                     ...Data1[index],
                     [field.FieldName]: data
                 };
                 newArray = {
                     ...newArray,
-                    items: Data1
+                    Items: Data1
                 }
                 let typeIndex = updatedRows.findIndex((item) => item.Name === typeName)
                 updatedRows[typeIndex] = {
@@ -113,14 +113,14 @@ const RiskBodyTable = ({ fields, tableData, settableData, preview = false, langu
             else if (field.FieldDisplayType == "level") {
                 let newArray = updatedRows.find((item) => item.Name === typeName)
 
-                const Data1 = [...newArray.items]
+                const Data1 = [...newArray.Items]
                 Data1[index] = {
                     ...Data1[index],
                     [field.FieldName]: data
                 };
                 newArray = {
                     ...newArray,
-                    items: Data1
+                    Items: Data1
                 }
                 let typeIndex = updatedRows.findIndex((item) => item.Name === typeName)
                 updatedRows[typeIndex] = {
@@ -132,14 +132,14 @@ const RiskBodyTable = ({ fields, tableData, settableData, preview = false, langu
                 const { name, value } = data
 
                 let newArray = updatedRows.find((item) => item.Name === typeName)
-                const Data1 = [...newArray.items]
+                const Data1 = [...newArray.Items]
                 Data1[index] = {
                     ...Data1[index],
                     [name]: value
                 };
                 newArray = {
                     ...newArray,
-                    items: Data1
+                    Items: Data1
                 }
 
                 let typeIndex = updatedRows.findIndex((item) => item.Name === typeName)

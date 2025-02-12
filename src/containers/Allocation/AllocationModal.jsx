@@ -49,8 +49,6 @@ export default function AllocationModal({ handleCloseModal, selected, hardRefres
         textOverflow: "ellipsis",
     }
     const { GetTechnicianList } = allocationApis()
-    console.log('sel22', selected);
-
     const userData = JSON.parse(localStorage.getItem("ClaymoreUserData"))[0];
 
     const [formData, setFormData] = useState({})
@@ -91,7 +89,6 @@ export default function AllocationModal({ handleCloseModal, selected, hardRefres
             showAlert('info', `Please Allocate ${emptyFields[0]}`);
             return;
         }
-        console.log('save', formData);
         const saveData = {
             Id: 0,
             jobOrderNo: selected,
@@ -110,8 +107,6 @@ export default function AllocationModal({ handleCloseModal, selected, hardRefres
         }
 
     };
-    console.log('multi main', formData?.details?.[0]);
-
     return (
         <>
             <DialogContent>
@@ -128,6 +123,7 @@ export default function AllocationModal({ handleCloseModal, selected, hardRefres
                             value={mainDetails}
                             setValue={setMainDetails}
                             maxLength={100}
+                            width={200}
                         />
                         <UserInputField
                             label={"Date"}
@@ -138,6 +134,7 @@ export default function AllocationModal({ handleCloseModal, selected, hardRefres
                             value={mainDetails}
                             setValue={setMainDetails}
                             maxLength={100}
+                            width={200}
                         />
                         <UserInputField
                             label={"Client"}
@@ -148,13 +145,14 @@ export default function AllocationModal({ handleCloseModal, selected, hardRefres
                             value={mainDetails}
                             setValue={setMainDetails}
                             maxLength={100}
+                            width={200}
                         />
 
                     </Box>
 
-                    <Box sx={{ display: 'flex', flexWrap: 'wrap',gap:2 }}>
-                            <TableContainer component={Paper} sx={{ maxHeight: '180px',maxWidth: '300px', overflowY: 'auto',mt:2 }}>
-                                <Table stickyHeader size="small" sx={{ maxWidth: '300px' }}>
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap',gap:2,maxHeight:'200px',minHeight:'200px' }}>
+                            <TableContainer component={Paper} sx={{ maxHeight: '180px',minHeight:'180px', maxWidth: '370px', overflowY: 'auto', mt: 2,scrollbarWidth:'thin' }}>
+                                <Table stickyHeader size="small" sx={{ minWidth: '200px' }}>
                                     <TableHead>
                                         <TableRow>
                                             <TableCell sx={{... headerCellStyle }}>Product</TableCell>
@@ -168,10 +166,6 @@ export default function AllocationModal({ handleCloseModal, selected, hardRefres
                                         <TableCell sx={{... bodyCellStyle}}>{item.Quantity}</TableCell>
                                     </TableRow>
                                     ))}
-                                        
-                                        
-                                        
-                                        
                                     </TableBody>
                                 </Table>
                             </TableContainer>

@@ -231,9 +231,10 @@ export default function MasterProductDetails({
       Code: null,
       Id: detailPageId,
       Name: null,
-      inspFrequency: 0,
+      InspFrequency: 0,
       Type: null,
       Type_Name: null,
+      InspFrequency_Name:''
     });
 
     setDetailPageId(0);
@@ -286,7 +287,7 @@ export default function MasterProductDetails({
       name: mainDetails?.Name,
       code: mainDetails?.Code,
       type: mainDetails?.Type,
-      inspFrequency: mainDetails?.inspFrequency,
+      inspFrequency: mainDetails?.InspFrequency,
     };
     const response = await upsertproductmaster(saveData);
     if (response.status === "Success") {
@@ -340,9 +341,7 @@ export default function MasterProductDetails({
     }
   };
 
-  
 
-  
 
 
  
@@ -416,7 +415,6 @@ export default function MasterProductDetails({
               mandatory={true}
               value={mainDetails}
               setValue={setMainDetails}
-              onBlurAction={() => handleMasterExist(1)}
               maxLength={100}
             />
             <UserInputField
@@ -427,7 +425,6 @@ export default function MasterProductDetails({
               mandatory={true}
               value={mainDetails}
               setValue={setMainDetails}
-              onBlurAction={() => handleMasterExist(2)}
               maxLength={100}
             />
 
@@ -446,6 +443,20 @@ export default function MasterProductDetails({
               ColumnSpan={0}
               // disabled={disabledDetailed}
               Menu={[{ "Id": 1, "Name": "Finished goods" }, { "Id": 2, "Name": "Raw material" }, { "Id": 3, "Name": "Service" }]}
+
+            />
+            <AutoSelect
+              key={"InspFrequency"}
+              formData={mainDetails}
+              setFormData={setMainDetails}
+              autoId={"InspFrequency"}
+              formDataName={`InspFrequency_Name`}
+              formDataiId={"InspFrequency"}
+              required={true}
+              label={"Inspection Frequency"}
+              ColumnSpan={0}
+              // disabled={disabledDetailed}
+              Menu={[{ "Id": 1, "Name": "6 Months" }, { "Id": 2, "Name": "12 Months" }]}
 
             />
 

@@ -34,6 +34,7 @@ import {
   selectedColor,
   thirdColor,
 } from "../../config/config";
+import UserAutoComplete from "../AutoComplete/UserAutoComplete";
 
 const iconsExtraSx = {
   fontSize: "0.8rem",
@@ -50,9 +51,12 @@ export default function InspSummaryTable(props) {
     totalPages,
     hardRefresh,
     IdName,
-    handleLongPressStart,
+    statusName,
     handleLongPressEnd,
-    parentList,
+    getAssignjoborderlist,
+    mainDetails,
+    setMainDetails,
+    id
   } = props;
   const [selected, setSelected] = React.useState([]);
   const [selectedPd, setSelectedPd] = React.useState([]);
@@ -63,32 +67,32 @@ export default function InspSummaryTable(props) {
   const [columns, setColumns] = React.useState([]);
 
   const profileDateFieldsArray = profileDateFields
-  .split(",")
-  .map((field) => field.trim()); 
-  const excludedFields = [ "Group", "GroupId","TotalRows","UserName"];
+    .split(",")
+    .map((field) => field.trim());
+  const excludedFields = ["Group", "GroupId", "TotalRows", "UserName", "Id", statusName];
 
   //To apply some filters on table rows
   const initialColumns =
     rows && rows.length > 0
       ? Object.keys(rows[0])
-          .filter((key) => !excludedFields.includes(key))
-          .map((key) => ({
-            id: key,
-            label:
-              key.charAt(0).toUpperCase() +
-              key
-                .slice(1)
-                .replace(/([A-Z])/g, " $1")
-                .trim(), // Format label as readable text
-            minWidth: 100, // Set default minWidth for all columns
-            maxWidth: 200,
-          }))
+        .filter((key) => !excludedFields.includes(key))
+        .map((key) => ({
+          id: key,
+          label:
+            key.charAt(0).toUpperCase() +
+            key
+              .slice(1)
+              .replace(/([A-Z])/g, " $1")
+              .trim(), // Format label as readable text
+          minWidth: 100, // Set default minWidth for all columns
+          maxWidth: 200,
+        }))
       : [];
   React.useEffect(() => {
     setColumns(initialColumns);
   }, [rows]);
 
-  
+
 
   //To expand column on mouse dragging
   const handleResize = (index, event) => {
@@ -157,7 +161,7 @@ export default function InspSummaryTable(props) {
     let newSelected = [];
     const selectedIndexpd = selectedPd.indexOf(row['Product']);
     let newSelectedPd = [];
-    
+
 
     if (selectedIndex === -1 || selectedIndexpd === -1) {
       newSelected = newSelected.concat(selected, row[IdName]); // Add the entire row object
@@ -305,6 +309,23 @@ export default function InspSummaryTable(props) {
               <FullscreenIcon />
             </IconButton>
           </Tooltip>
+          {!id &&
+
+            <Box sx={{ display: 'flex', flexWrap: "wrap", gap: .5, mr: 1, mb: 1, }}>
+              <UserAutoComplete
+                apiKey={getAssignjoborderlist}
+                formData={mainDetails}
+                setFormData={setMainDetails}
+                label={"Job Order No"}
+                autoId={"Allocation"}
+                required={false}
+                formDataName={"JobOrderNo"}
+                formDataiId={"Allocation"}
+                criteria={3}
+              />
+            </Box>
+          }
+
           <TextField
             margin="normal"
             size="small"
@@ -424,8 +445,8 @@ export default function InspSummaryTable(props) {
                       />
                     </TableCell>
                   ))}
-                  
-                  
+
+
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -442,7 +463,7 @@ export default function InspSummaryTable(props) {
                       onTouchEnd={handleLongPressEnd}
                       role="checkbox"
                       aria-checked={isItemSelected}
-                      onDoubleClick={() => props.onRowDoubleClick(row[IdName],row)}
+                      onDoubleClick={() => props.onRowDoubleClick(row[IdName], row)}
                       tabIndex={-1}
                       sx={{
                         cursor: "pointer",
@@ -450,8 +471,8 @@ export default function InspSummaryTable(props) {
                         backgroundColor: isItemSelected
                           ? selectedColor
                           : index % 2 === 1
-                          ? thirdColor
-                          : null,
+                            ? thirdColor
+                            : null,
                       }}
                     >
                       {/* <TableCell sx={{ padding: "0px",textAlign:"center" }}>
@@ -486,12 +507,12 @@ export default function InspSummaryTable(props) {
                             {profileDateFieldsArray.includes(column.label)
                               ? convertToLocaleDateString(row[column.id])
                               : row[column.id] === null
-                              ? ""
-                              : `${row[column.id]}`}
+                                ? ""
+                                : `${row[column.id]}`}
                           </TableCell>
                         </Tooltip>
                       ))}
-                      </TableRow>
+                    </TableRow>
                   );
                 })}
               </TableBody>

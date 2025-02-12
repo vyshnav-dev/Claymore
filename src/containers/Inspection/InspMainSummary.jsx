@@ -14,7 +14,7 @@ import { identity } from "lodash";
 import { summaryData } from "../../config";
 import { allocationApis } from "../../service/Allocation/allocation";
 
-function BasicBreadcrumbs() {
+function BasicBreadcrumbs({mId}) {
   const style = {
     display: "flex",
     alignItems: "center",
@@ -49,7 +49,7 @@ function BasicBreadcrumbs() {
           aria-label="breadcrumb"
         >
           <Typography underline="hover" sx={style} key="1">
-            Inspection Main Summary
+           { mId !== 31 ? 'Inspection ' :'Approve'}
           </Typography>
         </Breadcrumbs>
       </Stack>
@@ -58,7 +58,7 @@ function BasicBreadcrumbs() {
 }
 
 const DefaultIcons = ({ iconsClick, userAction }) => {
-  const hasEditAction = userAction.some((action) => action.Name === "Edit");
+  const hasEditAction = userAction?.some((action) => action.Name === "Edit");
   return (
     <Box
       sx={{
@@ -70,15 +70,15 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
         scrollbarWidth: "thin",
       }}
     >
-      {/* {userAction.some((action) => action.Action === "New") && (
+      {userAction.some((action) => action.Action === "New") && (
         <ActionButton
           iconsClick={iconsClick}
           icon={"fa-solid fa-plus"}
           caption={"New"}
           iconName={"new"}
         />
-      )} */}
-      {userAction.some((action) => action.Action === "Edit") && (
+      )}
+      {userAction?.some((action) => action.Action === "Edit") && (
         <ActionButton
           iconsClick={iconsClick}
           icon={"fa-solid fa-pen"}
@@ -86,7 +86,7 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
           iconName={"edit"}
         />
       )}
-      {userAction.some((action) => action.Action === "Excel") && (
+      {userAction?.some((action) => action.Action === "Excel") && (
         <ActionButton
           iconsClick={iconsClick}
           icon={"fa-solid fa-file-excel"}
@@ -94,7 +94,7 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
           iconName={"excel"}
         />
       )}
-      {userAction.some((action) => action.Action === "Delete") && (
+      {userAction?.some((action) => action.Action === "Delete") && (
         <ActionButton
           iconsClick={iconsClick}
           icon={"trash"}
@@ -103,7 +103,7 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
         />
       )}
       {!hasEditAction &&
-        userAction.some((action) => action.Name === "View") && (
+        userAction?.some((action) => action.Name === "View") && (
           <ActionButton
             iconsClick={iconsClick}
             icon={"fa-solid fa-eye"}
@@ -125,7 +125,11 @@ export default function InspMainSummary({
   setPageRender,
   setId,
   userAction,
+  menuIdLocal
 }) {
+
+  // const hasAproove = userAction?.some((action) => action.Action == "Authorise");
+  
   const [rows, setRows] = React.useState([]); //To Pass in Table
   const [displayLength, setdisplayLength] = React.useState(25); // Show Entries
   const [pageNumber, setpageNumber] = React.useState(1); //Table current page number
@@ -148,17 +152,30 @@ export default function InspMainSummary({
 
   const longPressThreshold = 500;
 
+  
 
   //Role Summary
   const fetchRoleSummary = async () => {
     setselectedDatas([]);
     const currentSearchKey = latestSearchKeyRef.current;
+    let Type;
+    if(menuIdLocal == 31)
+    {
+      Type = 3;
+    }
+    else if(menuIdLocal == 29){
+      Type = 2;
+    }
+    else{
+      return;
+    }
     
     try {
       const response = await GetAllocatedJobOrderSummary({
         pageNo: pageNumber,
         pageSize: displayLength,
         search: currentSearchKey,
+        type:Type
       });
 
       setrefreshFlag(false);
@@ -167,7 +184,7 @@ export default function InspMainSummary({
         currentSearchKey === latestSearchKeyRef.current
       ) {
         const myObject = JSON.parse(response?.result);
-
+        
         setRows(myObject?.Data );
 
         const totalRows = myObject?.Metadata.TotalRows;
@@ -193,7 +210,7 @@ export default function InspMainSummary({
 
   React.useEffect(() => {
     fetchRoleSummary(); // Initial data fetch
-  }, [pageNumber, displayLength, searchKey, changesTriggered, groupId]);
+  }, [pageNumber, displayLength, searchKey, changesTriggered,menuIdLocal]);
 
 
   
@@ -324,19 +341,29 @@ export default function InspMainSummary({
   };
 
   const handleExcelExport = async () => {
+    let Type;
+    if(menuIdLocal == 31)
+    {
+      Type = 3;
+    }
+    else if(menuIdLocal == 29){
+      Type = 2;
+    }
+    else{
+      return;
+    }
     try {
-      const response = await gettagsummary({
-        tagId: 11,
-        refreshFlag: true,
+      const response = await GetAllocatedJobOrderSummary({
         pageNumber: 0,
         pageSize: 0,
-        searchString: "",
+        type:Type,
+        search: "",
       });
       const excludedFields = ["Id"];
       const filteredRows = JSON.parse(response?.result)?.Data;
 
       await ExcelExport({
-        reportName: "Bin Summary",
+        reportName: menuIdLocal !== 31 ? 'Inspection ' :'Approve',
         filteredRows,
         excludedFields,
       });
@@ -382,7 +409,7 @@ export default function InspMainSummary({
             flexWrap: "wrap",
           }}
         >
-          <BasicBreadcrumbs />
+          <BasicBreadcrumbs mId={menuIdLocal} />
           <DefaultIcons iconsClick={handleIconsClick} userAction={userAction} />
         </Box>
         <Box sx={{ width: "100%", overflowX: "auto", paddingBottom: "10px" }}>
@@ -405,6 +432,7 @@ export default function InspMainSummary({
             totalPages={totalPages}
             hardRefresh={hardRefresh}
             IdName={"Id"}
+            statusName={menuIdLocal !== 31 ?"Status":''}
           />
         </Box>
         <ConfirmationAlert

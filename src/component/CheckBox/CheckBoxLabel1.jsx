@@ -35,7 +35,6 @@ export default function ChecKBoxLabel1({
     }
   };
 
-  console.log('val',value);
   
 
   return (

@@ -64,12 +64,12 @@ const refreshToken = async () => {
   try {
     
     const response = await axios.get(`${baseUrl}login/regeneratetokens?refreshToken=${refreshTokenValue}`);
-    const myObject = response?.data
+    const myObject = response?.data?.result
     // Store tokens in localStorage
-    localStorage.setItem("SangClaymoreAccessToken", myObject.accessToken);
-    localStorage.setItem("SangClaymoreRefreshToken", myObject.refreshToken);
+    localStorage.setItem("SangClaymoreAccessToken",JSON.parse( myObject?.accessToken));
+    localStorage.setItem("SangClaymoreRefreshToken",JSON.parse( myObject?.refreshToken));
 
-    return myObject.AccessToken;
+    return JSON.parse( myObject.accessToken);
   } catch (error) {
     console.error("refresh token error", error);
     navigateTo("/");
@@ -100,7 +100,6 @@ baseApi.interceptors.response.use(
     return response.data;
   },
   async (error) => {
-  
     const originalRequest = error.config;
 
     
@@ -123,7 +122,7 @@ baseApi.interceptors.response.use(
         } catch (refreshError) {
           processQueue(refreshError, null);
           isRefreshing = false;
-          // window.location.href = '/';
+          // window.location.href = '/';       
           localStorage.removeItem("SangClaymoreAccessToken");
           localStorage.removeItem("SangClaymoreRefreshToken");
           navigateTo("/");

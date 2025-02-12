@@ -1,8 +1,11 @@
 import { Box } from '@mui/material'
 import React from 'react'
 import UserInputField from '../../component/InputFields/UserInputField'
+import AutoSelect from '../../component/AutoComplete/AutoSelect'
+import TagAutoSelect from '../../component/Select/TagAutoSelect'
 
 export default function InspDetailsTab({formData,setFormData}) {
+    
   return (
     
     <Box sx={{
@@ -32,6 +35,20 @@ export default function InspDetailsTab({formData,setFormData}) {
             // onBlurAction={() => handleMasterExist(2)}
             maxLength={100}
         />
+        <AutoSelect
+              key={"InspectionType"}
+              formData={formData}
+              setFormData={setFormData}
+              autoId={"InspectionType"}
+              formDataName={"InspectionType_Name"}
+              formDataiId={"InspectionType"}
+              required={true}
+              label={"Inspection Type"}
+              languageName={"english"}
+              ColumnSpan={0}
+              // disabled={disabledDetailed}
+              Menu={[{ "Id": 1, "Name": "PERIODIC" }, { "Id": 2, "Name": "THOROUGH" },]}
+            />
         <UserInputField
             label={"Previous Inspection Report"}
             name={"PreviousInspectionReport"}
@@ -67,8 +84,8 @@ export default function InspDetailsTab({formData,setFormData}) {
         />
         <UserInputField
             label={"Last Proof Load Test"}
-            name={"LoadTest"}
-            type={"text"}
+            name={"TestDate"}
+            type={"date"}
             disabled={false}
             mandatory={true}
             value={formData}
@@ -78,7 +95,7 @@ export default function InspDetailsTab({formData,setFormData}) {
         />
         <UserInputField
             label={"Calibrated Test Equipment"}
-            name={"TestEquipment"}
+            name={"CalibratedTestEquipment"}
             type={"text"}
             disabled={false}
             mandatory={true}

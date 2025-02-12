@@ -100,13 +100,13 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction }) => {
           (action.Action === "New" && detailPageId === 0) ||
           (action.Action === "Edit" && detailPageId !== 0)
       ) && (
-        <ActionButton
-          iconsClick={iconsClick}
-          icon={"save"}
-          caption={"Save"}
-          iconName={"save"}
-        />
-      )}
+          <ActionButton
+            iconsClick={iconsClick}
+            icon={"save"}
+            caption={"Save"}
+            iconName={"save"}
+          />
+        )}
       {userAction.some((action) => action.Action === "Delete") && (
         <>
           {detailPageId != 0 ? (
@@ -159,8 +159,8 @@ export default function RoleDetails({
       if (detailPageId === 0) {
         handleNew();
       } else {
-        
-        
+
+
         const response = await getroledetails({
           Role: detailPageId,
         });
@@ -193,7 +193,14 @@ export default function RoleDetails({
         break;
       case "save":
         const emptyFields = [];
-        if (!mainDetails.RoleName) emptyFields.push("Role Name");
+        let namePattern = /[A-Za-z]/;
+
+        if (!mainDetails.RoleName) {
+          emptyFields.push("Role Name");
+        } else if (!namePattern.test(mainDetails.RoleName)) {
+          showAlert("info", "Role Name must contain at least one letter.");
+          return;
+        }
         if (!child.length) emptyFields.push("Actions");
         if (emptyFields.length > 0) {
           showAlert("info", `Please Provide ${emptyFields[0]}`);
@@ -280,24 +287,21 @@ export default function RoleDetails({
     setChild(data);
   };
 
-  const handleRoleExist = async () => {
-    try {
-      const response = await checkrolenameexistence({
-        roleId: mainDetails?.RoleId,
-        roleName: mainDetails?.RoleName,
-      });
-      if (response.status === "Success") {
-        return true;
-      } else {
-        return false;
-      }
-    } catch (error) {
-      return false;
-    }
-  };
-
-  console.log('maindetail33',mainDetails);
-  
+  // const handleRoleExist = async () => {
+  //   try {
+  //     const response = await checkrolenameexistence({
+  //       roleId: mainDetails?.RoleId,
+  //       roleName: mainDetails?.RoleName,
+  //     });
+  //     if (response.status === "Success") {
+  //       return true;
+  //     } else {
+  //       return false;
+  //     }
+  //   } catch (error) {
+  //     return false;
+  //   }
+  // };
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
@@ -368,7 +372,7 @@ export default function RoleDetails({
               value={mainDetails}
               setValue={setMainDetails}
               maxLength={50}
-              onBlurAction={handleRoleExist}
+            // onBlurAction={handleRoleExist}
             />
           </Box>
           <RoleTree menuAction={menuAction} handleChild={handleChild} />

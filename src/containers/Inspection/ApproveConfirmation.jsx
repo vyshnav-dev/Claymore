@@ -20,12 +20,13 @@ export default function ApproveConfirmation({
   data,
   submite,
   selectedDatas,
-  itemLabel
+  itemLabel,
+  mainDetails,
+  setMainDetails
 }) {
   const themes = useTheme();
 //   const { gettagpropertiesdetails } = masterApis();
   const [activeData, setActiveData] = useState({});
-  const [mainDetails, setMainDetails] = useState({});
 
 //   useEffect(() => {
 //     if (selectedDatas) {
@@ -47,17 +48,12 @@ export default function ApproveConfirmation({
 //     }
 //   }, [open]);
 
-  const handleNew = () => {
-    setActiveData({
-      Id: 0,
-      Status: null,
-    });
-  };
+  
 
   return (
     <>
       <MDBModal open={open} onClose={handleClose} tabIndex="-1" centered>
-        <MDBModalDialog size={!selectedDatas ? "md" : "sm"}>
+        <MDBModalDialog >
           <MDBModalContent>
             {/* Modal Header */}
             <MDBModalHeader
@@ -78,13 +74,14 @@ export default function ApproveConfirmation({
                 {data?.message}
               </Typography>):(
                 <UserInputField
-                name={"findings"}
+                name={"Remarks"}
                 type={"text"}
                 disabled={false}
                 mandatory={true}
                 value={mainDetails}
                 setValue={setMainDetails}
                 multiline={true}
+                width={400}
             />
               )}
               
@@ -96,11 +93,11 @@ export default function ApproveConfirmation({
                 Close
               </MDBBtn>
               { itemLabel === 'reject' ? (
-                <MDBBtn onClick={() => submite(3)} color={"danger"}>
+                <MDBBtn onClick={() => submite(1)} color={"danger"}>
                   Reject
                 </MDBBtn>
               ) : (
-                <MDBBtn onClick={() => submite(0)} color={"success"}>
+                <MDBBtn onClick={() => submite(2)} color={"success"}>
                   Approve
                 </MDBBtn>
               )}

@@ -48,9 +48,6 @@ export default function FormBodyModal({ handleCloseModal, upsertSubcategorytmast
         handleEdit();
       },[id])
     
-      console.log('form',formData);
-      
-
     const handleSave = async () => {
       const update = {...formData}
       setFormData[update]

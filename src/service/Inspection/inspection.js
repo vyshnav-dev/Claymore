@@ -5,6 +5,23 @@ const inspectionApis = () => {
   const { makeAuthorizedRequestBase } = baseApis()
 
  
+  //#region inspection common apis
+
+  const getAssignjoborderlist = async (payload) => {
+    try {
+      const response = await makeAuthorizedRequestBase(
+        "get",
+        "allocation/getjoborderlist",
+        payload,
+        true
+      );
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+
   //#region risk Assesment
 
   const GetRisAssesmentSummary = async (payload) => {
@@ -62,6 +79,37 @@ const inspectionApis = () => {
       throw error;
     }
   };
+
+  const getFormdata = async (payload) => {
+    try {
+      const response = await makeAuthorizedRequestBase(
+        "get",
+        "inspection/getformdata",
+        payload,
+        true
+      );
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+
+  const getriskjoborderdetails = async (payload) => {
+    try {
+      const response = await makeAuthorizedRequestBase(
+        "get",
+        "allocation/getjoborderdetails",
+        payload,
+        true
+      );
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+
 
 
   //#region time sheet
@@ -125,11 +173,67 @@ const inspectionApis = () => {
    //#region Inspection form
 
 
+  const getjoborderproductlistsummary = async (payload) => {
+    try {
+      const response = await makeAuthorizedRequestBase(
+        "get",
+        "allocation/getjoborderproductlistsummary",
+        payload,
+        true
+      );
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+
+
+
+  const getdocno = async (payload) => {
+    try {
+      const response = await makeAuthorizedRequestBase(
+        "get",
+        "allocation/getdocno",
+        payload,
+        true
+      );
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  };
+  const getjoborderheaddetails = async (payload) => {
+    try {
+      const response = await makeAuthorizedRequestBase(
+        "get",
+        "allocation/getjoborderdetails",
+        payload,
+        true
+      );
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  };
   const GetInspectionFields = async (payload) => {
     try {
       const response = await makeAuthorizedRequestBase(
         "get",
         "inspection/getinspectionfields",
+        payload,
+        true
+      );
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  };
+  const getexaminationform = async (payload) => {
+    try {
+      const response = await makeAuthorizedRequestBase(
+        "get",
+        "inspection/getexaminationform",
         payload,
         true
       );
@@ -194,6 +298,28 @@ const inspectionApis = () => {
       throw error;
     }
   };
+
+  const uploadAttachfiles = async (id,payload) => {
+
+    try {
+      const response = await makeAuthorizedRequestBase("post", `/inspection/uploadinspectionattachments?id=${id}`, payload, true);
+      return response;
+    } catch (error) {
+      // console.error(error);
+      throw error;
+    }
+  };
+ //Delete file
+ const deleteattachments = async (payload) => {
+  
+  try {
+    const response = await makeAuthorizedRequestBase("delete","/inspection/deleteinspectionattachments",payload);
+    return response;
+  } catch (error) {
+    // console.error(error);
+    throw error;
+  }
+};
   
 
 
@@ -255,29 +381,55 @@ const inspectionApis = () => {
     }
   };
   
+  //#region aproove
+
+  const upsertApprove = async (payload) => {
+    try {
+      const response = await makeAuthorizedRequestBase(
+        "post",
+        "approve/upsertapprove",
+        payload,
+        true
+      );
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  };
+
 
   
 
   
 
   return {
+    getAssignjoborderlist,
     GetRisAssesmentSummary,
     GetRiskAssesmentDetails,
     UpsertRiskAssesment,
     deleteRiskAssesment,
+    getFormdata,
+    getriskjoborderdetails,
     GetTimeSheetSummary,
     GetTimeSheetDetails,
     UpsertTimeSheet,
     deleteTimeSheet,
+    getjoborderproductlistsummary,
+    getdocno,
+    getjoborderheaddetails,
     GetInspectionFields,
+    getexaminationform,
     getInspectionSummary,
     getInspectionDetails,
     upsertInspection,
     deleteInspection,
+    uploadAttachfiles,
+    deleteattachments,
     getAcknowledgementSummary,
     getAcknowledgemenDetails,
     upsertAcknowledgement,
-    deleteAcknowledgement
+    deleteAcknowledgement,
+    upsertApprove,
   }
 }
 

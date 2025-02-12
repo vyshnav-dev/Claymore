@@ -17,18 +17,18 @@ import { useAlert } from "../../../component/Alerts/AlertContext";
 import { primaryColor } from "../../../config/config";
 import UserInputField from "../../../component/InputFields/UserInputField";
 import { stockCountApis } from "../../../service/Transaction/stockcount";
-import ChecKBoxLabel from "../../../component/CheckBox/CheckBoxLabel";
-import WarehouseAutoComplete from "../../../component/AutoComplete/WarehouseAutoComplete";
-import { reconciliationApis } from "../../../service/Transaction/reconciliation";
-import ReconEntityAutoComplete from "../../../component/AutoComplete/ReconciliationAutoComplete/ReconEntityAutoComplete";
-import ReconciliationTable from "../../Transaction/Reconciliation/ReconciliationTable";
+// import ChecKBoxLabel from "../../../component/CheckBox/CheckBoxLabel";
+// import WarehouseAutoComplete from "../../../component/AutoComplete/WarehouseAutoComplete";
+// import { reconciliationApis } from "../../../service/Transaction/reconciliation";
+// import ReconEntityAutoComplete from "../../../component/AutoComplete/ReconciliationAutoComplete/ReconEntityAutoComplete";
+// import ReconciliationTable from "../../Transaction/Reconciliation/ReconciliationTable";
 import { reportApis } from "../../../service/Report/report";
-import UserAutoCompleteManual from "../../../component/AutoComplete/UserAutoCompleteManual";
-import ReportTable from "../../../component/Table/ReportTable";
+// import UserAutoCompleteManual from "../../../component/AutoComplete/UserAutoCompleteManual";
+// import ReportTable from "../../../component/Table/ReportTable";
 import ExcelExport from "../../../component/Excel/Excel";
 import ReportSummary from "../../../component/Table/ReportSummary";
-import ReportBinAutoComplete from "../../../component/AutoComplete/ReportAutoComplete/ReportBinAutoComplete";
-import UserAutoComplete from "../../../component/AutoComplete/UserAutoComplete";
+// import ReportBinAutoComplete from "../../../component/AutoComplete/ReportAutoComplete/ReportBinAutoComplete";
+// import UserAutoComplete from "../../../component/AutoComplete/UserAutoComplete";
 import NormalButton from "../../../component/Buttons/NormalButton";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 const currentDate = new Date().toISOString().split("T")[0];
@@ -424,7 +424,7 @@ export default function ClosingStockReport({ userAction, disabledDetailed }) {
                   value={mainDetails}
                   setValue={setMainDetails}
                 />
-                <ReconEntityAutoComplete
+                {/* <ReconEntityAutoComplete
                   apiKey={gettaglist}
                   formData={mainDetails}
                   setFormData={setMainDetails}
@@ -480,7 +480,7 @@ export default function ClosingStockReport({ userAction, disabledDetailed }) {
                   formDataiId={"bin"}
                   formDataName={"binName"}
                   tagId={17}
-                />
+                /> */}
                 <Box p={1.9}>
                   <NormalButton label={"Search"} action={tagDetails} />
                 </Box>

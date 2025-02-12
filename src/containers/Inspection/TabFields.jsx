@@ -4,7 +4,7 @@ import { Box } from '@mui/material';
 // import { useAlert } from '../../../../components/Alerts/AlertContext';
 // import { tagFieldLanguageDirection } from '../../../../config/config';
 import Accordions from '../../component/Accordion/Accordion';
-// import SwitchTag from '../../../../components/Home/Tags/SwitchTag';
+import SwitchTag from '../../component/Switch/SwitchTag';
 // import DateAndTimeTag from '../../../../components/Home/Tags/Inputs/DateAndTimeTag';
 import InputCommon from '../../component/InputFields/InputCommon';
 import TagAutoSelect from '../../component/Select/TagAutoSelect';
@@ -71,53 +71,41 @@ const TabFields = ({ formData,setFormData,fields, expanded, onChange,language,ta
       
     }
 
-    const handleMapSelection = (coordintes,fieldname)=>{
-        setFormData({...formData,[fieldname]:coordintes})
-    }
+    
 
-    const checkNameExistance = async (value,type)=>{
-      try {
-        const response = await checktagexistence({tagId:tagDetails?.TagId,id:formData.iId,name:value,type:type })
-       
-      } catch (error) {
-        
-      }
-    }
+    
    
 
 
-    const handleOnBlur = (fieldName,value)=>{
-      if(disabledDetailed){
-        return
-      }
+    // const handleOnBlur = (fieldName,value)=>{
+    //   if(disabledDetailed){
+    //     return
+    //   }
      
       
-     if(!value){
-      return
-     }
+    //  if(!value){
+    //   return
+    //  }
       
-     if(fieldName == "Name"){
-      if(value == formData.detailName){
-        return
-      }
-      checkNameExistance(value,1)
-     }
-     else if(fieldName == "Code"){
-      if(value == formData.detailCode){
-        return
-      }
-      checkNameExistance(value,2)
-     }
+    //  if(fieldName == "Name"){
+    //   if(value == formData.detailName){
+    //     return
+    //   }
+    //   checkNameExistance(value,1)
+    //  }
+    //  else if(fieldName == "Code"){
+    //   if(value == formData.detailCode){
+    //     return
+    //   }
+    //   checkNameExistance(value,2)
+    //  }
      
-    }
+    // }
     
     
     const sortedFields = [...fields].sort((a, b) => a.FieldOrder - b.FieldOrder);
     const Wrapper = isAccordion ? Accordions : Box;
 
-    console.log('sort',sortedFields);
-    console.log('formdata000',formData);
-    
     
   return (
     <Wrapper
@@ -135,20 +123,14 @@ const TabFields = ({ formData,setFormData,fields, expanded, onChange,language,ta
           flexWrap: 'wrap', // Allow the fields to wrap
           gap: 2, // Add space between fields
           scrollbarWidth:"thin",overflowX:"auto",
-          //flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', // Change direction based on rtl or ltr
-          // paddingBottom:5
+         
        
         }}
       >
-          {sortedFields.length > 0 && sortedFields.map((field) => {
+          {sortedFields.map((field) => {
             // Render components based on FieldDisplayType
-            // if ((formData.Group&&!field.HiddenInGroup
-            //   ) || (!formData.Group&&!field.Hidden)) {
               switch ((field.FieldDisplayType)?.toLowerCase()) {
                 case "textbox":
-                //    if(  
-                //     [field.FieldName] == "Code"
-                //   ) {
                     return (
                       <InputCommon
                         label={field.Caption}
@@ -165,7 +147,7 @@ const TabFields = ({ formData,setFormData,fields, expanded, onChange,language,ta
                         AllowNegative={field?.Negative ?? true}
                         DefaultValue={field?.DefaultValue}
                         ErrorMessage={field?.ErrorMessage}
-                        onBlur={(data) => handleOnBlur(field?.FieldName, data)}
+                        // onBlur={(data) => handleOnBlur(field?.FieldName, data)}
                         ColumnSpan={field?.ColumnSpan}
                         RowSpan={field?.RowSpan}
                         multiline={field?.RowSpan > 1 ? true : null}
@@ -177,12 +159,8 @@ const TabFields = ({ formData,setFormData,fields, expanded, onChange,language,ta
                         // Add other necessary props here like value, onChange, etc.
                       />
                     );
-                //   } 
                   break;
                 case "date":
-                //    if(  
-                //     [field.FieldName] == "Code"
-                //   ) {
                     return (
                       <InputCommon
                         label={field.Caption}
@@ -199,7 +177,7 @@ const TabFields = ({ formData,setFormData,fields, expanded, onChange,language,ta
                         AllowNegative={field?.Negative ?? true}
                         DefaultValue={field?.DefaultValue}
                         ErrorMessage={field?.ErrorMessage}
-                        onBlur={(data) => handleOnBlur(field?.FieldName, data)}
+                        // onBlur={(data) => handleOnBlur(field?.FieldName, data)}
                         ColumnSpan={field?.ColumnSpan}
                         RowSpan={field?.RowSpan}
                         multiline={field?.RowSpan > 1 ? true : null}
@@ -211,10 +189,8 @@ const TabFields = ({ formData,setFormData,fields, expanded, onChange,language,ta
                         // Add other necessary props here like value, onChange, etc.
                       />
                     );
-                //   } 
                   break;
                 case "drop down":
-                    // if((field.FieldType).toLowerCase() === "number list") {
                     return (
                       <TagAutoSelect
                       key={field?.FieldName}
@@ -233,33 +209,33 @@ const TabFields = ({ formData,setFormData,fields, expanded, onChange,language,ta
                     );
                 //   }
                   break;
-                case "checkbox":
-                  // Handle Checkbox rendering here
-                  return (
-                    <CheckBoxTag
-                      key={field?.FieldName}
-                      checked={formData[field.FieldName] ?? false}
-                      onChange={handleCheckboxChange(field.FieldName)}
-                      label={field?.Caption}
-                      disabled={disabledDetailed || field?.ReadOnly || false}
-                      columnSpan={field?.ColumnSpan}
-                    />
-                  );
-                  break;  
-                // case "switch":
+                // case "checkbox":
                 //   // Handle Checkbox rendering here
                 //   return (
-                //     <SwitchTag
+                //     <CheckBoxTag
                 //       key={field?.FieldName}
                 //       checked={formData[field.FieldName] ?? false}
                 //       onChange={handleCheckboxChange(field.FieldName)}
                 //       label={field?.Caption}
                 //       disabled={disabledDetailed || field?.ReadOnly || false}
-                //       rowSpan={field?.RowSpan}
+                //       columnSpan={field?.ColumnSpan}
                 //     />
                 //   );
+                //   break;  
+                case "switch":
+                  // Handle Checkbox rendering here
+                  return (
+                    <SwitchTag
+                      key={field?.FieldName}
+                      checked={formData[field.FieldName] ?? false}
+                      onChange={handleCheckboxChange(field.FieldName)}
+                      label={field?.Caption}
+                      disabled={disabledDetailed || field?.ReadOnly || false}
+                      rowSpan={field?.RowSpan}
+                    />
+                  );
                 
-                // break;
+                break;
                 
                 default:
                   return null; // Skip if no recognized FieldDisplayType

@@ -93,7 +93,6 @@ import { useAlert } from "../../../component/Alerts/AlertContext";
   
     // };
 
-    console.log('edit',edit.length);
     
   
     const handleAdd = async () => {
@@ -150,9 +149,6 @@ import { useAlert } from "../../../component/Alerts/AlertContext";
       }
     };
 
-    console.log('number',numberList);
-    
-  
     const handleEdit = (row) => {
       setEdit(row);
     };
