@@ -96,14 +96,14 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
           iconName={"excel"}
         />
       )}
-      {userAction.some((action) => action.Action === "Delete") && (
+      {/* {userAction.some((action) => action.Action === "Delete") && (
         <ActionButton
           iconsClick={iconsClick}
           icon={"trash"}
           caption={"Delete"}
           iconName={"delete"}
         />
-      )}
+      )} */}
       {!hasEditAction &&
         userAction.some((action) => action.Name === "View") && (
           <ActionButton
@@ -215,9 +215,9 @@ export default function AllocationSummary({
   const handleSelectedRowsChange = (selectedRowsData) => {
     setselectedDatas(selectedRowsData);
   };
-  const resetChangesTrigger = () => {
-    setchangesTriggered(false);
-  };
+  // const resetChangesTrigger = () => {
+  //   setchangesTriggered(false);
+  // };
   const handleDisplayLengthChange = (newDisplayLength) => {
     setdisplayLength(newDisplayLength);
   };
@@ -229,7 +229,9 @@ export default function AllocationSummary({
   const hardRefresh = () => {
     setrefreshFlag(true);
     setselectedDatas([]);
-    setchangesTriggered(true);
+    setsearchKey("")
+    latestSearchKeyRef.current = ""
+    setchangesTriggered(!changesTriggered);
   };
 
   const handleIconsClick = (value) => {
@@ -309,7 +311,7 @@ export default function AllocationSummary({
     } finally {
       setrefreshFlag(true);
       setselectedDatas([]);
-      setchangesTriggered(true);
+      setchangesTriggered(!changesTriggered);
       handleConfrimClose();
     }
   };
@@ -387,7 +389,7 @@ export default function AllocationSummary({
             //  onSortChange={handleSortChange}
             onSearchKeyChange={handleSearchKeyChange}
             changesTriggered={changesTriggered}
-            setchangesTriggered={resetChangesTrigger}
+            // setchangesTriggered={resetChangesTrigger}
             onSelectedRowsChange={handleSelectedRowsChange}
             onRowDoubleClick={handleRowDoubleClick}
             totalRows={totalRows}

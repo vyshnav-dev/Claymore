@@ -213,7 +213,9 @@ export default function UserSummary({ setPageRender, setId, userAction }) {
   const hardRefresh = () => {
     setrefreshFlag(true);
     setselectedDatas([]);
-    setchangesTriggered(true);
+    setsearchKey("")
+    latestSearchKeyRef.current = ""
+    setchangesTriggered(!changesTriggered);
   };
 
   const handleIconsClick = (value) => {

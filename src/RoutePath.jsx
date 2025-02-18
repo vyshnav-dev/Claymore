@@ -25,6 +25,7 @@ import FormBodyContainer from "./containers/Master/MasterBody/FormBodyContainer"
 import InspContainer from "./containers/Inspection/InspContainer";
 import AllocatedContainer from "./containers/Allocated/AllocatedContainer";
 import ClosingStockReportContainer from "./containers/Report/ClosingStockReport/ClosingStockReportContainer";
+import JobOrderReportContainer from "./containers/Report/JobOrderReport/JobOrderReportContainer";
 
 export default function RoutePath() {
   const location = useLocation();
@@ -197,7 +198,7 @@ export default function RoutePath() {
               path="/joborder"
               element={
                 <ProtectedRoute>
-                  <ClosingStockReportContainer/>
+                  <JobOrderReportContainer/>
                 </ProtectedRoute>
               }
             />

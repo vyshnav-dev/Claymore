@@ -366,6 +366,7 @@ const InspBodyTable = ({ fields, tableData, settableData, Batch, setBatch, previ
                             padding: "0px",
                             // width: "fit-content",
                             overflowY: "auto",
+                            width:"fit-Content"
 
                         }}
 
@@ -379,7 +380,7 @@ const InspBodyTable = ({ fields, tableData, settableData, Batch, setBatch, previ
                                         // const isClickable = inputConfig?.bBifurcation? field.FieldName=="AddCharge" : false;
                                         const isClickable = field?.FieldName == "AddCharge" ? true : false;
                                         return (
-                                            <TableCell onClick={() => isClickable && handleHeaderClick(field.FieldName)} key={idx} sx={{ ...headerCellStyle, minWidth: "100px" }}>
+                                            <TableCell onClick={() => isClickable && handleHeaderClick(field.FieldName)} key={idx} sx={{ ...headerCellStyle, minWidth: "100px",maxWidth: "fit-Content" }}>
                                                 {field.Caption}
                                             </TableCell>
                                         )
@@ -513,6 +514,7 @@ const MemoizedTableRow = ({ row, index, rowClick, handleRowChange, bodyCell, fie
     const renderCellContent = (field, index) => {
         const fieldValue = row[field.FieldName];
 
+
         switch ((field?.FieldDisplayType)?.toLowerCase()) {
             case 'text box':
                 return (
@@ -539,7 +541,8 @@ const MemoizedTableRow = ({ row, index, rowClick, handleRowChange, bodyCell, fie
                         dateType={field?.AllowDate}
                         DonotAllowSpecialChar={field?.DonotAllowSpecialChar}
                         tableField={true}
-                        fullwidth={'100%'}
+                        // fullwidth={'100%'}
+                        width={330}
 
 
                     />
@@ -611,17 +614,22 @@ const MemoizedTableRow = ({ row, index, rowClick, handleRowChange, bodyCell, fie
                 return (
                     <Box
                         sx={{
-
                             border: "1px solid #ccc",
                             padding: "5px",
                             borderRadius: "4px",
                             display: 'flex',
                             justifyContent: 'start',
-                            width: field.RowSpan ? `${250 * field.RowSpan}px` : "100%",
+                            width:"800px",
+                            maxWidth:  "800px",
+                            overflowY: 'auto',
+                            scrollbarWidth:'none'
                         }}
                     >
+                        <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', width: '100%' }}>
+                        <Tooltip title={row.Name}  disableHoverListener={row.Name.length <= 110}>
                         <Typography sx={{ fontSize: '14px' }}>{row.Name}</Typography>
-
+                        </Tooltip>
+                        </label>
                     </Box>
                 )
 
@@ -664,12 +672,12 @@ const MemoizedTableRow = ({ row, index, rowClick, handleRowChange, bodyCell, fie
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
             >
-                {index + 1}
+                {row.SlNo}
 
             </TableCell>
 
             {fields.map((field, idx) => (
-                <TableCell key={idx} sx={{ ...bodyCell, paddingLeft: "0px" }}>
+                <TableCell key={idx} sx={{ ...bodyCell, paddingLeft: "0px",maxWidth: "fit-Content" }}>
                     {renderCellContent(field, index)}
                 </TableCell>
             ))}

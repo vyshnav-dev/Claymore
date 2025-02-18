@@ -209,7 +209,7 @@ export default function AllocatedSummary({
 
   React.useEffect(() => {
     fetchRoleSummary(); // Initial data fetch
-  }, [pageNumber, displayLength, searchKey, changesTriggered, groupId]);
+  }, [pageNumber, displayLength, searchKey, changesTriggered]);
 
 
 
@@ -242,7 +242,9 @@ export default function AllocatedSummary({
   const hardRefresh = () => {
     setrefreshFlag(true);
     setselectedDatas([]);
-    setchangesTriggered(true);
+    setsearchKey("")
+    latestSearchKeyRef.current = ""
+    setchangesTriggered(!changesTriggered);
   };
 
   const handleIconsClick = (value) => {
@@ -407,7 +409,7 @@ export default function AllocatedSummary({
             //  onSortChange={handleSortChange}
             onSearchKeyChange={handleSearchKeyChange}
             changesTriggered={changesTriggered}
-            setchangesTriggered={resetChangesTrigger}
+            // setchangesTriggered={resetChangesTrigger}
             onSelectedRowsChange={handleSelectedRowsChange}
             onRowDoubleClick={handleRowDoubleClick}
             totalRows={totalRows}

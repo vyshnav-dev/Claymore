@@ -406,6 +406,8 @@ export default function InspDetails({
         DocNo: null,
     });
 
+    const [exam,setExam] = useState();
+
     //----Fields-----
     const [viewFields, setViewFields] = useState([])
     const [fieldsWithStructure, setFieldsWithStructure] = useState([]);
@@ -704,7 +706,8 @@ export default function InspDetails({
                     return;
                 }
                 const isValid = await validateFormData();
-                if (isValid) {
+                const isExam = await validateExamination();
+                if (isValid && isExam) {
                     setConfirmData({ message: "Save", type: "success" });
                     setConfirmType("save");
                     setConfirmAlert(true);
@@ -752,7 +755,7 @@ export default function InspDetails({
                 const fieldValue = formData["InspectionInformation"][FieldName];
 
 
-                if (fieldValue === null || fieldValue === undefined || fieldValue === "") {
+                if (fieldValue === null || fieldValue === undefined || fieldValue === "" || fieldValue == 0) {
                     setExpanded(tabKey)
                     showAlert("info", `${Caption} is reqiured (${tabCaption})`);
                     return false
@@ -767,30 +770,45 @@ export default function InspDetails({
         return true;
     }
 
-    const handleSave = async () => {
 
-        const updatedChildData = tableBody.map((obj) => {
+    const validateExamination = async () => {
+
+        const updatedChildData = tableBody?.map((obj) => {
             return obj?.Items?.map((list) => {
                 return {
                     slNo: list.SlNo,
                     subCategory: list.SubCategory,
                     data: list.Data,
                     remarks: list.Remarks,
+                    tabName: list.Tab_Name
                 };
             });
         }).flat();
 
-        const hasDataZero = updatedChildData?.some(
-            (item) => item.data == 0
-        );
 
-        if (hasDataZero) {
-            showAlert("info", "Ensure complete Data")
+        const filteredData = updatedChildData
+            .filter(item => item.data === 0 || item.data == undefined)
+            .map(({ tabName, slNo }) => ({ tabName, slNo }));
+            
+        if (filteredData.length > 0) {
+            filteredData.forEach(item => {
+                setExpanded(item.tabName)
+                showAlert("info", `Ensure fill the SLNO ${item.slNo} in ${item.tabName}`);
+            });
+            return false
         }
+        setExam(updatedChildData)
+        return true
+    }
+    
+
+    const handleSave = async () => {
+
+        
 
 
 
-        if (!hasDataZero) {
+        // if (!filteredData?.length) {
 
             const validFieldNames = new Set(viewFields.map(field => field.FieldName));
 
@@ -817,7 +835,7 @@ export default function InspDetails({
                 clientTestEquipment: formData?.ClientTestEquipment,
                 testDate: formData?.TestDate,
                 inspectionInformation: inspectionInformationArray,
-                examination: updatedChildData,
+                examination: exam,
                 attachments: formData?.Attachment || []
             };
 
@@ -875,7 +893,7 @@ export default function InspDetails({
                 handleclose();
                 // }
 
-            }
+            // }
 
         }
     };

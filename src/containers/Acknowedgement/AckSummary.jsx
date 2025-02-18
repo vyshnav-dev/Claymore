@@ -230,7 +230,9 @@ export default function AckSummary({
   const hardRefresh = () => {
     setrefreshFlag(true);
     setselectedDatas([]);
-    setchangesTriggered(true);
+    setsearchKey("")
+    latestSearchKeyRef.current = ""
+    setchangesTriggered(!changesTriggered);
   };
 
   const handleIconsClick = (value) => {

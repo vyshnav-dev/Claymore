@@ -245,7 +245,9 @@ export default function InspMainSummary({
   const hardRefresh = () => {
     setrefreshFlag(true);
     setselectedDatas([]);
-    setchangesTriggered(true);
+    setsearchKey("")
+    latestSearchKeyRef.current = ""
+    setchangesTriggered(!changesTriggered);
   };
 
   const handleIconsClick = (value) => {

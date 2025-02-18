@@ -59,7 +59,7 @@ function MultiCheckBox({ formData, setFormData, tagId, sFieldName, label, isMand
         // setcompanyList(mergedItems || []);
         setcompanyList((prevList) => (JSON.stringify(prevList) !== JSON.stringify(mergedItems) ? mergedItems : prevList));
       } catch (error) {
-
+        setcompanyList([])
       } finally {
         setLoading(false)
       }
@@ -98,7 +98,7 @@ function MultiCheckBox({ formData, setFormData, tagId, sFieldName, label, isMand
   return (
     <>
       <Loader loader={loading} loaderClose={() => setLoading(false)} />
-      {companyList && (
+      {/* {companyList && ( */}
         <div className="checkboxmainD1">
           <div className="checkboxmainD1C">
 
@@ -130,7 +130,7 @@ function MultiCheckBox({ formData, setFormData, tagId, sFieldName, label, isMand
             </div>
           </div>
         </div>
-      )}
+      {/* )} */}
     </>
   )
 }

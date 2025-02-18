@@ -130,9 +130,10 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
     };
     return (
         <>
-            <DialogContent>
+        <Box >
+            <DialogContent >
 
-                <Box sx={{ display: 'flex', flexDirection: 'column', flexWrap: 'wrap' }} >
+                <Box sx={{ display: 'flex', flexDirection: 'column', flexWrap: 'wrap',minHeight:'350px' }} >
 
                     <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                         <UserInputField
@@ -171,9 +172,9 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
 
                     </Box>
 
-                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2,maxHeight:'200px',minHeight:'200px' }}>
-                        <TableContainer component={Paper} sx={{ maxHeight: '180px', maxWidth: '370px', overflowY: 'auto', mt: 2,scrollbarWidth:'thin' }}>
-                            <Table stickyHeader size="small" sx={{ minWidth: '300px',maxWidth:'300px' }}>
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, maxHeight: '200px', minHeight: '200px' }}>
+                        <TableContainer component={Paper} sx={{ maxHeight: '275px',minHeight:'275px', maxWidth: '370px', overflowY: 'auto', mt: 2, scrollbarWidth: 'thin' }}>
+                            <Table stickyHeader size="small" sx={{ minWidth: '200px', }}>
                                 <TableHead>
                                     <TableRow>
                                         <TableCell sx={{ ...headerCellStyle }}>Product</TableCell>
@@ -183,13 +184,15 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
                                 <TableBody>
                                     {products?.map((item, index) => (
                                         <TableRow key={index} >
-                                            <TableCell sx={{ ...bodyCellStyle }}>{item.Product_Name}</TableCell>
+                                            <TableCell sx={{
+                                                ...bodyCellStyle,
+                                                maxWidth: '150px', // Adjust width as needed
+                                                wordBreak: 'break-word',
+                                                whiteSpace: 'pre-wrap'
+                                            }}>{item.Product_Name}</TableCell>
                                             <TableCell sx={{ ...bodyCellStyle }}>{item.Quantity}</TableCell>
                                         </TableRow>
                                     ))}
-
-
-
 
                                 </TableBody>
                             </Table>
@@ -217,12 +220,12 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
                 </Box>
 
             </DialogContent>
-            
+
             <DialogActions >
                 <NormalButton action={handleCloseModal} label="Cancel" />
                 <NormalButton action={handleSave} label="Ok" />
             </DialogActions>
-
+            </Box>
         </>
     );
 }

@@ -275,17 +275,15 @@ export default function TagFileTab({
 
   const handleDownload = (fileObj) => {
     if (fileObj.FileName_Url) {
-      
       const imageExtensions = ["jpg", "jpeg", "png", "gif", "bmp", "webp"];
       const fileNameParts = fileObj.FileName.split(".");
       const extension = fileNameParts[fileNameParts.length - 1].toLowerCase();
       const formattedPath = formatPath(fileObj.FileName_Url);
-      
       if (imageExtensions.includes(extension)) {
         // Handle images: display in a new tab
         const htmlContent = `<html>
                                <head><title>Image Viewer</title></head>
-                               <body><img src="${IMAGE_URL}/${formattedPath}" style="max-width: 100%; height: auto;"></body>
+                               <body><img src="${formattedPath}" style="max-width: 100%; height: auto;"></body>
                              </html>`;
         const blob = new Blob([htmlContent], { type: "text/html" });
         const url = URL.createObjectURL(blob);

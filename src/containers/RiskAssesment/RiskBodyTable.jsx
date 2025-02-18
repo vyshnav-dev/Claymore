@@ -55,7 +55,7 @@ const RiskBodyTable = ({ fields, tableData, settableData, preview = false, langu
 
     const bodyCell = useMemo(() => ({
         ...cellStyle,
-        minWidth: "100px",
+        // minWidth: "100px",
         whiteSpace: "nowrap",
         overflow: "hidden",
         textOverflow: "ellipsis",
@@ -282,6 +282,7 @@ const RiskBodyTable = ({ fields, tableData, settableData, preview = false, langu
                             padding: "0px",
                             // maxWidth: "195vh",
                             overflowY: "auto",
+                            width:'fit-Content'
 
                         }}
 
@@ -295,7 +296,7 @@ const RiskBodyTable = ({ fields, tableData, settableData, preview = false, langu
                                         // const isClickable = inputConfig?.bBifurcation? field.FieldName=="AddCharge" : false;
                                         const isClickable = field?.FieldName == "AddCharge" ? true : false;
                                         return (
-                                            <TableCell onClick={() => isClickable && handleHeaderClick(field.FieldName)} key={idx} sx={{ ...headerCellStyle, minWidth: "100px" }}>
+                                            <TableCell onClick={() => isClickable && handleHeaderClick(field.FieldName)} key={idx} sx={{ ...headerCellStyle, minWidth: "100px",maxWidth: "fit-Content" }}>
                                                 {field.Caption}
                                             </TableCell>
                                         )
@@ -420,7 +421,8 @@ const MemoizedTableRow = ({ row, index, rowClick, handleRowChange, bodyCell, fie
                         dateType={field?.AllowDate}
                         DonotAllowSpecialChar={field?.DonotAllowSpecialChar}
                         tableField={true}
-                        fullwidth={'100%'}
+                        // fullwidth={'100%'}
+                        width={330}
 
 
                     />
@@ -440,7 +442,7 @@ const MemoizedTableRow = ({ row, index, rowClick, handleRowChange, bodyCell, fie
                                 display: 'flex',
                                 justifyContent: 'center',
                                 width: field.RowSpan ? `${250 * field.RowSpan}px` : "100%",
-                                minWidth: field.RowSpan ? `${250 * field.RowSpan}px` : "120px"
+                                minWidth: field.RowSpan ? `${250 * field.RowSpan}px` : "150px"
                             }}
                         >
                             <FormControl>
@@ -531,12 +533,17 @@ const MemoizedTableRow = ({ row, index, rowClick, handleRowChange, bodyCell, fie
                             borderRadius: "4px",
                             display: 'flex',
                             justifyContent: 'start',
-                            width: field.RowSpan ? `${250 * field.RowSpan}px` : "100%",
-                            overflowY: 'auto'
+                            width:"650px",
+                            maxWidth:  "650px",
+                            overflowY: 'auto',
+                            scrollbarWidth:'none'
                         }}
                     >
+                        <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', width: '100%' }}>
+                        <Tooltip title={row.Data_Description}  disableHoverListener={row.Data_Description.length <= 100}>
                         <Typography sx={{ fontSize: '14px' }}>{row.Data_Description}</Typography>
-
+                        </Tooltip>
+                        </label>
                     </Box>
                 )
 
@@ -579,12 +586,12 @@ const MemoizedTableRow = ({ row, index, rowClick, handleRowChange, bodyCell, fie
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
             >
-                {index + 1}
+                {row.SlNo}
 
             </TableCell>
 
             {fields.map((field, idx) => (
-                <TableCell key={idx} sx={{ ...bodyCell, paddingLeft: "0px" }}>
+                <TableCell key={idx} sx={{ ...bodyCell, paddingLeft: "0px",maxWidth: "fit-Content" }}>
                     {renderCellContent(field, index)}
                 </TableCell>
             ))}

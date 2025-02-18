@@ -8,6 +8,7 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import RefreshIcon from "@mui/icons-material/Refresh";
+import SearchIcon from "@mui/icons-material/Search";
 import {
   FormControl,
   InputLabel,
@@ -19,6 +20,7 @@ import {
   useTheme,
   Tooltip,
   Button,
+  InputAdornment,
 } from "@mui/material";
 import FirstPageIcon from "@mui/icons-material/FirstPage";
 import LastPageIcon from "@mui/icons-material/LastPage";
@@ -146,10 +148,17 @@ export default function SummaryTable(props) {
 
   //To Search
   const handleSearch = (event) => {
-    setSearchTerm(event.target.value);
     setPage(0);
     props.onpageNumberChange(1);
-    props.onSearchKeyChange(event.target.value);
+    props.onSearchKeyChange(event.target.value||searchTerm||"");
+    setSearchTerm(event.target.value||searchTerm||"") 
+  };
+
+  const handleKeyDown = (event) => {
+  
+    if (event.key === "Enter") {
+      handleSearch(event);
+    }
   };
 
   const handleClick = (event, row) => {
@@ -188,11 +197,14 @@ export default function SummaryTable(props) {
     setFilteredRows(rows);
   }, [rows]);
 
+  
+
   React.useEffect(() => {
     setPage(0); // Reset page to 0
     props.onpageNumberChange(1); // Call the callback function with 0 if needed
-    props.setchangesTriggered(false);
+    // props.setchangesTriggered(false);
     setSelected([]);
+    setSearchTerm("")
   }, [props.changesTriggered]);
 
   React.useEffect(() => {
@@ -216,6 +228,7 @@ export default function SummaryTable(props) {
 
     return `${day}-${month}-${year}`;
   };
+
   return (
     <Box
       sx={{
@@ -299,7 +312,9 @@ export default function SummaryTable(props) {
             label="Search"
             autoComplete="off"
             value={searchTerm}
-            onChange={handleSearch}
+            onChange={(event)=>setSearchTerm(event.target.value)}
+            onBlur={handleSearch}              
+            onKeyDown={handleKeyDown}
             sx={{
               width: 200, // Default width
               "@media (max-width: 600px)": {
@@ -332,6 +347,16 @@ export default function SummaryTable(props) {
               "& .MuiFormLabel-root.Mui-focused": {
                 color: primaryColor,
               },
+            }}
+            InputProps={{
+              // (3) add a search icon as an end-adornment:
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton onClick={handleSearch} edge="end">
+                    <SearchIcon />
+                  </IconButton>
+                </InputAdornment>
+              ),
             }}
           />
         </div>

@@ -38,7 +38,7 @@ export default function AllocationModal({ handleCloseModal, selected, hardRefres
         paddingTop: "3px",
         paddingBottom: "3px",
     }
-    
+
     const bodyCellStyle = {
         padding: "0px",
         paddingLeft: "4px",
@@ -53,13 +53,13 @@ export default function AllocationModal({ handleCloseModal, selected, hardRefres
 
     const [formData, setFormData] = useState({})
     const [mainDetails, setMainDetails] = useState({
-        JobOrderNo:'',
-        Date:'',
-        Client_Name:null,
+        JobOrderNo: '',
+        Date: '',
+        Client_Name: null,
     });
     const [products, setProducts] = useState([]);
     const { showAlert } = useAlert();
-    const { UpsertJobOrderAllocation,GetPendingJobOrderdetails } = allocationApis()
+    const { UpsertJobOrderAllocation, GetPendingJobOrderdetails } = allocationApis()
 
 
     React.useEffect(() => {
@@ -70,7 +70,7 @@ export default function AllocationModal({ handleCloseModal, selected, hardRefres
                 });
                 if (response?.status === "Success") {
                     const myObject = JSON.parse(response.result);
-                    
+
                     setMainDetails(myObject?.PendingJobOrderDetails);
                     setProducts(myObject?.ProductDetails)
                 }
@@ -92,11 +92,11 @@ export default function AllocationModal({ handleCloseModal, selected, hardRefres
         const saveData = {
             Id: 0,
             jobOrderNo: selected,
-            client:mainDetails?.Client_Name,
-            date:mainDetails?.Date,
-            details:formData?.details,
+            client: mainDetails?.Client_Name,
+            date: mainDetails?.Date,
+            details: formData?.details,
         }
-       
+
 
         const response = await UpsertJobOrderAllocation(saveData)
         if (response?.status === "Success") {
@@ -111,7 +111,7 @@ export default function AllocationModal({ handleCloseModal, selected, hardRefres
         <>
             <DialogContent>
 
-                <Box sx={{ display: 'flex', flexDirection: 'column', flexWrap: 'wrap' }} >
+                <Box sx={{ display: 'flex', flexDirection: 'column', flexWrap: 'wrap',minHeight:'350px' }} >
 
                     <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                         <UserInputField
@@ -150,42 +150,52 @@ export default function AllocationModal({ handleCloseModal, selected, hardRefres
 
                     </Box>
 
-                    <Box sx={{ display: 'flex', flexWrap: 'wrap',gap:2,maxHeight:'200px',minHeight:'200px' }}>
-                            <TableContainer component={Paper} sx={{ maxHeight: '180px',minHeight:'180px', maxWidth: '370px', overflowY: 'auto', mt: 2,scrollbarWidth:'thin' }}>
-                                <Table stickyHeader size="small" sx={{ minWidth: '200px' }}>
-                                    <TableHead>
-                                        <TableRow>
-                                            <TableCell sx={{... headerCellStyle }}>Product</TableCell>
-                                            <TableCell sx={{... headerCellStyle }}>Quantity</TableCell>
-                                        </TableRow>
-                                    </TableHead>
-                                    <TableBody>
-                                    {products?.map((item,index)=>(
-                                        <TableRow key={index} >
-                                        <TableCell sx={{... bodyCellStyle}}>{item.Name}</TableCell>
-                                        <TableCell sx={{... bodyCellStyle}}>{item.Quantity}</TableCell>
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, maxHeight: '200px', minHeight: '200px' }}>
+                        <TableContainer component={Paper} sx={{  minHeight:'275px', maxWidth: '370px', overflowY: 'auto', mt: 2, scrollbarWidth: 'thin' }}>
+                            <Table stickyHeader size="small" sx={{ minWidth: '200px' }}>
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell sx={{ ...headerCellStyle }}>Product</TableCell>
+                                        <TableCell sx={{ ...headerCellStyle }}>Quantity</TableCell>
                                     </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {products?.map((item, index) => (
+                                        <TableRow key={index}>
+                                            <TableCell
+                                                sx={{
+                                                    ...bodyCellStyle,
+                                                    maxWidth: '150px', // Adjust width as needed
+                                                    wordBreak: 'break-word',
+                                                    whiteSpace: 'pre-wrap'
+                                                }}
+                                            >
+                                                {item.Name}
+                                            </TableCell>
+                                            <TableCell sx={{ ...bodyCellStyle }}>{item.Quantity}</TableCell>
+                                        </TableRow>
                                     ))}
-                                    </TableBody>
-                                </Table>
-                            </TableContainer>
-                            <MultiCheckBox
-                                key={'Technician'}
-                                sFieldName={'Inspector'}
-                                label={'Technician'}
-                                // isMandatory={field?.Mandatory}
-                                formDataHeader={mainDetails}
-                                key1={'Technician'}
-                                //disabled={isDisabled}
-                                // tagId={field.LinkTag}'technition'
-                                objectName="details"
-                                formData={formData}
-                                setFormData={setFormData}
-                                // disabled={disabledDetailed || field?.ReadOnly || false}
-                                tag_getbusinessentitysummary={GetTechnicianList}
-                                userData={userData?.UserId}
-                            />
-                        </Box>
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+
+                        <MultiCheckBox
+                            key={'Technician'}
+                            sFieldName={'Inspector'}
+                            label={'Technician'}
+                            // isMandatory={field?.Mandatory}
+                            formDataHeader={mainDetails}
+                            key1={'Technician'}
+                            //disabled={isDisabled}
+                            // tagId={field.LinkTag}'technition'
+                            objectName="details"
+                            formData={formData}
+                            setFormData={setFormData}
+                            // disabled={disabledDetailed || field?.ReadOnly || false}
+                            tag_getbusinessentitysummary={GetTechnicianList}
+                            userData={userData?.UserId}
+                        />
+                    </Box>
 
 
 

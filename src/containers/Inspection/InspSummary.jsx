@@ -95,14 +95,14 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
           iconName={"excel"}
         />
       )}
-      {userAction?.some((action) => action.Action === "Delete") && (
+      {/* {userAction?.some((action) => action.Action === "Delete") && (
         <ActionButton
           iconsClick={iconsClick}
           icon={"trash"}
           caption={"Delete"}
           iconName={"delete"}
         />
-      )}
+      )} */}
       {!hasEditAction &&
         userAction?.some((action) => action.Name === "View") && (
           <ActionButton
@@ -276,7 +276,9 @@ export default function InspSummary({
   const hardRefresh = () => {
     setrefreshFlag(true);
     setselectedDatas([]);
-    setchangesTriggered(true);
+    setsearchKey("")
+    latestSearchKeyRef.current = ""
+    setchangesTriggered(!changesTriggered);
   };
 
   const handleIconsClick = (value) => {

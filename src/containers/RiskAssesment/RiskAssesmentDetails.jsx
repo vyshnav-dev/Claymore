@@ -447,14 +447,13 @@ export default function RiskAssesmentDetails({
 }) {
 
     const currentDate = new Date().toISOString().split("T")[0];
-
-    const userData = JSON.parse(localStorage.getItem("ClaymoreUserData"))[0];
     const [mainDetails, setMainDetails] = useState({});
     const [detailPageId, setDetailPageId] = useState(summaryId);
     const [confirmAlert, setConfirmAlert] = useState(false);
     const [confirmData, setConfirmData] = useState({});
+    const [updateDetails, setUpdateDetails] = useState();
     const [confirmType, setConfirmType] = useState(null);
-    const [expanded, setExpanded] = useState(0);//Accordion open
+    const [expanded, setExpanded] = useState("Location Type");//Accordion open
     const [tableBody, setTableBody] = useState([]);
     const { showAlert } = useAlert();
     const {
@@ -524,23 +523,23 @@ export default function RiskAssesmentDetails({
 
     useEffect(() => {
 
-        const fetchHeadData = async () =>{
+        const fetchHeadData = async () => {
             const response = await getriskjoborderdetails({
                 allocation: mainDetails?.Allocation
             });
             if (response?.status === "Success") {
                 const myObject = JSON.parse(response?.result);
-                setMainDetails({
-                    ...mainDetails,
+                // delete myObject[0].Id;
+                setMainDetails(prevState => ({
+                    ...prevState, // Retain previous values
                     ...myObject[0],
                     Date: currentDate,
-                });
+                }));
             }
         }
         fetchHeadData();
-      
+
     }, [mainDetails?.Allocation])
-    
 
 
 
@@ -564,11 +563,14 @@ export default function RiskAssesmentDetails({
                     showAlert("info", `Please Provide ${emptyFields[0]}`);
                     return;
                 }
+                const isDetail = await detailsValidation();
+                if (isDetail) {
+                    setConfirmData({ message: "Save", type: "success" });
+                    setConfirmType("save");
+                    setConfirmAlert(true);
+                }
 
 
-                setConfirmData({ message: "Save", type: "success" });
-                setConfirmType("save");
-                setConfirmAlert(true);
                 break;
             case "delete":
                 setConfirmData({ message: "Delete", type: "danger" });
@@ -588,56 +590,78 @@ export default function RiskAssesmentDetails({
         setPageRender(1);
     };
 
+
+    const detailsValidation = async () => {
+        const updatedChildData = tableBody.flatMap(obj =>
+            obj?.Items?.map(list => ({
+                slNo: list.SlNo,
+                data: list.Id,
+                risk: list.RiskData,
+                description: list.Description,
+                riskLevel: list.RiskLevel,
+                tabName: list.Tab_Name
+            }))
+        );
+
+        // Filter records with missing risk
+        const filteredData = updatedChildData
+            .filter(item => item.risk === 0 || item.risk == undefined)
+            .map(({ tabName, slNo }) => ({ tabName, slNo }));
+
+        if (filteredData.length > 0) {
+            const uniqueTabNames = [...new Set(filteredData.map(item => item.tabName))];
+            uniqueTabNames.forEach(tab => setExpanded(tab)); // Expand all affected tabs
+
+            filteredData.forEach(item => {
+                showAlert("info", `Ensure fill Risk in the SLNO ${item.slNo} in ${item.tabName}`);
+            });
+            return false; // Stop execution here since risk validation failed
+        }
+
+        // If no risk validation errors, check for missing risk levels
+        const filteredData2 = updatedChildData
+            .filter(item => item.riskLevel === 0 || item.riskLevel == undefined)
+            .map(({ tabName, slNo }) => ({ tabName, slNo }));
+
+        if (filteredData2.length > 0) {
+            const uniqueTabNames = [...new Set(filteredData2.map(item => item.tabName))];
+            uniqueTabNames.forEach(tab => setExpanded(tab)); // Expand all affected tabs
+
+            filteredData2.forEach(item => {
+                showAlert("info", `Ensure fill Risk Level in the SLNO ${item.slNo} in ${item.tabName}`);
+            });
+            return false; // Stop execution since risk level validation failed
+        }
+        setUpdateDetails(updatedChildData)
+        return true
+    }
+
     const handleSave = async () => {
 
-        const updatedChildData = tableBody.map((obj) => {
-            return obj?.Items?.map((list) => {
-                return {
-                    slNo: list.SlNo,
-                    data: list.Id,
-                    risk: list.RiskData,
-                    description: list.Description,
-                    riskLevel: list.RiskLevel,
-                };
-            });
-        }).flat();
 
-        const hasRiskZero = updatedChildData.some(
-            (item) => item.risk === 0
-        );
-        const hasRiskLevelZero = updatedChildData.some(
-            (item) => item.riskLevel === 0
-        );
-        if (hasRiskZero) {
-            showAlert("info", "Ensure complete Risk")
-        }
-        if (hasRiskLevelZero) {
-            showAlert("info", "Ensure complete RiskLevel")
-        }
+        // If both validations pass, proceed with saving
+        const saveData = {
+            Id: mainDetails?.Id,
+            allocation: mainDetails?.Allocation,
+            date: mainDetails?.Date,
+            inspector: mainDetails?.Inspector,
+            fileNo: mainDetails?.FileNo,
+            details: updateDetails
+        };
 
-        if (!hasRiskZero && !hasRiskLevelZero) {
-            const saveData = {
-                Id: mainDetails?.Id,
-                allocation: mainDetails?.Allocation,
-                date: mainDetails?.Date,
-                inspector: mainDetails?.Inspector,
-                fileNo: mainDetails?.FileNo,
-                details: updatedChildData,
-            };
-
-
-            const response = await UpsertRiskAssesment(saveData);
-            if (response.status === "Success") {
-                showAlert("success", response?.message);
-                handleNew();
-                // setPageRender(1);
-                const actionExists = userAction.some((action) => action.Action === "New");
-                if (!actionExists) {
-                    setPageRender(1);
-                }
-            }
+        const response = await UpsertRiskAssesment(saveData);
+        if (response.status === "Success") {
+            showAlert("success", response?.message);
+            handleNew();
+            setPageRender(1);
+            // Check if "New" action exists, otherwise setPageRender
+            // const actionExists = userAction.some(action => action.Action === "New");
+            // if (!actionExists) {
+            //     setPageRender(1);
+            // }
         }
     };
+
 
     //confirmation
 
@@ -737,7 +761,7 @@ export default function RiskAssesmentDetails({
                             gap: "2px", // Reduced width for small screens
                         },
                     }} >
-                        
+
                         <UserAutoComplete
                             apiKey={getAssignjoborderlist}
                             formData={mainDetails}
@@ -753,7 +777,7 @@ export default function RiskAssesmentDetails({
                             label={"Client"}
                             name={"Client_Name"}
                             type={"text"}
-                            disabled={false}
+                            disabled={true}
                             mandatory={true}
                             value={mainDetails}
                             setValue={setMainDetails}
@@ -763,17 +787,17 @@ export default function RiskAssesmentDetails({
                             label={"Location"}
                             name={"Location"}
                             type={"text"}
-                            disabled={false}
+                            disabled={true}
                             mandatory={true}
                             value={mainDetails}
                             setValue={setMainDetails}
                             maxLength={100}
                         />
                         <UserInputField
-                            label={"Inspector"}
+                            label={"Technician"}
                             name={"Inspector_Name"}
                             type={"text"}
-                            disabled={false}
+                            disabled={true}
                             mandatory={true}
                             value={mainDetails}
                             setValue={setMainDetails}
@@ -810,8 +834,8 @@ export default function RiskAssesmentDetails({
                                 <CustomizedAccordions
                                     // icons="fa-solid fa-briefcase"
                                     label={list?.Name}
-                                    expanded={expanded === index}
-                                    onChange={handleChange(index)}
+                                    expanded={expanded === list?.Name}
+                                    onChange={handleChange(list?.Name)}
                                 >
 
                                     <RiskBodyTable fields={tableFields} tableData={list.Items} settableData={setTableBody} preview={false} typeName={list?.Name} />
