@@ -4,11 +4,24 @@ import { baseApis } from "../ApiInterceptors/interceptorApi"
 const  reportApis = ()=>{
     const {makeAuthorizedRequestBase} = baseApis()
 
-    const getstockcountreport = async (payload) => {
+    const getpendingjoborderreport = async (payload) => {
         try {
           const response = await makeAuthorizedRequestBase(
             "get",
-            "reports/getstockcountreport",
+            "report/getpendingjoborderreport",
+            payload,
+            true
+          );
+          return response;
+        } catch (error) {
+          throw error;
+        }
+      };
+    const getallocatedjoborderreport = async (payload) => {
+        try {
+          const response = await makeAuthorizedRequestBase(
+            "get",
+            "report/getjoborderreport",
             payload,
             true
           );
@@ -18,11 +31,11 @@ const  reportApis = ()=>{
         }
       };
 
-      const getstockclosereport = async (payload) => {
+      const getunallocatedtechnicianreport = async (payload) => {
         try {
           const response = await makeAuthorizedRequestBase(
             "get",
-            "reports/getstockclosereport",
+            "report/getunallocatedtechnicianreport",
             payload,
             true
           );
@@ -32,11 +45,53 @@ const  reportApis = ()=>{
         }
       };
 
-      const getexcessshortagereport = async (payload) => {
+      const getriskassessmentreport = async (payload) => {
         try {
           const response = await makeAuthorizedRequestBase(
             "get",
-            "reports/getexcessshortagereport",
+            "report/getriskassessmentreport",
+            payload,
+            true
+          );
+          return response;
+        } catch (error) {
+          throw error;
+        }
+      };
+
+      const gettimesheetreport = async (payload) => {
+        try {
+          const response = await makeAuthorizedRequestBase(
+            "get",
+            "report/gettimesheetreport",
+            payload,
+            true
+          );
+          return response;
+        } catch (error) {
+          throw error;
+        }
+      };
+
+      const getinspectionreport = async (payload) => {
+        try {
+          const response = await makeAuthorizedRequestBase(
+            "get",
+            "report/getinspectionreport",
+            payload,
+            true
+          );
+          return response;
+        } catch (error) {
+          throw error;
+        }
+      };
+      
+      const getacknowledgementreport = async (payload) => {
+        try {
+          const response = await makeAuthorizedRequestBase(
+            "get",
+            "report/getacknowledgementreport",
             payload,
             true
           );
@@ -47,9 +102,13 @@ const  reportApis = ()=>{
       };
 
       return {
-        getstockcountreport,
-        getstockclosereport,
-        getexcessshortagereport
+        getpendingjoborderreport,
+        getallocatedjoborderreport,
+        getunallocatedtechnicianreport,
+        getriskassessmentreport,
+        gettimesheetreport,
+        getinspectionreport,
+        getacknowledgementreport
       }
 }
 

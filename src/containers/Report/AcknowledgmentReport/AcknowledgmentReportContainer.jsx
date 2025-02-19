@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { securityApis } from "../../../service/Security/security";
-import ReconciliationReport from "./ReconciliationReport";
+import AcknowledgmentReport from "./AcknowledgmentReport";
 
-export default function ReconciliationReportContainer() {
+export default function AcknowledgmentReportContainer() {
   const location = useLocation();
   const [page, setPage] = useState(1);
   const [id, setId] = useState(0);
@@ -38,7 +38,9 @@ export default function ReconciliationReportContainer() {
 
   return (
     <>
-      <ReconciliationReport detailPageId={id} userAction={userAction} />
+      <AcknowledgmentReport detailPageId={id} userAction={userAction} />
     </>
   );
 }
+
+

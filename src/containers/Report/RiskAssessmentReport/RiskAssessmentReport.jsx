@@ -4,6 +4,7 @@ import {
   Stack,
   Button as ButtonM,
   Typography,
+  Paper,
   Slide,
 } from "@mui/material";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
@@ -15,19 +16,9 @@ import ActionButton from "../../../component/Buttons/ActionButton";
 import { useAlert } from "../../../component/Alerts/AlertContext";
 import { primaryColor } from "../../../config/config";
 import UserInputField from "../../../component/InputFields/UserInputField";
-import { stockCountApis } from "../../../service/Transaction/stockcount";
-import ChecKBoxLabel from "../../../component/CheckBox/CheckBoxLabel";
-import WarehouseAutoComplete from "../../../component/AutoComplete/WarehouseAutoComplete";
-import { reconciliationApis } from "../../../service/Transaction/reconciliation";
-import ReconEntityAutoComplete from "../../../component/AutoComplete/ReconciliationAutoComplete/ReconEntityAutoComplete";
-import ReconciliationTable from "../../Transaction/Reconciliation/ReconciliationTable";
 import { reportApis } from "../../../service/Report/report";
-import UserAutoCompleteManual from "../../../component/AutoComplete/UserAutoCompleteManual";
-import ReportTable from "../../../component/Table/ReportTable";
 import ExcelExport from "../../../component/Excel/Excel";
 import ReportSummary from "../../../component/Table/ReportSummary";
-import UserAutoComplete from "../../../component/AutoComplete/UserAutoComplete";
-import ReportBinAutoComplete from "../../../component/AutoComplete/ReportAutoComplete/ReportBinAutoComplete";
 import NormalButton from "../../../component/Buttons/NormalButton";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 const currentDate = new Date().toISOString().split("T")[0];
@@ -104,7 +95,7 @@ function BasicBreadcrumbs({ viewAction, status }) {
           aria-label="breadcrumb"
         >
           <Typography underline="hover" sx={style} key="1">
-            Stock Count Report
+          Risk Assessment Report
           </Typography>
           <Typography underline="hover" sx={style} key="1"></Typography>
         </Breadcrumbs>
@@ -143,25 +134,30 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
   );
 };
 
-export default function StockCountReport({ userAction, disabledDetailed }) {
+const icon = (
+  <Paper sx={{ m: 1, width: 100, height: 100 }} elevation={4}>
+    <svg>
+      <Box
+        component="polygon"
+        points="0,100 50,00, 100,100"
+        sx={(theme) => ({
+          fill: theme.palette.common.white,
+          stroke: theme.palette.divider,
+          strokeWidth: 1,
+        })}
+      />
+    </svg>
+  </Paper>
+);
+
+export default function RiskAssessmentReport({ userAction, disabledDetailed }) {
   const [mainDetails, setMainDetails] = useState({
     fromDate: currentDate,
     toDate: currentDate,
-    BE: null,
-    Warehouse: null,
-    Type: 1,
-    product: null,
-    bin: null,
   });
   const [confirmAlert, setConfirmAlert] = useState(false);
   const [confirmData, setConfirmData] = useState({});
   const [confirmType, setConfirmType] = useState(null);
-  const {
-    getwarehousebyentity,
-    gettaglist,
-    getproductbyentity,
-    getbinbywarehouse,
-  } = stockCountApis();
   const { showAlert } = useAlert();
   const [rows, setRows] = React.useState([]); //To Pass in Table
   const [displayLength, setdisplayLength] = React.useState(25); // Show Entries
@@ -171,15 +167,15 @@ export default function StockCountReport({ userAction, disabledDetailed }) {
   const [refreshFlag, setrefreshFlag] = React.useState(true); //To take data from Data base
   const [searchKey, setsearchKey] = useState(""); //Table Searching
   const [totalPages, setTotalPages] = useState(null);
-  const latestSearchKeyRef = useRef(searchKey);
   const [checked, setChecked] = React.useState(true);
+  const latestSearchKeyRef = useRef(searchKey);
   const containerRef = React.useRef(null);
 
   const handleChange = () => {
     setChecked((prev) => !prev);
   };
 
-  const { getstockcountreport } = reportApis();
+  const { getriskassessmentreport } = reportApis();
   useEffect(() => {
     const fetchData = async () => {
       await tagDetails();
@@ -191,23 +187,15 @@ export default function StockCountReport({ userAction, disabledDetailed }) {
     const currentSearchKey = latestSearchKeyRef.current;
     try {
       if (
-        mainDetails?.BE &&
         mainDetails.fromDate &&
-        mainDetails.toDate &&
-        mainDetails?.Type
+        mainDetails.toDate 
       ) {
-        const response = await getstockcountreport({
-          bE: mainDetails.BE,
+        const response = await getriskassessmentreport({
           fromDate: mainDetails.fromDate,
           toDate: mainDetails.toDate,
-          type: mainDetails?.Type,
-          warehouse: mainDetails?.Warehouse,
-          product: mainDetails?.product,
-          bin: mainDetails?.bin,
-          refreshFlag: refreshFlag,
-          pageNumber: pageNumber,
+          pageNo: pageNumber,
           pageSize: displayLength,
-          searchString: currentSearchKey,
+          search: currentSearchKey,
         });
         if (
           response?.status === "Success" &&
@@ -217,8 +205,8 @@ export default function StockCountReport({ userAction, disabledDetailed }) {
 
           setRows(myObject?.Data);
 
-          const totalRows = myObject?.PageSummary[0].TotalRows;
-          const totalPages = myObject?.PageSummary[0].TotalPages;
+          const totalRows = myObject?.Metadata.TotalRows;
+          const totalPages = myObject?.Metadata.TotalPages;
 
           settotalRows(totalRows);
           setTotalPages(totalPages);
@@ -257,8 +245,9 @@ export default function StockCountReport({ userAction, disabledDetailed }) {
 
   const hardRefresh = () => {
     setrefreshFlag(true);
-    setselectedDatas([]);
-    setchangesTriggered(true);
+    setsearchKey("")
+    latestSearchKeyRef.current = ""
+    setchangesTriggered(!changesTriggered);
   };
 
   const handleIconsClick = async (value) => {
@@ -284,18 +273,12 @@ export default function StockCountReport({ userAction, disabledDetailed }) {
   };
 
   const handleExcel = async () => {
-    const response = await getstockcountreport({
-      bE: mainDetails.BE,
+    const response = await getriskassessmentreport({
       fromDate: mainDetails.fromDate,
       toDate: mainDetails.toDate,
-      type: mainDetails?.Type,
-      warehouse: mainDetails?.Warehouse,
-      product: mainDetails?.product,
-      bin: mainDetails?.bin,
-      refreshFlag: true,
       pageNumber: 0,
       pageSize: 0,
-      searchString: "",
+      search: "",
     });
     const excludedFields = [
       "BE",
@@ -304,10 +287,11 @@ export default function StockCountReport({ userAction, disabledDetailed }) {
       "Warehouse",
       "Bin",
       "TransId",
+      "Id"
     ];
     const filteredRows = JSON.parse(response?.result)?.Data;
     await ExcelExport({
-      reportName: "Stock Count Report",
+      reportName: "Risk Assessment Report",
       filteredRows,
       excludedFields,
     });
@@ -407,62 +391,6 @@ export default function StockCountReport({ userAction, disabledDetailed }) {
                   value={mainDetails}
                   setValue={setMainDetails}
                 />
-                <ReconEntityAutoComplete
-                  apiKey={gettaglist}
-                  formData={mainDetails}
-                  setFormData={setMainDetails}
-                  label={"Entity"}
-                  autoId={"entity"}
-                  formDataName={"BEName"}
-                  formDataiId={"BE"}
-                  required={true}
-                  tagId={1}
-                />
-
-                <UserAutoCompleteManual
-                  formData={mainDetails}
-                  setFormData={setMainDetails}
-                  label={"Type"}
-                  autoId={"type"}
-                  required={true}
-                  suggestion={suggestionType}
-                  formDataId={"Type"}
-                />
-
-                <WarehouseAutoComplete
-                  apiKey={getwarehousebyentity}
-                  formData={mainDetails}
-                  setFormData={setMainDetails}
-                  label={"Warehouse"}
-                  autoId={"warehouse"}
-                  formDataName={"WarehouseName"}
-                  formDataiId={"Warehouse"}
-                  disable={false}
-                  beId={mainDetails?.BE}
-                />
-
-                <UserAutoComplete
-                  apiKey={getproductbyentity}
-                  formData={mainDetails}
-                  setFormData={setMainDetails}
-                  label={"Product"}
-                  autoId={"product"}
-                  required={false}
-                  formDataiId={"product"}
-                  formDataName={"productName"}
-                  beId={mainDetails?.BE}
-                />
-                <UserAutoComplete
-                  apiKey={gettaglist}
-                  formData={mainDetails}
-                  setFormData={setMainDetails}
-                  label={"Bin"}
-                  autoId={"bin"}
-                  required={false}
-                  formDataiId={"bin"}
-                  formDataName={"binName"}
-                  tagId={17}
-                />
                 <Box p={1.9}>
                   <NormalButton label={"Search"} action={tagDetails} />
                 </Box>
@@ -471,6 +399,7 @@ export default function StockCountReport({ userAction, disabledDetailed }) {
           </Box>
         </Slide>
       )}
+
       {rows?.length || latestSearchKeyRef?.current ? (
         <ReportSummary
           rows={rows}
@@ -487,7 +416,7 @@ export default function StockCountReport({ userAction, disabledDetailed }) {
           //   currentTheme={currentTheme}
           totalPages={totalPages}
           hardRefresh={hardRefresh}
-          IdName={"TransId"}
+          IdName={"Id"}
           length={checked}
         />
       ) : null}
@@ -501,3 +430,4 @@ export default function StockCountReport({ userAction, disabledDetailed }) {
     </Box>
   );
 }
+

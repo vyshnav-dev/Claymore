@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { securityApis } from "../../../service/Security/security";
-import ExcessReport from "./ExcessReport";
+import AllocatedJobReport from "./AllocatedJobReport";
 
-export default function ExcessReportContainer() {
+export default function AllocatedJobReportContainer() {
   const location = useLocation();
   const [page, setPage] = useState(1);
   const [id, setId] = useState(0);
@@ -38,7 +38,8 @@ export default function ExcessReportContainer() {
 
   return (
     <>
-      <ExcessReport detailPageId={id} userAction={userAction} />
+      <AllocatedJobReport detailPageId={id} userAction={userAction} />
     </>
   );
 }
+

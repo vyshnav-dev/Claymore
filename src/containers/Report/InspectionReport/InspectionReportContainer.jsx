@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { securityApis } from "../../../service/Security/security";
-import ClosingStockReport from "./ClosingStockReport";
+import InspectionReport from "./InspectionReport";
 
-export default function ClosingStockReportContainer() {
+export default function InspectionReportContainer() {
   const location = useLocation();
   const [page, setPage] = useState(1);
   const [id, setId] = useState(0);
@@ -38,7 +38,9 @@ export default function ClosingStockReportContainer() {
 
   return (
     <>
-      <ClosingStockReport detailPageId={id} userAction={userAction} />
+      <InspectionReport detailPageId={id} userAction={userAction} />
     </>
   );
 }
+
+

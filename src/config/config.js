@@ -8,6 +8,7 @@ export let thirdColor = null
 export let selectedColor = null
 export let backgroundColor = null
 export let profileDateFields = null
+export let reportDateFields = null
 export let baseUrlMob = null
 export let rowsPerSheet = null;
 export let IMAGE_URL = null;
@@ -37,6 +38,7 @@ export const getConfig = () => {
     selectedColor=config.selectedColor
     backgroundColor=config.backgroundColor
     profileDateFields=config.profileDateFields
+    reportDateFields=config.reportDateFields
     baseUrlMob=config.baseUrlMob
     rowsPerSheet = config.rowsPerSheet
     IMAGE_URL = config.IMAGE_URL

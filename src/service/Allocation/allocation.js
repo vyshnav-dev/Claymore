@@ -108,8 +108,21 @@ const allocationApis = () => {
     }
   };
 
-  //#region Allocated Job Orders product list
+  //#region Client list
 
+  const getclientlist = async (payload) => {
+    try {
+      const response = await makeAuthorizedRequestBase(
+        "get",
+        "allocation/getclientlist",
+        payload,
+        true
+      );
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  };
   
 
 
@@ -124,6 +137,7 @@ const allocationApis = () => {
     UpsertJobOrderAllocation,
     GetAllocatedJobOrderSummary,
     GetAllocatedJobOrderDetails,
+    getclientlist
   }
 }
 

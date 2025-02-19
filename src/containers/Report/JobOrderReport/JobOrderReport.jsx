@@ -31,6 +31,8 @@ import ReportSummary from "../../../component/Table/ReportSummary";
 // import UserAutoComplete from "../../../component/AutoComplete/UserAutoComplete";
 import NormalButton from "../../../component/Buttons/NormalButton";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { allocationApis } from "../../../service/Allocation/allocation";
+import UserAutoComplete from "../../../component/AutoComplete/UserAutoComplete";
 const currentDate = new Date().toISOString().split("T")[0];
 const suggestionType = [
   { Id: 1, Name: "Reconciliation Date" },
@@ -105,7 +107,7 @@ function BasicBreadcrumbs({ viewAction, status }) {
           aria-label="breadcrumb"
         >
           <Typography underline="hover" sx={style} key="1">
-            Closing Stock Report
+            Pending Job Order Report
           </Typography>
           <Typography underline="hover" sx={style} key="1"></Typography>
         </Breadcrumbs>
@@ -164,21 +166,14 @@ export default function JobOrderReport({ userAction, disabledDetailed }) {
   const [mainDetails, setMainDetails] = useState({
     fromDate: currentDate,
     toDate: currentDate,
-    BE: null,
-    Warehouse: null,
-    Type: 1,
-    product: null,
-    bin: null,
+    Client: null,
   });
   const [confirmAlert, setConfirmAlert] = useState(false);
   const [confirmData, setConfirmData] = useState({});
   const [confirmType, setConfirmType] = useState(null);
   const {
-    getwarehousebyentity,
-    gettaglist,
-    getbinbywarehouse,
-    getproductbyentity,
-  } = stockCountApis();
+    getclientlist
+  } = allocationApis();
   const { showAlert } = useAlert();
   const [rows, setRows] = React.useState([]); //To Pass in Table
   const [displayLength, setdisplayLength] = React.useState(25); // Show Entries
@@ -196,7 +191,7 @@ export default function JobOrderReport({ userAction, disabledDetailed }) {
     setChecked((prev) => !prev);
   };
 
-  const { getstockclosereport } = reportApis();
+  const { getpendingjoborderreport } = reportApis();
   useEffect(() => {
     const fetchData = async () => {
       await tagDetails();
@@ -208,23 +203,16 @@ export default function JobOrderReport({ userAction, disabledDetailed }) {
     const currentSearchKey = latestSearchKeyRef.current;
     try {
       if (
-        mainDetails?.BE &&
         mainDetails.fromDate &&
-        mainDetails.toDate &&
-        mainDetails?.Type
+        mainDetails.toDate
       ) {
-        const response = await getstockclosereport({
-          bE: mainDetails.BE,
+        const response = await getpendingjoborderreport({
           fromDate: mainDetails.fromDate,
           toDate: mainDetails.toDate,
-          type: mainDetails?.Type,
-          warehouse: mainDetails?.Warehouse,
-          product: mainDetails?.product,
-          bin: mainDetails?.bin,
-          refreshFlag: refreshFlag,
-          pageNumber: pageNumber,
+          client: mainDetails?.Client,
+          pageNo: pageNumber,
           pageSize: displayLength,
-          searchString: currentSearchKey,
+          search: currentSearchKey,
         });
         if (
           response?.status === "Success" &&
@@ -234,8 +222,8 @@ export default function JobOrderReport({ userAction, disabledDetailed }) {
 
           setRows(myObject?.Data);
 
-          const totalRows = myObject?.PageSummary[0].TotalRows;
-          const totalPages = myObject?.PageSummary[0].TotalPages;
+          const totalRows = myObject?.Metadata.TotalRows;
+          const totalPages = myObject?.Metadata.TotalPages;
 
           settotalRows(totalRows);
           setTotalPages(totalPages);
@@ -274,8 +262,9 @@ export default function JobOrderReport({ userAction, disabledDetailed }) {
 
   const hardRefresh = () => {
     setrefreshFlag(true);
-    setselectedDatas([]);
-    setchangesTriggered(true);
+    setsearchKey("")
+    latestSearchKeyRef.current = ""
+    setchangesTriggered(!changesTriggered);
   };
 
   const handleIconsClick = async (value) => {
@@ -301,18 +290,13 @@ export default function JobOrderReport({ userAction, disabledDetailed }) {
   };
 
   const handleExcel = async () => {
-    const response = await getstockclosereport({
-      bE: mainDetails.BE,
+    const response = await getpendingjoborderreport({
       fromDate: mainDetails.fromDate,
       toDate: mainDetails.toDate,
-      type: mainDetails?.Type,
-      warehouse: mainDetails?.Warehouse,
-      product: mainDetails?.product,
-      bin: mainDetails?.bin,
-      refreshFlag: true,
+      client: mainDetails?.Client,
       pageNumber: 0,
       pageSize: 0,
-      searchString: "",
+      search: "",
     });
     const excludedFields = [
       "BE",
@@ -320,11 +304,11 @@ export default function JobOrderReport({ userAction, disabledDetailed }) {
       "Unit",
       "Warehouse",
       "Bin",
-      "TransId",
+      "Id",
     ];
     const filteredRows = JSON.parse(response?.result)?.Data;
     await ExcelExport({
-      reportName: "Closing Stock Report",
+      reportName: "Pending Job Order Report",
       filteredRows,
       excludedFields,
     });
@@ -424,63 +408,16 @@ export default function JobOrderReport({ userAction, disabledDetailed }) {
                   value={mainDetails}
                   setValue={setMainDetails}
                 />
-                {/* <ReconEntityAutoComplete
-                  apiKey={gettaglist}
-                  formData={mainDetails}
-                  setFormData={setMainDetails}
-                  label={"Entity"}
-                  autoId={"entity"}
-                  formDataName={"BEName"}
-                  formDataiId={"BE"}
-                  required={true}
-                  tagId={1}
-                />
-
-                <UserAutoCompleteManual
-                  formData={mainDetails}
-                  setFormData={setMainDetails}
-                  label={"Type"}
-                  autoId={"type"}
-                  required={true}
-                  suggestion={suggestionType}
-                  formDataId={"Type"}
-                />
-
-                <WarehouseAutoComplete
-                  apiKey={getwarehousebyentity}
-                  formData={mainDetails}
-                  setFormData={setMainDetails}
-                  label={"Warehouse"}
-                  autoId={"warehouse"}
-                  formDataName={"WarehouseName"}
-                  formDataiId={"Warehouse"}
-                  disable={false}
-                  beId={mainDetails?.BE}
-                />
-
                 <UserAutoComplete
-                  apiKey={getproductbyentity}
+                  apiKey={getclientlist}
                   formData={mainDetails}
                   setFormData={setMainDetails}
-                  label={"Product"}
-                  autoId={"product"}
+                  label={"Client"}
+                  autoId={"Client"}
                   required={false}
-                  formDataiId={"product"}
-                  formDataName={"productName"}
-                  beId={mainDetails?.BE}
+                  formDataiId={"Client"}
+                  formDataName={"Client_Name"}
                 />
-
-                <UserAutoComplete
-                  apiKey={gettaglist}
-                  formData={mainDetails}
-                  setFormData={setMainDetails}
-                  label={"Bin"}
-                  autoId={"bin"}
-                  required={false}
-                  formDataiId={"bin"}
-                  formDataName={"binName"}
-                  tagId={17}
-                /> */}
                 <Box p={1.9}>
                   <NormalButton label={"Search"} action={tagDetails} />
                 </Box>
@@ -499,14 +436,14 @@ export default function JobOrderReport({ userAction, disabledDetailed }) {
           //  onSortChange={handleSortChange}
           onSearchKeyChange={handleSearchKeyChange}
           changesTriggered={changesTriggered}
-          setchangesTriggered={resetChangesTrigger}
+          // setchangesTriggered={resetChangesTrigger}
           // onSelectedRowsChange={handleSelectedRowsChange}
           // onRowDoubleClick={handleRowDoubleClick}
           totalRows={totalRows}
           //   currentTheme={currentTheme}
           totalPages={totalPages}
           hardRefresh={hardRefresh}
-          IdName={"TransId"}
+          IdName={"Id"}
           length={checked}
         />
       ) : null}

@@ -24,8 +24,13 @@ import PDContainer from "./containers/Master/ProductDescripton/PDContainer";
 import FormBodyContainer from "./containers/Master/MasterBody/FormBodyContainer";
 import InspContainer from "./containers/Inspection/InspContainer";
 import AllocatedContainer from "./containers/Allocated/AllocatedContainer";
-import ClosingStockReportContainer from "./containers/Report/ClosingStockReport/ClosingStockReportContainer";
 import JobOrderReportContainer from "./containers/Report/JobOrderReport/JobOrderReportContainer";
+import TechncianReportContainer from "./containers/Report/TechnicianReport/TechncianReportContainer";
+import TimeSheetReportContainer from "./containers/Report/TimeSheetReport/TimeSheetReportContainer";
+import RiskAssessmentReportContainer from "./containers/Report/RiskAssessmentReport/RiskAssessmentReportContainer";
+import AllocatedJobReportContainer from "./containers/Report/AllocatedJobOrderReport/AllocatedJobReportContainer";
+import InspectionReportContainer from "./containers/Report/InspectionReport/InspectionReportContainer";
+import AcknowledgmentReportContainer from "./containers/Report/AcknowledgmentReport/AcknowledgmentReportContainer";
 
 export default function RoutePath() {
   const location = useLocation();
@@ -35,9 +40,9 @@ export default function RoutePath() {
 
   useEffect(() => {
     if (navigate) setNavigate(navigate); // Set the navigate function globally
-    if(showAlert)
+    if (showAlert)
       setShowAlert(showAlert);
-  }, [navigate,showAlert]);
+  }, [navigate, showAlert]);
   return (
     <div
       style={{
@@ -45,7 +50,7 @@ export default function RoutePath() {
         flexDirection: "column",
         minHeight: "100vh", // Ensures full viewport height
         backgroundColor: !showHeader ? "#3b71ca" : null,
-         scrollbarWidth:"thin"
+        scrollbarWidth: "thin"
       }}
     >
       {showHeader && <Header />}
@@ -54,7 +59,7 @@ export default function RoutePath() {
         style={{
           flex: 1,
           overflowY: "auto",
-          scrollbarWidth:"thin"
+          scrollbarWidth: "thin"
           // Adjust '120px' based on the combined height of your header and footer
         }}
       >
@@ -66,8 +71,8 @@ export default function RoutePath() {
             height: "auto", // Adjust height dynamically (subtracting header/footer)
             overflowY: "auto", // Enable vertical scrolling
             scrollbarWidth: "thin", // Firefox-specific property for thin scrollbar
-           
-            
+
+
           }}
         >
           <Routes>
@@ -103,13 +108,13 @@ export default function RoutePath() {
                 </ProtectedRoute>
               }
             />
-            
+
             <Route
               path="/product"
               element={
                 <ProtectedRoute>
                   <MasterProductContainer />
-                 </ProtectedRoute>
+                </ProtectedRoute>
               }
             />
             <Route
@@ -125,14 +130,14 @@ export default function RoutePath() {
               element={
                 <ProtectedRoute>
                   <PDContainer />
-                 </ProtectedRoute>
+                </ProtectedRoute>
               }
             />
             <Route
               path="/form"
               element={
                 <ProtectedRoute>
-                  <FormBodyContainer/>
+                  <FormBodyContainer />
                 </ProtectedRoute>
               }
             />
@@ -148,7 +153,7 @@ export default function RoutePath() {
               path="/allocated"
               element={
                 <ProtectedRoute>
-                  <AllocatedContainer/>
+                  <AllocatedContainer />
                 </ProtectedRoute>
               }
             />
@@ -173,7 +178,7 @@ export default function RoutePath() {
               path="/risk"
               element={
                 <ProtectedRoute>
-                  <RiskAssesmentContainer/>
+                  <RiskAssesmentContainer />
                 </ProtectedRoute>
               }
             />
@@ -181,7 +186,7 @@ export default function RoutePath() {
               path="/approve"
               element={
                 <ProtectedRoute>
-                   <InspContainer />
+                  <InspContainer />
                 </ProtectedRoute>
               }
             />
@@ -190,19 +195,12 @@ export default function RoutePath() {
               path="/timesheet"
               element={
                 <ProtectedRoute>
-                  <TimeRecordContainer/>
+                  <TimeRecordContainer />
                 </ProtectedRoute>
               }
             />
-            <Route
-              path="/joborder"
-              element={
-                <ProtectedRoute>
-                  <JobOrderReportContainer/>
-                </ProtectedRoute>
-              }
-            />
-          
+
+
             <Route
               path="/reset-password"
               element={
@@ -211,7 +209,65 @@ export default function RoutePath() {
                 </ProtectedRoute>
               }
             />
-           
+
+            {/* --------REPORT SECTION--------- */}
+
+            <Route
+              path="/joborderreport"
+              element={
+                <ProtectedRoute>
+                  <JobOrderReportContainer />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/allocatedjoborder"
+              element={
+                <ProtectedRoute>
+                  <AllocatedJobReportContainer />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/unallocated"
+              element={
+                <ProtectedRoute>
+                  <TechncianReportContainer />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/riskreport"
+              element={
+                <ProtectedRoute>
+                  <RiskAssessmentReportContainer />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/timesheetreport"
+              element={
+                <ProtectedRoute>
+                  <TimeSheetReportContainer />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/inspectionreport"
+              element={
+                <ProtectedRoute>
+                  <InspectionReportContainer />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/acknowledgmentreport"
+              element={
+                <ProtectedRoute>
+                  <AcknowledgmentReportContainer />
+                </ProtectedRoute>
+              }
+            />
           </Routes>
         </Box>
       </div>

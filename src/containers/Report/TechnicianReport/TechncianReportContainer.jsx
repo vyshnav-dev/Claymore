@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { securityApis } from "../../../service/Security/security";
-import StockCountReport from "./StockCountReport";
+import TechnicianReport from "./TechnicianReport";
 
-export default function StockCountReportContainer() {
+export default function TechncianReportContainer() {
   const location = useLocation();
   const [page, setPage] = useState(1);
   const [id, setId] = useState(0);
@@ -38,7 +38,8 @@ export default function StockCountReportContainer() {
 
   return (
     <>
-      <StockCountReport detailPageId={id} userAction={userAction} />
+      <TechnicianReport detailPageId={id} userAction={userAction} />
     </>
   );
 }
+

@@ -105,6 +105,8 @@ function Header() {
     setAnchorElUser(null);
   };
 
+  console.log('menu',menu);
+  
   
   const handleClickEvent = async (menu) => {
 
@@ -152,9 +154,19 @@ function Header() {
     }
     else if(menu?.Parent === 34){
       if (menu?.ScreenId === 35) {
-        navigate("/joborder", { state: menu});
+        navigate("/joborderreport", { state: menu});
       }else if (menu?.ScreenId === 36) {
-        navigate("/allocated", { state: menu });
+        navigate("/allocatedjoborder", { state: menu });
+      }else if (menu?.ScreenId === 37) {
+        navigate("/inspectionreport", { state: menu });
+      }else if (menu?.ScreenId === 38) {
+        navigate("/unallocated", { state: menu });
+      }else if (menu?.ScreenId === 39) {
+        navigate("/timesheetreport", { state: menu });
+      }else if (menu?.ScreenId === 40) {
+        navigate("/riskreport", { state: menu });
+      }else if (menu?.ScreenId === 41) {
+        navigate("/acknowledgmentreport", { state: menu });
       }
     }
     else {

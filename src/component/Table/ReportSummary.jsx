@@ -18,16 +18,18 @@ import {
   TextField,
   useTheme,
   Tooltip,
+  InputAdornment,
 } from "@mui/material";
 import FirstPageIcon from "@mui/icons-material/FirstPage";
 import LastPageIcon from "@mui/icons-material/LastPage";
 import Pagination from "@mui/material/Pagination";
 import FitScreenIcon from "@mui/icons-material/FitScreen";
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
+import SearchIcon from "@mui/icons-material/Search";
 import {
   backgroundColor,
   primaryColor,
-  profileDateFields,
+  reportDateFields,
   secondaryColor,
   selectedColor,
   thirdColor,
@@ -130,10 +132,17 @@ export default function ReportSummary(props) {
 
   //To Search
   const handleSearch = (event) => {
-    setSearchTerm(event.target.value);
     setPage(0);
     props.onpageNumberChange(1);
-    props.onSearchKeyChange(event.target.value);
+    props.onSearchKeyChange(event.target.value||searchTerm||"");
+    setSearchTerm(event.target.value||searchTerm||"") 
+  };
+
+  const handleKeyDown = (event) => {
+  
+    if (event.key === "Enter") {
+      handleSearch(event);
+    }
   };
 
   //To change page //remove event if Nan comes in pagination
@@ -157,8 +166,9 @@ export default function ReportSummary(props) {
   React.useEffect(() => {
     setPage(0); // Reset page to 0
     props.onpageNumberChange(1); // Call the callback function with 0 if needed
-    props.setchangesTriggered(false);
+    // props.setchangesTriggered(false);
     setSelected([]);
+    setSearchTerm("")
   }, [props.changesTriggered]);
 
   //To convert date and time to dd/mm/yyyy format
@@ -262,7 +272,9 @@ export default function ReportSummary(props) {
             label="Search"
             autoComplete="off"
             value={searchTerm}
-            onChange={handleSearch}
+            onChange={(event)=>setSearchTerm(event.target.value)}
+            onBlur={handleSearch}              
+            onKeyDown={handleKeyDown}
             sx={{
               width: 200, // Default width
               "@media (max-width: 600px)": {
@@ -295,6 +307,16 @@ export default function ReportSummary(props) {
               "& .MuiFormLabel-root.Mui-focused": {
                 color: primaryColor,
               },
+            }}
+            InputProps={{
+              // (3) add a search icon as an end-adornment:
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton onClick={handleSearch} edge="end">
+                    <SearchIcon />
+                  </IconButton>
+                </InputAdornment>
+              ),
             }}
           />
         </div>
@@ -388,7 +410,7 @@ export default function ReportSummary(props) {
                             key={column.id}
                             style={{ minWidth: column.minWidth }}
                           >
-                            {profileDateFields.includes(column.label)
+                            {reportDateFields.includes(column.label)
                               ? convertToLocaleDateString(row[column.id])
                               : row[column.id] === null? "" : `${row[column.id]}`}
                           </TableCell>
