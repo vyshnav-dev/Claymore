@@ -167,6 +167,8 @@ function Header() {
         navigate("/riskreport", { state: menu });
       }else if (menu?.ScreenId === 41) {
         navigate("/acknowledgmentreport", { state: menu });
+      }else if (menu?.ScreenId === 42) {
+        navigate("/authorizereport", { state: menu });
       }
     }
     else {

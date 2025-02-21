@@ -409,7 +409,7 @@ export default function AcknowledgmentReport({ userAction, disabledDetailed }) {
                                     formDataName={"Client_Name"}
                                 />
 
-                                <AutoSelect
+                                {/* <AutoSelect
                                     key={"Status"}
                                     formData={mainDetails}
                                     setFormData={setMainDetails}
@@ -421,7 +421,7 @@ export default function AcknowledgmentReport({ userAction, disabledDetailed }) {
                                     ColumnSpan={0}
                                     Menu={[{ "Id": 1, "Name": "Allocated" }, { "Id": 2, "Name": "Working" }, { "Id": 3, "Name": "Closed" }]}
 
-                                />
+                                /> */}
 
 
                                 <Box p={1.9}>

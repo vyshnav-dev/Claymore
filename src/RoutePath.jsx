@@ -31,6 +31,7 @@ import RiskAssessmentReportContainer from "./containers/Report/RiskAssessmentRep
 import AllocatedJobReportContainer from "./containers/Report/AllocatedJobOrderReport/AllocatedJobReportContainer";
 import InspectionReportContainer from "./containers/Report/InspectionReport/InspectionReportContainer";
 import AcknowledgmentReportContainer from "./containers/Report/AcknowledgmentReport/AcknowledgmentReportContainer";
+import ApproveReportContainer from "./containers/Report/ApproveReport/ApproveReportContainer";
 
 export default function RoutePath() {
   const location = useLocation();
@@ -265,6 +266,14 @@ export default function RoutePath() {
               element={
                 <ProtectedRoute>
                   <AcknowledgmentReportContainer />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/authorizereport"
+              element={
+                <ProtectedRoute>
+                  <ApproveReportContainer />
                 </ProtectedRoute>
               }
             />

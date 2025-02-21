@@ -1,11 +1,7 @@
 import React from 'react';
 import { Box } from '@mui/material';
-// import { tagsApis } from '../../../../services/tags/tagsApi';
-// import { useAlert } from '../../../../components/Alerts/AlertContext';
-// import { tagFieldLanguageDirection } from '../../../../config/config';
 import Accordions from '../../component/Accordion/Accordion';
 import SwitchTag from '../../component/Switch/SwitchTag';
-// import DateAndTimeTag from '../../../../components/Home/Tags/Inputs/DateAndTimeTag';
 import InputCommon from '../../component/InputFields/InputCommon';
 import TagAutoSelect from '../../component/Select/TagAutoSelect';
 import CheckBoxTag from '../../component/CheckBox/CheckBoxTag';
@@ -116,7 +112,7 @@ const TabFields = ({ formData,setFormData,fields, expanded, onChange,language,ta
     // direction={direction}
     //sx={!isAccordion ? { padding: 2, margin: 1, border: '1px solid lightgray', borderRadius: '4px' } : undefined} // Box specific styling
   >
-      {expanded &&
+      {/* {expanded && */}
         <Box 
         sx={{ 
           display: 'flex', 
@@ -137,14 +133,14 @@ const TabFields = ({ formData,setFormData,fields, expanded, onChange,language,ta
                         value={formData[field.FieldName] || ''}
                         name={field.FieldName}
                         setValue={(data) => handleChange(field, data)}
-                        languageName={language}
+                        languageName={"english"}
                         key={field?.FieldName}
-                        mandatory={field?.Mandatory}
+                        mandatory={field?.Mandatory|| true}
                         disabled={disabledDetailed || field?.ReadOnly || false}
                         // type={field?.FieldType.toLowerCase()}
                         type={'text'}
                         maxLength={field?.MaxSize}
-                        AllowNegative={field?.Negative ?? true}
+                        AllowNegative={field?.Negative ?? false}
                         DefaultValue={field?.DefaultValue}
                         ErrorMessage={field?.ErrorMessage}
                         // onBlur={(data) => handleOnBlur(field?.FieldName, data)}
@@ -154,10 +150,47 @@ const TabFields = ({ formData,setFormData,fields, expanded, onChange,language,ta
                         CharacterCasing={field?.CharacterCasing ?? 0}
                         RegularExpression={field?.RegularExpression}
                         dateType={field?.AllowDate}
-                        DonotAllowSpecialChar={field?.DonotAllowSpecialChar}
+                        DonotAllowSpecialChar={field?.DonotAllowSpecialChar || true}
 
                         // Add other necessary props here like value, onChange, etc.
                       />
+                    );
+                  break;
+                  case "number":
+                    return (
+                      <InputCommon
+                      label={field.Caption}
+                      value={formData[field.FieldName] || ''}
+                      name={field.FieldName}
+                      setValue={(data) => handleChange(field, data)}
+                      languageName={"english"}
+                      key={field?.FieldName}
+                      mandatory={field?.Mandatory|| true}
+                      disabled={disabledDetailed || field?.ReadOnly || false}
+                      // type={field?.FieldType.toLowerCase()}
+                      type={'numeric'}
+                      maxLength={field?.MaxSize}
+                      AllowNegative={field?.Negative ?? false}
+                      DefaultValue={field?.DefaultValue}
+                      ErrorMessage={field?.ErrorMessage}
+                      // onBlur={(data) => handleOnBlur(field?.FieldName, data)}
+                      ColumnSpan={field?.ColumnSpan}
+                      RowSpan={field?.RowSpan}
+                      multiline={field?.RowSpan > 1 ? true : null}
+                      CharacterCasing={field?.CharacterCasing ?? 0}
+                      // RegularExpression={field?.RegularExpression}
+                      dateType={field?.AllowDate}
+                      DonotAllowSpecialChar={field?.DonotAllowSpecialChar || true}
+                      RegularExpression={new RegExp(
+                              `^-?[0-9]*\\.?[0-9]{0,${2}}$`
+                            )
+                          
+                      }
+                      RoundOff={null}
+                      decimalPart={2}
+                      DecimalPoints={2}
+                      // Add other necessary props here like value, onChange, etc.
+                    />
                     );
                   break;
                 case "date":
@@ -169,7 +202,7 @@ const TabFields = ({ formData,setFormData,fields, expanded, onChange,language,ta
                         setValue={(data) => handleChange(field, data)}
                         languageName={language}
                         key={field?.FieldName}
-                        mandatory={field?.Mandatory}
+                        mandatory={field?.Mandatory || true}
                         disabled={disabledDetailed || field?.ReadOnly || false}
                         // type={field?.FieldType.toLowerCase()}
                         type={'date'}
@@ -199,9 +232,9 @@ const TabFields = ({ formData,setFormData,fields, expanded, onChange,language,ta
                       autoId={field.Caption}
                       formDataName={`${field.FieldName}_Name`}
                       formDataiId={field.FieldName}
-                      required={field?.Mandatory}
+                      required={field?.Mandatory || true}
                       label={field.Caption}
-                    //   languageName={language}
+                      languageName={"english"}
                       ColumnSpan={field?.ColumnSpan}
                       disabled={disabledDetailed || field?.ReadOnly || false}
                       Menu={JSON.parse(field?.NumberList)}
@@ -244,7 +277,7 @@ const TabFields = ({ formData,setFormData,fields, expanded, onChange,language,ta
             return null;
           })}
         </Box>
-     }
+     {/* } */}
     </Wrapper>
   );
 };

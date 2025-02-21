@@ -20,6 +20,7 @@ import {
   Tooltip,
   Button,
   InputAdornment,
+  Stack,
 } from "@mui/material";
 import FirstPageIcon from "@mui/icons-material/FirstPage";
 import LastPageIcon from "@mui/icons-material/LastPage";
@@ -37,6 +38,8 @@ import {
   thirdColor,
 } from "../../config/config";
 import UserAutoComplete from "../AutoComplete/UserAutoComplete";
+import RouteMap from "../RouteMap/RouteMap";
+import { MDBIcon } from "mdb-react-ui-kit";
 
 const iconsExtraSx = {
   fontSize: "0.8rem",
@@ -46,6 +49,15 @@ const iconsExtraSx = {
   },
   marginRight: 1,
 };
+
+const iconsExtraSxCell = {
+  fontSize: "0.8rem",
+  padding: "0rem",
+  "&:hover": {
+    backgroundColor: "transparent",
+  },
+};
+
 
 export default function InspSummaryTable(props) {
   const {
@@ -67,6 +79,9 @@ export default function InspSummaryTable(props) {
   const [searchTerm, setSearchTerm] = React.useState("");
   const [filteredRows, setFilteredRows] = React.useState([]);
   const [columns, setColumns] = React.useState([]);
+
+  const [mapOpen, setMapOpen] = React.useState(false)
+  const [mapId, setMapId] = React.useState(0)
 
   const profileDateFieldsArray = profileDateFields
     .split(",")
@@ -243,6 +258,17 @@ export default function InspSummaryTable(props) {
 
     return `${day}-${month}-${year}`;
   };
+  
+  const handleMapOpen = (id) => {
+    setMapId(id)
+    setMapOpen(true)
+  }
+  const handleMapClose = () => {
+    setSelected([])
+    setMapId(0)
+    setMapOpen(false)
+  }
+
   return (
     <Box
       sx={{
@@ -431,7 +457,7 @@ export default function InspSummaryTable(props) {
           >
             <Table stickyHeader sx={{ minWidth: 750 }}>
               <TableHead>
-                <TableRow sx={{ position: "sticky", top: 0 }}>
+                <TableRow sx={{ position: "sticky", top: 0,zIndex:3 }}>
                   {columns.map((column, index) => (
                     <TableCell
                       key={column.id}
@@ -522,11 +548,24 @@ export default function InspSummaryTable(props) {
                               overflow: "hidden",
                               textOverflow: "ellipsis",
                               fontWeight: row["Group"] ? 800 : null,
+                              textAlign: column.id === "Location" ? "center" : "left",
+                              // backgroundColor:row[column.id] ==='Approved'?'green':row[column.id] ==='Rejected'?'red':null,
+                              // color:row[column.id] ==='Approved'|| row[column.id] ==='Rejected'?'white':null
                             }}
                             key={column.id}
                             style={{ minWidth: column.minWidth }}
                           >
-                            {profileDateFieldsArray.includes(column.label)
+                            {column.id === "Location" ? (
+                              <IconButton
+                                onClick={() => handleMapOpen(row["Location"])}
+                                aria-label="location"
+                                sx={iconsExtraSxCell}
+                              >
+                                <Stack direction="column" alignItems="center">
+                                  <MDBIcon  fas icon="fa-solid fa-location-dot" className="responsiveAction-icon" />
+                                </Stack>
+                              </IconButton>
+                            ) :profileDateFieldsArray.includes(column.label)
                               ? convertToLocaleDateString(row[column.id])
                               : row[column.id] === null
                                 ? ""
@@ -573,6 +612,7 @@ export default function InspSummaryTable(props) {
           }}
         />
       )}
+      <RouteMap open={mapOpen} handleClose={handleMapClose} mapId={mapId} />
     </Box>
   );
 }

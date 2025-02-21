@@ -184,6 +184,8 @@ export default function TagFileTab({
     //   return
     // }
     const fileInput = document.getElementById("masterFilesId"); // Replace with your actual file input ID
+    
+    
 
     const fileToAdd = newFileRef.current;
     const existingFile = formData?.Attachment[editFileIndex]?.FileName;
@@ -247,7 +249,7 @@ export default function TagFileTab({
           const updatedFile= [
             ...formData?.Attachment,
             {
-              FileName: "",
+              FileName: fileToAdd?.name,
               file: fileToAdd, // Include the File object
               SLNo: newSLNo,
             },
@@ -315,6 +317,8 @@ export default function TagFileTab({
 
   //#region  File edit
   const handleEdit = (index, fileObj) => {
+
+    
     if(disabledDetailed){
       return
     }
@@ -442,7 +446,7 @@ export default function TagFileTab({
         expanded={expanded}
         onChange={onChange}
       >
-        {expanded &&
+        {/* {expanded && */}
         <Box
           sx={{
             display: "flex",
@@ -454,99 +458,7 @@ export default function TagFileTab({
             // flexWrap: "wrap",
           }}
         >
-          {/* <Box >
-            <Box
-              sx={{
-                display: "flex",
-                flexWrap: "wrap", // Allow the fields to wrap
-                gap: 2, // Add space between fields
-                scrollbarWidth: "thin",
-                overflowX: "auto",
-                //flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', // Change direction based on rtl or ltr
-                paddingBottom: 5,
-              }}
-            >
-              {dropdownField && (
-                // <TagSelect
-                //   value={formData[dropdownField.FieldName]}
-                //   onChange={(e) =>
-                //     handleChange(dropdownField, e.target.value)
-                //   }
-                //   label={dropdownField.Caption}
-                //   options={[
-                //     //need api
-                //     { value: 1, label: "option1" },
-                //     { value: 2, label: "option2" },
-                //     { value: 3, label: "option3" },
-                //   ]}
-                //   ColumnSpan={0}
-                //   languageDirection={direction}
-                //   // Add necessary props like options, value, onChange, etc.
-                // />
-                
-                <TagAutoComplete
-                          formData={autoCompleteData}
-                          setFormData={setautoCompleteData}
-                          autoId={dropdownField.Caption}
-                          apiKey={gettaglist}
-                          required={dropdownField.Mandatory}
-                          formDataName={"AttachType_Name"}
-                          formDataiId={"AttachType"}
-                          languageId={currentLanguage}
-                          label={dropdownField.Caption}
-                          params1="search"
-                          params2="type"
-                          params3="tagId"
-                          params3Value={dropdownField.LinkTag}
-                          params4="businessEntityId"
-                          params4Value={1}
-                          languageName={currentLanguageName}
-                          ColumnSpan={dropdownField.ColumnSpan}
-                          disabled={disabledDetailed || dropdownField?.ReadOnly || false}
-                          handleTagSwitch={handleTagSwitch}
-                          isSwitchable={handleTagSwitch?true:false}
-                          />
-              )}
-              {referenceField && (
-                <InputTag1
-                  label={referenceField.Caption}
-                  value={autoCompleteData.RefNo}
-                  name={referenceField.FieldName}
-                  setValue={(data) => {
-                    setautoCompleteData({
-                      ...autoCompleteData,
-                      RefNo: data.value,
-                    });
-                  }}
-                  languageName={currentLanguageName}
-                  key={referenceField?.FieldName}
-                  mandatory={referenceField?.Mandatory}
-                  disabled={disabledDetailed ||referenceField?.ReadOnly || false}
-                  type={referenceField?.FieldType.toLowerCase()}
-                  // type={("big integer").toLowerCase()}
-                  maxLength={referenceField?.MaxSize}
-                  AllowNegative={referenceField?.Negative}
-                  // AllowNegative={true}
-                  DefaultValue={referenceField?.DefaultValue}
-                  ErrorMessage={referenceField?.ErrorMessage}
-                  ColumnSpan={referenceField?.ColumnSpan}
-                  RowSpan={referenceField?.RowSpan}
-                  multiline={referenceField?.RowSpan > 1 ? true : null}
-                  CharacterCasing={referenceField?.CharacterCasing ?? 0}
-                  RegularExpression={referenceField?.RegularExpression}
-                  // RegularExpression={"/^-?[0-9]*\.?[0-9]{0,4}$/"}
-                  MinimumValue={referenceField?.MinimumValue}
-                  MaximumValue={referenceField?.MaximumValue}
-                  // MinimumValue={4.45}
-                  // MaximumValue={1020200202.78}
-                  dateType={referenceField?.AllowDate}
-                  DonotAllowSpecialChar={referenceField?.DonotAllowSpecialChar}
-
-                  // Add other necessary props here like value, onChange, etc.
-                />
-              )}
-            </Box>
-          </Box> */}
+         
           <Box >
             <Box
               sx={{
@@ -567,6 +479,7 @@ export default function TagFileTab({
                 accept={allowedExtensionsTagAttachments.map(ext => `.${ext}`).join(', ')}
                 id="masterFilesId"
                 style={{ width: "fit-Content" }}
+                
               />
               <div>
                 <NormalButton action={handleAddFile} label={`${"Add"}`} />
@@ -705,7 +618,7 @@ export default function TagFileTab({
             </TableContainer>
           </Box>
         </Box>
-        }
+        {/* } */}
       </TagAccordions>
       <ConfirmationAlert2
         handleClose={handleConfrimClose}

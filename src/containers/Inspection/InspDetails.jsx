@@ -705,8 +705,11 @@ export default function InspDetails({
                     showAlert("info", `Please Provide ${emptyFields[0]}`);
                     return;
                 }
+                let isExam ;
                 const isValid = await validateFormData();
-                const isExam = await validateExamination();
+                if(isValid){
+                     isExam = await validateExamination();
+                }
                 if (isValid && isExam) {
                     setConfirmData({ message: "Save", type: "success" });
                     setConfirmType("save");
@@ -755,7 +758,7 @@ export default function InspDetails({
                 const fieldValue = formData["InspectionInformation"][FieldName];
 
 
-                if (fieldValue === null || fieldValue === undefined || fieldValue === "" || fieldValue == 0) {
+                if (fieldValue === null || fieldValue === undefined || fieldValue === "" || fieldValue === 0) {
                     setExpanded(tabKey)
                     showAlert("info", `${Caption} is reqiured (${tabCaption})`);
                     return false
@@ -938,7 +941,7 @@ export default function InspDetails({
 
     const handlePropertyConfirmation = async (status) => {
         if (status == 1) {
-            if (!mainDetails?.Remarks) {
+            if (!mainDetails1?.Remarks) {
                 showAlert("info", `Please Provide Remarks`);
                 return;
             }
@@ -962,6 +965,8 @@ export default function InspDetails({
         }
     };
 
+    console.log('formdta',mainDetails1);
+    
 
     return (
         <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
@@ -1031,7 +1036,7 @@ export default function InspDetails({
                             label={"Doc No"}
                             name={"DocNo"}
                             type={"text"}
-                            disabled={false}
+                            disabled={true}
                             mandatory={true}
                             value={formData}
                             setValue={setFormData}
@@ -1057,8 +1062,8 @@ export default function InspDetails({
                                 label={"Owner Name"}
                                 name={"Owner"}
                                 type={"text"}
-                                disabled={false}
-                                mandatory={true}
+                                disabled={true}
+                                mandatory={false}
                                 value={formData}
                                 setValue={setFormData}
                                 maxLength={100}
@@ -1067,8 +1072,8 @@ export default function InspDetails({
                                 label={"Office Address"}
                                 name={"Address"}
                                 type={"text"}
-                                disabled={false}
-                                mandatory={true}
+                                disabled={true}
+                                mandatory={false}
                                 value={formData}
                                 setValue={setFormData}
                                 maxLength={100}
@@ -1077,8 +1082,8 @@ export default function InspDetails({
                                 label={"Equipment Location"}
                                 name={"Location"}
                                 type={"text"}
-                                disabled={false}
-                                mandatory={true}
+                                disabled={true}
+                                mandatory={false}
                                 value={formData}
                                 setValue={setFormData}
                                 maxLength={100}

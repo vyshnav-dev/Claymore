@@ -450,6 +450,7 @@ export default function RiskAssesmentDetails({
     const [mainDetails, setMainDetails] = useState({});
     const [detailPageId, setDetailPageId] = useState(summaryId);
     const [confirmAlert, setConfirmAlert] = useState(false);
+    const [isGet, setIsGet] = useState(false);
     const [confirmData, setConfirmData] = useState({});
     const [updateDetails, setUpdateDetails] = useState();
     const [confirmType, setConfirmType] = useState(null);
@@ -484,7 +485,7 @@ export default function RiskAssesmentDetails({
                     const myObject = JSON.parse(response?.result);
                     setMainDetails(myObject?.Header);
                     setTableBody(myObject?.RiskAssessments)
-
+                    setIsGet(true);
                 } else {
                     handleNew();
                 }
@@ -537,7 +538,11 @@ export default function RiskAssesmentDetails({
                 }));
             }
         }
-        fetchHeadData();
+        if(mainDetails?.Allocation)
+        {
+            fetchHeadData();
+        }
+        
 
     }, [mainDetails?.Allocation])
 
@@ -553,12 +558,14 @@ export default function RiskAssesmentDetails({
                 handleclose();
                 break;
             case "save":
+                let namePattern = /^[^A-Za-z\d]+$/;
                 const emptyFields = [];
-                if (!mainDetails?.Date) emptyFields.push("Date");
                 if (!mainDetails?.JobOrderNo) emptyFields.push("Job OrderNo");
-                if (!mainDetails?.Client_Name) emptyFields.push("Client");
-                // if (!mainDetails?.FileNo) emptyFields.push("File No"); 
-                if (!mainDetails?.Location) emptyFields.push("Location");
+                if (!mainDetails.FileNo) emptyFields.push("File No Name");
+                if(namePattern.test(mainDetails.FileNo)) {
+                    showAlert("info", "File No Only special characters are not allowed.");
+                    return;
+                  } 
                 if (emptyFields.length > 0) {
                     showAlert("info", `Please Provide ${emptyFields[0]}`);
                     return;
@@ -588,6 +595,7 @@ export default function RiskAssesmentDetails({
 
     const handleclose = () => {
         setPageRender(1);
+        setIsGet(false)
     };
 
 
@@ -619,19 +627,19 @@ export default function RiskAssesmentDetails({
         }
 
         // If no risk validation errors, check for missing risk levels
-        const filteredData2 = updatedChildData
-            .filter(item => item.riskLevel === 0 || item.riskLevel == undefined)
-            .map(({ tabName, slNo }) => ({ tabName, slNo }));
+        // const filteredData2 = updatedChildData
+        //     .filter(item => item.riskLevel === 0 || item.riskLevel == undefined)
+        //     .map(({ tabName, slNo }) => ({ tabName, slNo }));
 
-        if (filteredData2.length > 0) {
-            const uniqueTabNames = [...new Set(filteredData2.map(item => item.tabName))];
-            uniqueTabNames.forEach(tab => setExpanded(tab)); // Expand all affected tabs
+        // if (filteredData2.length > 0) {
+        //     const uniqueTabNames = [...new Set(filteredData2.map(item => item.tabName))];
+        //     uniqueTabNames.forEach(tab => setExpanded(tab)); // Expand all affected tabs
 
-            filteredData2.forEach(item => {
-                showAlert("info", `Ensure fill Risk Level in the SLNO ${item.slNo} in ${item.tabName}`);
-            });
-            return false; // Stop execution since risk level validation failed
-        }
+        //     filteredData2.forEach(item => {
+        //         showAlert("info", `Ensure fill Risk Level in the SLNO ${item.slNo} in ${item.tabName}`);
+        //     });
+        //     return false; // Stop execution since risk level validation failed
+        // }
         setUpdateDetails(updatedChildData)
         return true
     }
@@ -768,10 +776,11 @@ export default function RiskAssesmentDetails({
                             setFormData={setMainDetails}
                             label={"Job Order No"}
                             autoId={"Allocation"}
-                            required={false}
+                            required={true}
                             formDataName={"JobOrderNo"}
                             formDataiId={"Allocation"}
                             criteria={1}
+                            disable={isGet}
                         />
                         <UserInputField
                             label={"Client"}
@@ -818,7 +827,7 @@ export default function RiskAssesmentDetails({
                             label={"Date"}
                             name={"Date"}
                             type={"date"}
-                            disabled={false}
+                            disabled={true}
                             mandatory={true}
                             value={mainDetails}
                             setValue={setMainDetails}

@@ -1,4 +1,4 @@
-import { IconButton, InputAdornment, TextField, useTheme } from "@mui/material";
+import { IconButton, InputAdornment, TextField, Tooltip, Box } from "@mui/material";
 import React from "react";
 import { styled } from "@mui/system";
 import { useState } from "react";
@@ -40,8 +40,8 @@ const errorMessages = {
   allowNegative: "allowNegative",
   specialCharacter: "specialCharacter",
   regexFailed: "regexFailed",
-  integerRange:"integerRange",
-  maxSize:"maxSize"
+  integerRange: "integerRange",
+  maxSize: "maxSize"
 };
 
 export default function InputCommon({
@@ -70,8 +70,8 @@ export default function InputCommon({
   MaximumValue,
   dateType,
   DonotAllowSpecialChar,
-  tableField=false,
-  hardRefresh=false,
+  tableField = false,
+  hardRefresh = false,
   trigger,
   DecimalPoints,
   fullwidth
@@ -79,47 +79,52 @@ export default function InputCommon({
 
 
 
-    const { showAlert } = useAlert();
-  
+  const { showAlert } = useAlert();
+
 
   const [inputValue, setInputValue] = useState(value || "");
   const [isBlurred, setIsBlurred] = useState(false);
   const [fieldKey, setFieldKey] = useState(0);
 
+
+
+
+
+
   type = type?.toLowerCase();
 
-    const InputType = {
-      numeric: "numeric",
-      text: "text",
-      tinyinteger:"tiny integer",
-      smallinteger:"small integer",
-      integer:"integer",
-      biginteger:"big integer",
-      date:"date",
-      time:"time",
-      datetime:"datetime",
-      geography:"geography",
-      boolean:"boolean",
-      tag:"tag",
-      password:"password"
+  const InputType = {
+    numeric: "numeric",
+    text: "text",
+    tinyinteger: "tiny integer",
+    smallinteger: "small integer",
+    integer: "integer",
+    biginteger: "big integer",
+    date: "date",
+    time: "time",
+    datetime: "datetime",
+    geography: "geography",
+    boolean: "boolean",
+    tag: "tag",
+    password: "password"
 
-      // Add other types as needed
-    };
-  
+    // Add other types as needed
+  };
 
-    useEffect(() => {
-      if(hardRefresh){
+
+  useEffect(() => {
+    if (hardRefresh) {
       setFieldKey(fieldKey + 1);
-  
-      if(!value){
+
+      if (!value) {
         setInputValue("")
       }
-      else{
+      else {
         setInputValue(value)
       }
     }
-    }, [trigger])
-    
+  }, [trigger])
+
 
   const validateSpecialChars = (val) => {
     if (DonotAllowSpecialChar) {
@@ -140,85 +145,85 @@ export default function InputCommon({
       ? new RegExp(RegularExpression?.replace(/\\\\/g, "\\")) // Replace double backslashes with a single backslash
       : RegularExpression;
 
-      const getMaxFractionDigitsFromRegex = (regexString) => {
-        const match = regexString?.match(/\.?\[0-9]{0,(\d+)}/);
-        if (match && match[1]) {
-          return parseInt(match[1], 10); // Return the number of decimal places
-        }
-        return 0; // Default to 0 if no decimal places are specified
-      };  
-      
-      useEffect(() => {
-        let parentValue = value ?? null;
-        if (
-          [
-            InputType.tinyinteger,InputType.smallinteger, InputType.biginteger, InputType.integer
-           
-          ].includes(type) &&
-          parentValue !== null
-        ) {
-          let formattedValue = "";
-          formattedValue =  parentValue !== null
+  const getMaxFractionDigitsFromRegex = (regexString) => {
+    const match = regexString?.match(/\.?\[0-9]{0,(\d+)}/);
+    if (match && match[1]) {
+      return parseInt(match[1], 10); // Return the number of decimal places
+    }
+    return 0; // Default to 0 if no decimal places are specified
+  };
+
+  useEffect(() => {
+    let parentValue = value ?? null;
+    if (
+      [
+        InputType.tinyinteger, InputType.smallinteger, InputType.biginteger, InputType.integer
+
+      ].includes(type) &&
+      parentValue !== null
+    ) {
+      let formattedValue = "";
+      formattedValue = parentValue !== null
+        ? new Intl.NumberFormat(
+          "en-US",
+          {
+            style: "decimal",
+            maximumFractionDigits: 0, // Max 0 decimal for integers, up to 8 for numeric
+          }
+        ).format(parentValue)
+        : ""
+
+
+      setInputValue(formattedValue); // Set formatted value
+    }
+    else if (type == InputType.numeric) {
+      let formattedValue = "";
+      const regexString = RegularExpression?.toString();
+      const maxFractionDigits = RegularExpression ? getMaxFractionDigitsFromRegex(regexString) : null;
+      const fractionDigits = DecimalPoints ?? maxFractionDigits;  // NEW
+      formattedValue =
+        parentValue !== null
           ? new Intl.NumberFormat(
             "en-US",
             {
               style: "decimal",
-              maximumFractionDigits: 0, // Max 0 decimal for integers, up to 8 for numeric
+              minimumFractionDigits: Math.min(FixedValues.MinDisplayDecimals, (fractionDigits > 0 ? fractionDigits : FixedValues.DisplayDecimals)),
+              maximumFractionDigits: fractionDigits > 0 ? fractionDigits : FixedValues.DisplayDecimals, // Apply the same logic as minimumFractionDigits
             }
           ).format(parentValue)
-          :""
-         
-          
-          setInputValue(formattedValue); // Set formatted value
-        }
-        else if(type ==InputType.numeric){
-          let formattedValue = "";
-          const regexString = RegularExpression?.toString();
-          const maxFractionDigits =  RegularExpression ?getMaxFractionDigitsFromRegex(regexString):null;
-          const fractionDigits = DecimalPoints ?? maxFractionDigits;  // NEW
-          formattedValue = 
-          parentValue !== null
-          ? new Intl.NumberFormat(
-            "en-US",
-            {
-              style: "decimal",
-             minimumFractionDigits: Math.min(FixedValues.MinDisplayDecimals, (fractionDigits > 0 ? fractionDigits : FixedValues.DisplayDecimals)),
-             maximumFractionDigits: fractionDigits > 0 ? fractionDigits : FixedValues.DisplayDecimals, // Apply the same logic as minimumFractionDigits
-            }
-          ).format(parentValue)
-          :""
-       
-          setInputValue(formattedValue);
-        } else {
-          setInputValue(parentValue); // Set default value if not provided
-        }
-      }, [value, type, languageName]);
-       
+          : ""
+
+      setInputValue(formattedValue);
+    } else {
+      setInputValue(parentValue); // Set default value if not provided
+    }
+  }, [value, type, languageName]);
+
 
   const handleBlurOrMouseLeave = (event) => {
-    if(disabled){
+    if (disabled) {
       return
     }
-    if (event.target && (event.target.tagName === "INPUT"|| event.target.tagName === "TEXTAREA")) {
+    if (event.target && (event.target.tagName === "INPUT" || event.target.tagName === "TEXTAREA")) {
       let newValue = event?.target?.value || "";
 
       // Convert to number if type is number
       if (type === InputType.numeric) {
         const errorResponse = validateInput({
           type,
-          value: event?.target?.value ??"",
+          value: event?.target?.value ?? "",
           minimumValue: MinimumValue,
           maximumValue: MaximumValue,
           allowNegative: AllowNegative, // or false based on your requirement
           regularExpression: RegularExpression,
           donotAllowSpecialChar: DonotAllowSpecialChar,
-     
+
         });
         let newValue = event?.target?.value.replace(/,/g, "") || "";
         newValue = parseFloat(newValue);
-     
-       
-        
+
+
+
         if (errorResponse == errorMessages.minimumValue) {
           showAlert("info", `Minimum value is ${MinimumValue}`);
           newValue = parseFloat(MinimumValue);
@@ -234,36 +239,36 @@ export default function InputCommon({
           newValue = "";
           // return;  // Prevent updating the value when less than MinimumValue
         }
-        
+
         if (errorResponse == errorMessages.regexFailed) {
           //showAlert("info", `Regular expresion mismatch`);
           newValue = "";
           // return;  // Prevent updating the value when less than MinimumValue
         }
-        
+
         // if (isNaN(newValue)) newValue =null;
         if (isNaN(newValue) || newValue === "") newValue = null;
 
         const regexString = RegularExpression?.toString();
-        const maxFractionDigits =  RegularExpression ?getMaxFractionDigitsFromRegex(regexString):null;
+        const maxFractionDigits = RegularExpression ? getMaxFractionDigitsFromRegex(regexString) : null;
         const fractionDigits = DecimalPoints ?? maxFractionDigits;  // NEW
-        setValue({ name, value: newValue??0 });
+        setValue({ name, value: newValue ?? 0 });
         const formattedValue =
           newValue !== null
             ? new Intl.NumberFormat(
-                "en-US",
-                {
-                  style: "decimal",
-                  minimumFractionDigits: Math.min(FixedValues.MinDisplayDecimals, (fractionDigits > 0 ? fractionDigits : FixedValues.DisplayDecimals)),
-                  maximumFractionDigits: fractionDigits > 0 ? fractionDigits : FixedValues.DisplayDecimals, // Apply the same logic as minimumFractionDigits
-                  
-                }
-              ).format(newValue)
+              "en-US",
+              {
+                style: "decimal",
+                minimumFractionDigits: Math.min(FixedValues.MinDisplayDecimals, (fractionDigits > 0 ? fractionDigits : FixedValues.DisplayDecimals)),
+                maximumFractionDigits: fractionDigits > 0 ? fractionDigits : FixedValues.DisplayDecimals, // Apply the same logic as minimumFractionDigits
+
+              }
+            ).format(newValue)
             : "";
-         
-             
+
+
         setInputValue(formattedValue?.toString());
-      
+
         setFieldKey(fieldKey + 1);
         if (onBlur && !disabled && !isBlurred) {
           onBlur(newValue); // Call the onBlur prop function
@@ -272,16 +277,16 @@ export default function InputCommon({
         return;
       }
       // Convert to integer if field type is integer
-      if ([InputType.tinyinteger,InputType.smallinteger, InputType.integer].includes(type)) {
+      if ([InputType.tinyinteger, InputType.smallinteger, InputType.integer].includes(type)) {
         const errorResponse = validateInput({
           type,
-          value: event?.target?.value ??"",
+          value: event?.target?.value ?? "",
           minimumValue: MinimumValue,
           maximumValue: MaximumValue,
           allowNegative: AllowNegative, // or false based on your requirement
           regularExpression: RegularExpression,
           donotAllowSpecialChar: DonotAllowSpecialChar,
-     
+
         });
         let newValue = event?.target?.value.replace(/,/g, "") || "";
         newValue = parseInt(newValue, 10);
@@ -311,17 +316,17 @@ export default function InputCommon({
         // if (isNaN(newValue)) newValue = null; // Reset if not a valid number
         if (isNaN(newValue) || newValue === "") newValue = null;
 
-        setValue({ name, value: newValue??0 });
+        setValue({ name, value: newValue ?? 0 });
         // Reformat with `Intl.NumberFormat`
         const formattedValue =
           newValue !== null
             ? new Intl.NumberFormat(
-                "en-US",
-                {
-                  style: "decimal",
-                  maximumFractionDigits: 0,
-                }
-              ).format(newValue)
+              "en-US",
+              {
+                style: "decimal",
+                maximumFractionDigits: 0,
+              }
+            ).format(newValue)
             : "";
         setInputValue(formattedValue);
         setFieldKey(fieldKey + 1);
@@ -331,118 +336,118 @@ export default function InputCommon({
         }
         return;
       }
-      if (type ===  InputType.biginteger ) {
-        
+      if (type === InputType.biginteger) {
+
         let newValue = event?.target?.value || "";
         const errorResponse = validateInput({
           type,
-          value:newValue,
+          value: newValue,
           minimumValue: MinimumValue,
           maximumValue: MaximumValue,
           allowNegative: AllowNegative, // or false based on your requirement
           regularExpression: RegularExpression,
           donotAllowSpecialChar: DonotAllowSpecialChar,
-     
+
         });
 
-      if(newValue){
-  
-        // Remove commas and ensure valid negative number formatting
-        newValue = newValue.replace(/,/g, "");
+        if (newValue) {
 
-              // Check if the value is a negative number or not
-        const isNegative = newValue.startsWith("-");
-        if (isNegative) {
-          newValue = "-" + newValue.replace(/-/g, ""); // Retain only the first `-` sign
-        }
-        try {
-       
-          
-        newValue = BigInt(newValue);
-   
-        if (errorResponse == errorMessages.minimumValue) {
-          showAlert("info", `Minimum value is : ${MinimumValue}`);
-          newValue = BigInt(MinimumValue);
-          // return;  // Prevent updating the value when less than MinimumValue
-        }
-        if (errorResponse == errorMessages.maximumValue) {
-          showAlert("info", `Maximum value is : ${MaximumValue}`);
-          newValue = BigInt(MaximumValue);
-          // return;  // Prevent updating the value when less than MinimumValue
-        }
-        if (errorResponse == errorMessages.allowNegative) {
-          showAlert("info", `Negative values not allowed`);
-          newValue = "";
-          // return;  // Prevent updating the value when less than MinimumValue
-        }
-        if (errorResponse == errorMessages.integerRange) {
-          showAlert(
-            "info",
-            `Value should be with in [${minValue},${maxValue}]`
-          );
-          newValue = "";
-        }
-        newValue = Number(newValue)
-      
-        // if (isNaN(newValue)) newValue = null; // Reset if not a valid number
-        if (newValue === "") newValue = null;
+          // Remove commas and ensure valid negative number formatting
+          newValue = newValue.replace(/,/g, "");
 
-        setValue({ name, value: newValue??0 });
-        newValue = newValue?.toString();
+          // Check if the value is a negative number or not
+          const isNegative = newValue.startsWith("-");
+          if (isNegative) {
+            newValue = "-" + newValue.replace(/-/g, ""); // Retain only the first `-` sign
+          }
+          try {
 
-        // Reformat with `Intl.NumberFormat`
-        const formattedValue =
-          newValue !== null
-            ? new Intl.NumberFormat(
-                "en-US",
-                {
-                  style: "decimal",
-                  maximumFractionDigits: 0,
-                }
-              ).format(newValue)
-            : "";
-        setInputValue(formattedValue);
-        setFieldKey(fieldKey + 1);
-        if (onBlur && !disabled && !isBlurred) {
-          onBlur(newValue); // Call the onBlur prop function
-          setIsBlurred(true); // Set blurred state to true
+
+            newValue = BigInt(newValue);
+
+            if (errorResponse == errorMessages.minimumValue) {
+              showAlert("info", `Minimum value is : ${MinimumValue}`);
+              newValue = BigInt(MinimumValue);
+              // return;  // Prevent updating the value when less than MinimumValue
+            }
+            if (errorResponse == errorMessages.maximumValue) {
+              showAlert("info", `Maximum value is : ${MaximumValue}`);
+              newValue = BigInt(MaximumValue);
+              // return;  // Prevent updating the value when less than MinimumValue
+            }
+            if (errorResponse == errorMessages.allowNegative) {
+              showAlert("info", `Negative values not allowed`);
+              newValue = "";
+              // return;  // Prevent updating the value when less than MinimumValue
+            }
+            if (errorResponse == errorMessages.integerRange) {
+              showAlert(
+                "info",
+                `Value should be with in [${minValue},${maxValue}]`
+              );
+              newValue = "";
+            }
+            newValue = Number(newValue)
+
+            // if (isNaN(newValue)) newValue = null; // Reset if not a valid number
+            if (newValue === "") newValue = null;
+
+            setValue({ name, value: newValue ?? 0 });
+            newValue = newValue?.toString();
+
+            // Reformat with `Intl.NumberFormat`
+            const formattedValue =
+              newValue !== null
+                ? new Intl.NumberFormat(
+                  "en-US",
+                  {
+                    style: "decimal",
+                    maximumFractionDigits: 0,
+                  }
+                ).format(newValue)
+                : "";
+            setInputValue(formattedValue);
+            setFieldKey(fieldKey + 1);
+            if (onBlur && !disabled && !isBlurred) {
+              onBlur(newValue); // Call the onBlur prop function
+              setIsBlurred(true); // Set blurred state to true
+            }
+          }
+          catch {
+            setValue({ name, value: 0 });
+            setInputValue(null);
+            setFieldKey(fieldKey + 1);
+            if (onBlur && !disabled && !isBlurred) {
+              onBlur(newValue); // Call the onBlur prop function
+              setIsBlurred(true); // Set blurred state to true
+            }
+          }
+
         }
-      }
-      catch{
-        setValue({ name, value: 0 });
-        setInputValue(null);
-        setFieldKey(fieldKey + 1);
-        if (onBlur && !disabled && !isBlurred) {
-          onBlur(newValue); // Call the onBlur prop function
-          setIsBlurred(true); // Set blurred state to true
+        else {
+          setValue({ name, value: 0 });
+          setInputValue(null);
+          setFieldKey(fieldKey + 1);
+          if (onBlur && !disabled && !isBlurred) {
+            onBlur(newValue); // Call the onBlur prop function
+            setIsBlurred(true); // Set blurred state to true
+          }
         }
+        return
+
       }
-      
-      }
-      else{
-        setValue({ name, value: 0 });
-        setInputValue(null);
-        setFieldKey(fieldKey + 1);
-        if (onBlur && !disabled && !isBlurred) {
-          onBlur(newValue); // Call the onBlur prop function
-          setIsBlurred(true); // Set blurred state to true
-        }
-      }
-      return
-        
-      }
-      if (type ===  InputType.text) {
+      if (type === InputType.text) {
         const errorResponse = validateInput({
           type,
-          value: event?.target?.value ??"",
+          value: event?.target?.value ?? "",
           minimumValue: MinimumValue,
           maximumValue: MaximumValue,
           allowNegative: AllowNegative, // or false based on your requirement
           regularExpression: RegularExpression,
           donotAllowSpecialChar: DonotAllowSpecialChar,
-          maxSize:maxLength,
-          languageName:languageName?.toLowerCase()
-     
+          maxSize: maxLength,
+          languageName: languageName?.toLowerCase()
+
         });
         if (errorResponse == errorMessages.specialCharacter) {
           showAlert("info", `special characters not allowed`);
@@ -454,7 +459,7 @@ export default function InputCommon({
         }
         // Regular expression validation for text fields
         if (RegularExpression) {
-          
+
           if (errorResponse == errorMessages.regexFailed) {
             //showAlert("info", `regular expression mismatch`);
             newValue = "";
@@ -463,18 +468,18 @@ export default function InputCommon({
         }
       }
 
-     
-      if (type ==  InputType.date) {
+
+      if (type == InputType.date) {
         newValue = newValue ? newValue : null; // Default to today's date
       }
-      if (type ==  InputType.time) {
+      if (type == InputType.time) {
         newValue = newValue ? newValue : null; // Default to today's date
       }
-      if (type ==  InputType.datetime) {
+      if (type == InputType.datetime) {
         newValue = newValue ? newValue : null; // Default to today's date
       }
- 
-      setValue({ name, value: newValue??"" });
+
+      setValue({ name, value: newValue ?? "" });
       setInputValue(newValue);
       setFieldKey(fieldKey + 1);
       if (onBlur && !disabled && !isBlurred) {
@@ -504,7 +509,7 @@ export default function InputCommon({
       return;
     }
     setIsBlurred(false);
-    if (event.target && (event.target.tagName === "INPUT"|| event.target.tagName === "TEXTAREA")) {
+    if (event.target && (event.target.tagName === "INPUT" || event.target.tagName === "TEXTAREA")) {
       let newValue = event.target.value || null;
 
       // Apply character casing based on CharacterCasing prop
@@ -531,12 +536,12 @@ export default function InputCommon({
       //   newValue = 0;
       // }
       if (
-        [InputType.tinyinteger,InputType.smallinteger, InputType.integer].includes(type) &&
+        [InputType.tinyinteger, InputType.smallinteger, InputType.integer].includes(type) &&
         newValue
       ) {
         newValue = newValue.replace(/,/g, "");
 
-        if (!AllowNegative && parseInt(newValue,10) < 0) {
+        if (!AllowNegative && parseInt(newValue, 10) < 0) {
           showAlert("info", `Negative values not allowed`);
           newValue = "";
         }
@@ -545,7 +550,7 @@ export default function InputCommon({
           return; // Reject non-numeric characters
         }
 
-              // Handle the edge case where newValue is just a minus sign "-"
+        // Handle the edge case where newValue is just a minus sign "-"
         if (newValue === "-" || newValue === "") {
           setInputValue(newValue); // Let user continue typing for negative numbers
           return;
@@ -574,20 +579,20 @@ export default function InputCommon({
           return; // Prevent updating the value when greater than MaximumValue
         }
         // Set the parsed integer value
-        
+
 
         // Format the value using `Intl.NumberFormat`
         const formattedValue =
           newValue !== null
             ? new Intl.NumberFormat(
-                "en-US",
-                {
-                  style: "decimal",
-                  maximumFractionDigits: 0,
-                }
-              ).format(parsedValue)
+              "en-US",
+              {
+                style: "decimal",
+                maximumFractionDigits: 0,
+              }
+            ).format(parsedValue)
             : "";
-            newValue = formattedValue?.toString();
+        newValue = formattedValue?.toString();
         setInputValue(formattedValue); // Update formatted value locally
       }
       if (type === InputType.biginteger && newValue) {
@@ -627,19 +632,19 @@ export default function InputCommon({
         }
 
         // Set the parsed integer value
-        
+
         // Format the value using `Intl.NumberFormat`
         const formattedValue =
           newValue !== null
             ? new Intl.NumberFormat(
-                "en-US",
-                {
-                  style: "decimal",
-                  maximumFractionDigits: 0,
-                }
-              ).format(parsedValue)
+              "en-US",
+              {
+                style: "decimal",
+                maximumFractionDigits: 0,
+              }
+            ).format(parsedValue)
             : "";
-       newValue = formattedValue?.toString();
+        newValue = formattedValue?.toString();
 
         setInputValue(formattedValue); // Update formatted value locally
       }
@@ -651,47 +656,47 @@ export default function InputCommon({
           showAlert("info", `Negative values not allowed`);
           newValue = "";
         }
-         // Allow only valid numeric values, including a single decimal point
-      if (!/^[+-]?\d*\.?\d*$/.test(newValue)) {
-        return; // Reject non-numeric characters
-      }
-      if (newValue === "-" || newValue === "") {
-        setInputValue(newValue); // Let user continue typing for negative numbers
-        return;
-      }
-      if (newValue.slice(-1) === "." ) {
-        // Format the integer part before the decimal, but keep the decimal point
-        const integerPart = newValue.slice(0, -1).replace(/,/g, ""); // Remove commas
-        const formattedIntegerPart = new Intl.NumberFormat("en-US", {
-          style: "decimal",
-         
-        }).format(integerPart);
-      
-        // Set the input value with the formatted integer part and the decimal point
-        setInputValue(`${formattedIntegerPart}.`); // Append the decimal point
-        return; // Skip further validation to allow the decimal point input
-      }
-  
-      
-      // Handle case where the last character is a '0' after a decimal point
-      if (newValue.includes(".") && newValue.slice(-1) === "0") {
-        const parts = newValue.split(".");
-        const integerPart = parts[0].replace(/,/g, ""); // Get the integer part
-        const formattedIntegerPart = new Intl.NumberFormat("en-US", {
-          style: "decimal",
-         
-        }).format(integerPart);
+        // Allow only valid numeric values, including a single decimal point
+        if (!/^[+-]?\d*\.?\d*$/.test(newValue)) {
+          return; // Reject non-numeric characters
+        }
+        if (newValue === "-" || newValue === "") {
+          setInputValue(newValue); // Let user continue typing for negative numbers
+          return;
+        }
+        if (newValue.slice(-1) === ".") {
+          // Format the integer part before the decimal, but keep the decimal point
+          const integerPart = newValue.slice(0, -1).replace(/,/g, ""); // Remove commas
+          const formattedIntegerPart = new Intl.NumberFormat("en-US", {
+            style: "decimal",
 
-        // Set the input value with the formatted integer part and the decimal portion
-        setInputValue(`${formattedIntegerPart}.${parts[1]}`); // Append the decimal portion including any trailing zeros
-        return; // Skip further validation to allow the decimal input
-      }
+          }).format(integerPart);
 
-      const regexString = RegularExpression?.toString();
-      const maxFractionDigits =  RegularExpression ?getMaxFractionDigitsFromRegex(regexString):null;
-      
-      
-        
+          // Set the input value with the formatted integer part and the decimal point
+          setInputValue(`${formattedIntegerPart}.`); // Append the decimal point
+          return; // Skip further validation to allow the decimal point input
+        }
+
+
+        // Handle case where the last character is a '0' after a decimal point
+        if (newValue.includes(".") && newValue.slice(-1) === "0") {
+          const parts = newValue.split(".");
+          const integerPart = parts[0].replace(/,/g, ""); // Get the integer part
+          const formattedIntegerPart = new Intl.NumberFormat("en-US", {
+            style: "decimal",
+
+          }).format(integerPart);
+
+          // Set the input value with the formatted integer part and the decimal portion
+          setInputValue(`${formattedIntegerPart}.${parts[1]}`); // Append the decimal portion including any trailing zeros
+          return; // Skip further validation to allow the decimal input
+        }
+
+        const regexString = RegularExpression?.toString();
+        const maxFractionDigits = RegularExpression ? getMaxFractionDigitsFromRegex(regexString) : null;
+
+
+
         // Check if regular expression is provided for decimal precision
         if (RegularExpression && maxFractionDigits) {
           if (!regex.test(newValue)) {
@@ -699,7 +704,7 @@ export default function InputCommon({
             return; // Reset value if it doesn't match the regular expression
           }
         }
-     
+
         if (
           MaximumValue != null &&
           newValue &&
@@ -711,24 +716,24 @@ export default function InputCommon({
             newValue = newValue.slice(0, -1); // Remove last character
           }
         }
-       
-        
+
+
         const formattedValue =
-        newValue !== null
-          ? new Intl.NumberFormat(//here take only regex rounding qty only. not consider decimal DecimalPoints
+          newValue !== null
+            ? new Intl.NumberFormat(//here take only regex rounding qty only. not consider decimal DecimalPoints
               "en-US",
               {
                 style: "decimal",
                 minimumFractionDigits: 0, // Minimum fraction digits
                 maximumFractionDigits: maxFractionDigits > 0 ? maxFractionDigits : FixedValues.DisplayDecimals, // Apply the same logic as minimumFractionDigits
-                
+
               }
             ).format(newValue?.toString())
-          : "";
-         
+            : "";
+
         // newValue = parseFloat(newValue); // Convert to float
         newValue = formattedValue?.toString();
-       
+
       }
 
       setInputValue(newValue); // Update local state
@@ -761,7 +766,7 @@ export default function InputCommon({
       case InputType.datetime:
         return "datetime-local";
       case InputType.password:
-        return "password";  
+        return "password";
       default:
         return "text"; // Default to text if not recognized
     }
@@ -888,222 +893,244 @@ export default function InputCommon({
       break;
   }
 
-  return (
-    <CustomTextField
-      key={fieldKey}
-      margin={tableField?undefined:"normal"}
-      size="small"
-      id={name}
-      value={
-        (type == InputType.date || type == InputType.time || type == InputType.datetime) && !inputValue
-          ? " "
-          : inputValue ?? ""
-      }
-      type={getInputType(type)}
-      label={label}
-      maxLength={maxLength}
-      required={!!mandatory}
-      multiline={
-        multiline &&
-        (getInputType(type) == "text" || getInputType(type) == "number")
-          ? multiline
-          : null
-      }
-      rows={
-        multiline &&
-        (getInputType(type) == "text" || getInputType(type) == "number")
-          ? RowSpan
-          : null
-      }
-      autoComplete={autoCompleteValue}
-      disabled={disabled}
-      onChange={handleChange}
-      onClick={onClick}
-      onBlur={handleBlurOrMouseLeave}// this always required as to set value to parent when on blur
-      //onMouseLeave={onBlur ? handleBlurOrMouseLeave : undefined}// only when onblur action in parent
-      InputProps={{
-        inputProps: {
-          autoComplete: autoCompleteValue,
-          ...(type == InputType.date
-            ? {
-                min: minDate,
-                max: maxDate,
-                onKeyDown: (e) => {
-                  // Prevent default only for keys other than Tab
-                  if (e.key !== "Tab") {
-                    e.preventDefault();
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      // Open picker on Enter or Space key
-                      e.target.showPicker?.();
-                    }
-                  }
-                },
-                
-                onFocus: (e) => e.target.showPicker?.(),
-              }
-            : type == InputType.time
-            ? {
-                step: 1, // Allows time input in HH:mm:ss format
-                onKeyDown: (e) => {
-                  // Prevent default only for keys other than Tab
-                  if (e.key !== "Tab") {
-                    e.preventDefault();
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      // Open picker on Enter or Space key
-                      e.target.showPicker?.();
-                    }
-                  }
-                },
-                
-                onFocus: (e) => e.target.showPicker?.(),
-              }
-            : type == InputType.datetime
-            ? {
-                step: 1, // For precise datetime input including seconds
-                onKeyDown: (e) => {
-                  // Disable manual typing for datetime fields
-                  if (e.key !== "Tab") {
-                    e.preventDefault();
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      // Open picker on Enter or Space key
-                      e.target.showPicker?.();
-                    }
-                  }
+  // Calculate effective width
+  const effectiveWidth = fullwidth ? fullwidth : width + ColumnSpan * 50;
 
-                },
-                onFocus: (e) => e.target.showPicker?.(),
-                min: minDateTime || undefined, // Set min to restrict future dates
-                max: maxDateTime || undefined, // Set max if needed for past dates
-              }
-              : [InputType.numeric, InputType.tinyinteger, InputType.smallinteger, InputType.integer, InputType.biginteger].includes(type)
-            ? {
-                onFocus: (e) => {
-              
-                  
-                  // If the field is numeric and its current value is "0" or "0.00", clear it
-                  if (parseFloat(e.target.value) === 0) {
-                    setInputValue("");
-                    // Force cursor to the start
-                    requestAnimationFrame(() => e.target.setSelectionRange(0, 0));
+  // Estimate the average width per character in pixels (adjust this value as needed)
+  const averageCharWidth = 8;
+
+  // Calculate the character threshold based on the effective width
+  const tooltipThreshold = Math.floor(effectiveWidth / averageCharWidth);
+
+
+  return (
+    <Tooltip
+      title={inputValue || ""}
+      disableHoverListener={inputValue?.length <= tooltipThreshold}
+      disableFocusListener={inputValue?.length <= tooltipThreshold}
+      disableTouchListener={inputValue?.length <= tooltipThreshold}
+      // optionally, you can add enterDelay/leaveDelay if you want
+      // e.g. enterDelay={800} leaveDelay={0}
+      placement="top"
+    >
+      <Box>
+        <CustomTextField
+          key={fieldKey}
+          margin={tableField ? undefined : "normal"}
+          size="small"
+          id={name}
+          value={
+            (type == InputType.date || type == InputType.time || type == InputType.datetime) && !inputValue
+              ? " "
+              : inputValue ?? ""
+          }
+          type={getInputType(type)}
+          label={label}
+          maxLength={maxLength}
+          required={!!mandatory}
+          multiline={
+            multiline &&
+              (getInputType(type) == "text" || getInputType(type) == "number")
+              ? multiline
+              : null
+          }
+          rows={
+            multiline &&
+              (getInputType(type) == "text" || getInputType(type) == "number")
+              ? RowSpan
+              : null
+          }
+          autoComplete={autoCompleteValue}
+          disabled={disabled}
+          onChange={handleChange}
+          onClick={onClick}
+          onBlur={handleBlurOrMouseLeave}// this always required as to set value to parent when on blur
+          //onMouseLeave={onBlur ? handleBlurOrMouseLeave : undefined}// only when onblur action in parent
+          InputProps={{
+            inputProps: {
+              autoComplete: autoCompleteValue,
+              ...(type == InputType.date
+                ? {
+                  min: minDate,
+                  max: maxDate,
+                  onKeyDown: (e) => {
+                    // Prevent default only for keys other than Tab
+                    if (e.key !== "Tab") {
+                      e.preventDefault();
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        // Open picker on Enter or Space key
+                        e.target.showPicker?.();
+                      }
+                    }
+                  },
+
+                  onFocus: (e) => e.target.showPicker?.(),
+                }
+                : type == InputType.time
+                  ? {
+                    step: 1, // Allows time input in HH:mm:ss format
+                    onKeyDown: (e) => {
+                      // Prevent default only for keys other than Tab
+                      if (e.key !== "Tab") {
+                        e.preventDefault();
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          // Open picker on Enter or Space key
+                          e.target.showPicker?.();
+                        }
+                      }
+                    },
+
+                    onFocus: (e) => e.target.showPicker?.(),
                   }
+                  : type == InputType.datetime
+                    ? {
+                      step: 1, // For precise datetime input including seconds
+                      onKeyDown: (e) => {
+                        // Disable manual typing for datetime fields
+                        if (e.key !== "Tab") {
+                          e.preventDefault();
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            // Open picker on Enter or Space key
+                            e.target.showPicker?.();
+                          }
+                        }
+
+                      },
+                      onFocus: (e) => e.target.showPicker?.(),
+                      min: minDateTime || undefined, // Set min to restrict future dates
+                      max: maxDateTime || undefined, // Set max if needed for past dates
+                    }
+                    : [InputType.numeric, InputType.tinyinteger, InputType.smallinteger, InputType.integer, InputType.biginteger].includes(type)
+                      ? {
+                        onFocus: (e) => {
+
+
+                          // If the field is numeric and its current value is "0" or "0.00", clear it
+                          if (parseFloat(e.target.value) === 0) {
+                            setInputValue("");
+                            // Force cursor to the start
+                            requestAnimationFrame(() => e.target.setSelectionRange(0, 0));
+                          }
+                        },
+                      }
+                      : {}),
+              style: {
+                direction: type == InputType.text ? direction : "ltr", // Default to LTR if direction is not found
+                fontFamily: "inherit", // Default to inherit if fontFamily is not found
+              },
+            },
+            endAdornment:
+              type == InputType.time && inputValue ? (
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={() => {
+                      setInputValue(""); // Clear the input value
+                      setValue({ name, value: null }); // Update the parent state
+                    }}
+                    edge="end"
+                    aria-label="clear time"
+                    tabIndex={-1} // Prevents Tab from focusing on this icon
+                  >
+                    <ClearIcon fontSize="small" />
+                  </IconButton>
+                </InputAdornment>
+              ) : null,
+            sx: {
+              '& input[type="date"]::-webkit-calendar-picker-indicator': {
+                filter: "invert(0)",
+              },
+              '& input[type="datetime-local"]::-webkit-calendar-picker-indicator': {
+                filter: "invert(0)",
+              },
+              '& input[type="time"]::-webkit-calendar-picker-indicator': {
+                filter: "invert(0)", // Ensures visibility in dark mode
+              },
+            },
+          }}
+          InputLabelProps={{
+            shrink: type == InputType.password && value ? true : undefined, // Shrink the label if it's a password field and has a value
+            sx: {
+              textAlign: direction === "rtl" ? "right" : "left",
+              right: direction === "rtl" ? 0 : "auto",
+            },
+          }}
+          sx={{
+            minWidth: fullwidth ? fullwidth : width + ColumnSpan * 50, // Adjust the width as needed
+            // "@media (max-width: 360px)": {
+            //       width: 220, // Reduced width for small screens
+            //     },
+            "& .MuiInputBase-root": {
+              ...(multiline &&
+                (getInputType(type) == "text" || getInputType(type) == "number")
+                ? {}
+                : { height: 30 }), // Adjust the height of the input area if not multiline
+              "& textarea": {
+                "&::-webkit-scrollbar": {
+                  width: "6px", // Adjust the width as needed
                 },
-              }
-            : {}),
-          style: {
-            direction: type == InputType.text ? direction : "ltr", // Default to LTR if direction is not found
-            fontFamily: "inherit", // Default to inherit if fontFamily is not found
-          },
-        },
-        endAdornment:
-          type == InputType.time && inputValue ? (
-            <InputAdornment position="end">
-              <IconButton
-                onClick={() => {
-                  setInputValue(""); // Clear the input value
-                  setValue({ name, value: null }); // Update the parent state
-                }}
-                edge="end"
-                aria-label="clear time"
-                tabIndex={-1} // Prevents Tab from focusing on this icon
-              >
-                <ClearIcon fontSize="small" />
-              </IconButton>
-            </InputAdornment>
-          ) : null,
-        sx: {
-          '& input[type="date"]::-webkit-calendar-picker-indicator': {
-            filter: "invert(0)",
-          },
-          '& input[type="datetime-local"]::-webkit-calendar-picker-indicator': {
-            filter:"invert(0)",
-          },
-          '& input[type="time"]::-webkit-calendar-picker-indicator': {
-            filter: "invert(0)", // Ensures visibility in dark mode
-          },
-        },
-      }}
-      InputLabelProps={{
-        shrink: type == InputType.password && value ? true : undefined, // Shrink the label if it's a password field and has a value
-        sx: {
-          textAlign: direction === "rtl" ? "right" : "left",
-          right: direction === "rtl" ? 0 : "auto",
-        },
-      }}
-      sx={{
-        minWidth: fullwidth? fullwidth : width + ColumnSpan * 50, // Adjust the width as needed
-        // "@media (max-width: 360px)": {
-        //       width: 220, // Reduced width for small screens
-        //     },
-        "& .MuiInputBase-root": {
-          ...(multiline &&
-          (getInputType(type) == "text" || getInputType(type) == "number")
-            ? {}
-            : { height: 30 }), // Adjust the height of the input area if not multiline
-          "& textarea": {
-            "&::-webkit-scrollbar": {
-              width: "6px", // Adjust the width as needed
+                "&::-webkit-scrollbar-thumb": {
+                  backgroundColor: "rgba(0, 0, 0, 0.2)", // Adjust the color as needed
+                  borderRadius: "3px", // Adjust the border radius as needed
+                  cursor: "pointer",
+                },
+                "&::-webkit-scrollbar-track": {
+                  backgroundColor: "rgba(0, 0, 0, 0.1)", // Adjust the track color as needed
+                },
+              },
             },
-            "&::-webkit-scrollbar-thumb": {
-              backgroundColor: "rgba(0, 0, 0, 0.2)", // Adjust the color as needed
-              borderRadius: "3px", // Adjust the border radius as needed
-              cursor: "pointer",
+            "& .MuiInputLabel-root": {
+              fontSize: "14px",
+              transform:
+                direction === "rtl"
+                  ? `translate(${calculateLabelPosition(
+                    width + ColumnSpan * 50,
+                    false
+                  )}px, 5px) scale(0.9)`
+                  : "translate(10px, 5px) scale(0.9)", // Adjust label position when not focused
+              color: "inherit",
             },
-            "&::-webkit-scrollbar-track": {
-              backgroundColor: "rgba(0, 0, 0, 0.1)", // Adjust the track color as needed
+            "& .MuiInputLabel-shrink": {
+              transform:
+                direction === "rtl"
+                  ? `translate(${calculateLabelPosition(
+                    width + ColumnSpan * 50,
+                    true
+                  )}px, -7px) scale(0.75)`
+                  : "translate(14px, -9px) scale(0.75)", // Adjust label position when focused
+              // right:direction === 'rtl' ? -25:null,
+              // top:direction === 'rtl' ? -8:null
             },
-          },
-        },
-        "& .MuiInputLabel-root": {
-          fontSize: "14px",
-          transform:
-            direction === "rtl"
-              ? `translate(${calculateLabelPosition(
-                  width + ColumnSpan * 50,
-                  false
-                )}px, 5px) scale(0.9)`
-              : "translate(10px, 5px) scale(0.9)", // Adjust label position when not focused
-          color: "inherit",
-        },
-        "& .MuiInputLabel-shrink": {
-          transform:
-            direction === "rtl"
-              ? `translate(${calculateLabelPosition(
-                  width + ColumnSpan * 50,
-                  true
-                )}px, -7px) scale(0.75)`
-              : "translate(14px, -9px) scale(0.75)", // Adjust label position when focused
-          // right:direction === 'rtl' ? -25:null,
-          // top:direction === 'rtl' ? -8:null
-        },
-        "& .MuiInputBase-input": {
-          fontSize: "0.75rem", // Adjust the font size of the input text
-          color: "inherit",
-        },
-        "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-          borderColor: "currentColor", // Keeps the current border color
-        },
-        "&:hover .MuiOutlinedInput-notchedOutline": {
-          borderColor: "currentColor", // Optional: Keeps the border color on hover
-        },
-        "& .MuiFormLabel-root.Mui-focused": {
-          color: "inherit", // Ensure the label color when focused
-        },
-        "& .MuiOutlinedInput-root": {
-          "& fieldset": {
-            borderColor: "#ddd",
-            textAlign: direction === "rtl" ? "right" : "left",
-          },
-          "&:hover fieldset": {
-            borderColor: "currentColor", // Keeps the border color on hover
-          },
-          "&.Mui-focused fieldset": {
-            borderColor: "currentColor", // Keeps the current border color
-          },
-          "& legend": {
-            width: direction === "rtl" ? "auto" : "max-content", // Let legend adjust width in RTL
-          },
-        },
-      }}
-    />
+            "& .MuiInputBase-input": {
+              fontSize: "0.75rem", // Adjust the font size of the input text
+              color: "inherit",
+            },
+            "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+              borderColor: "currentColor", // Keeps the current border color
+            },
+            "&:hover .MuiOutlinedInput-notchedOutline": {
+              borderColor: "currentColor", // Optional: Keeps the border color on hover
+            },
+            "& .MuiFormLabel-root.Mui-focused": {
+              color: "inherit", // Ensure the label color when focused
+            },
+            "& .MuiOutlinedInput-root": {
+              "& fieldset": {
+                borderColor: "#ddd",
+                textAlign: direction === "rtl" ? "right" : "left",
+              },
+              "&:hover fieldset": {
+                borderColor: "currentColor", // Keeps the border color on hover
+              },
+              "&.Mui-focused fieldset": {
+                borderColor: "currentColor", // Keeps the current border color
+              },
+              "& legend": {
+                width: direction === "rtl" ? "auto" : "max-content", // Let legend adjust width in RTL
+              },
+            },
+          }}
+        />
+      </Box>
+    </Tooltip>
   );
 }

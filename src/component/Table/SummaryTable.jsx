@@ -21,6 +21,7 @@ import {
   Tooltip,
   Button,
   InputAdornment,
+  Stack,
 } from "@mui/material";
 import FirstPageIcon from "@mui/icons-material/FirstPage";
 import LastPageIcon from "@mui/icons-material/LastPage";
@@ -36,6 +37,8 @@ import {
   selectedColor,
   thirdColor,
 } from "../../config/config";
+import RouteMap from "../RouteMap/RouteMap";
+import { MDBIcon } from "mdb-react-ui-kit";
 
 const iconsExtraSx = {
   fontSize: "0.8rem",
@@ -44,6 +47,14 @@ const iconsExtraSx = {
     backgroundColor: "transparent",
   },
   marginRight: 1,
+};
+
+const iconsExtraSxCell = {
+  fontSize: "0.8rem",
+  padding: "0rem",
+  "&:hover": {
+    backgroundColor: "transparent",
+  },
 };
 
 export default function SummaryTable(props) {
@@ -64,33 +75,36 @@ export default function SummaryTable(props) {
   const [filteredRows, setFilteredRows] = React.useState([]);
   const [columns, setColumns] = React.useState([]);
 
+  const [mapOpen, setMapOpen] = React.useState(false)
+  const [mapId, setMapId] = React.useState(0)
+
   const profileDateFieldsArray = profileDateFields
-  .split(",")
-  .map((field) => field.trim()); 
-  const excludedFields = [ statusName,"Group", "GroupId","TotalRows","UserName","Time","Id"];
+    .split(",")
+    .map((field) => field.trim());
+  const excludedFields = [statusName, "Group", "GroupId", "TotalRows", "UserName", "Time", "Id"];
 
   //To apply some filters on table rows
   const initialColumns =
     rows && rows.length > 0
       ? Object.keys(rows[0])
-          .filter((key) => !excludedFields.includes(key))
-          .map((key) => ({
-            id: key,
-            label:
-              key.charAt(0).toUpperCase() +
-              key
-                .slice(1)
-                .replace(/([A-Z])/g, " $1")
-                .trim(), // Format label as readable text
-            minWidth: 100, // Set default minWidth for all columns
-            maxWidth: 200,
-          }))
+        .filter((key) => !excludedFields.includes(key))
+        .map((key) => ({
+          id: key,
+          label:
+            key.charAt(0).toUpperCase() +
+            key
+              .slice(1)
+              .replace(/([A-Z])/g, " $1")
+              .trim(), // Format label as readable text
+          minWidth: 100, // Set default minWidth for all columns
+          maxWidth: 200,
+        }))
       : [];
   React.useEffect(() => {
     setColumns(initialColumns);
   }, [rows]);
 
-  
+
 
   //To expand column on mouse dragging
   const handleResize = (index, event) => {
@@ -150,12 +164,12 @@ export default function SummaryTable(props) {
   const handleSearch = (event) => {
     setPage(0);
     props.onpageNumberChange(1);
-    props.onSearchKeyChange(event.target.value||searchTerm||"");
-    setSearchTerm(event.target.value||searchTerm||"") 
+    props.onSearchKeyChange(event.target.value || searchTerm || "");
+    setSearchTerm(event.target.value || searchTerm || "")
   };
 
   const handleKeyDown = (event) => {
-  
+
     if (event.key === "Enter") {
       handleSearch(event);
     }
@@ -197,7 +211,7 @@ export default function SummaryTable(props) {
     setFilteredRows(rows);
   }, [rows]);
 
-  
+
 
   React.useEffect(() => {
     setPage(0); // Reset page to 0
@@ -228,6 +242,19 @@ export default function SummaryTable(props) {
 
     return `${day}-${month}-${year}`;
   };
+
+  const handleMapOpen = (id) => {
+    setMapId(id)
+    setMapOpen(true)
+  }
+  const handleMapClose = () => {
+    setSelected([])
+    setMapId(0)
+    setMapOpen(false)
+  }
+
+  console.log('colmns', columns);
+
 
   return (
     <Box
@@ -312,8 +339,8 @@ export default function SummaryTable(props) {
             label="Search"
             autoComplete="off"
             value={searchTerm}
-            onChange={(event)=>setSearchTerm(event.target.value)}
-            onBlur={handleSearch}              
+            onChange={(event) => setSearchTerm(event.target.value)}
+            onBlur={handleSearch}
             onKeyDown={handleKeyDown}
             sx={{
               width: 200, // Default width
@@ -400,24 +427,22 @@ export default function SummaryTable(props) {
           >
             <Table stickyHeader sx={{ minWidth: 750 }}>
               <TableHead>
-                <TableRow sx={{ position: "sticky", top: 0 }}>
+                <TableRow sx={{ position: "sticky", top: 0,zIndex:3 }}>
                   {columns.map((column, index) => (
                     <TableCell
                       key={column.id}
-                      style={{
-                        minWidth: column.minWidth,
-                        position: "relative",
-                      }}
                       sx={{
                         padding: "0px",
                         paddingLeft: "4px",
                         border: `1px solid ${thirdColor}`,
                         fontWeight: "600",
-                        font: "14px",
+                        fontSize: "14px",
                         backgroundColor: secondaryColor,
                         color: "white",
                         paddingTop: "3px",
                         paddingBottom: "3px",
+                        textAlign: "center",
+                        position: "relative",
                       }}
                       onDoubleClick={() => handleDoubleClick(index)}
                     >
@@ -436,78 +461,75 @@ export default function SummaryTable(props) {
                       />
                     </TableCell>
                   ))}
-                  
-                  
                 </TableRow>
               </TableHead>
               <TableBody>
                 {filteredRows.map((row, index) => {
                   const isItemSelected = isSelected(row[IdName]);
+
                   return (
                     <TableRow
                       key={`${row[IdName]}-${index}`}
                       onClick={(event) => handleClick(event, row)}
-                      // onMouseDown={(event) => handleLongPressStart(event, row)}
                       onMouseUp={handleLongPressEnd}
-                      onMouseLeave={handleLongPressEnd} // In case the user drags out of the row
-                      // onTouchStart={(event) => handleLongPressStart(event, row)} // For mobile
+                      onMouseLeave={handleLongPressEnd}
                       onTouchEnd={handleLongPressEnd}
+                      onDoubleClick={() => props.onRowDoubleClick(row[IdName], row)}
                       role="checkbox"
                       aria-checked={isItemSelected}
-                      onDoubleClick={() => props.onRowDoubleClick(row[IdName],row)}
                       tabIndex={-1}
                       sx={{
                         cursor: "pointer",
-
                         backgroundColor: isItemSelected
                           ? selectedColor
                           : index % 2 === 1
-                          ? thirdColor
-                          : null,
+                            ? thirdColor
+                            : null,
                       }}
                     >
-                      {/* <TableCell sx={{ padding: "0px",textAlign:"center" }}>
-                        <Checkbox
-                          sx={{ padding: "0px" }}
-                          checked={isItemSelected}
-                          inputProps={{ "aria-labelledby": labelId }}
-                        />
-                      </TableCell> */}
-
                       {columns.map((column) => (
-                        <Tooltip
-                          title={
-                            column.id === "Narration" ? row[column.id] : null
-                          }
-                        >
+                        <Tooltip key={column.id} title={column.id === "Narration" ? row[column.id] : ""}>
                           <TableCell
+                            key={column.id}
                             sx={{
                               padding: "0px",
                               paddingLeft: "4px",
                               border: `1px solid ${thirdColor}`,
                               minWidth: "100px",
-                              maxWidth: column.maxWidth,
+                              maxWidth: column.maxWidth || "200px",
                               whiteSpace: "nowrap",
                               overflow: "hidden",
                               textOverflow: "ellipsis",
-                              fontWeight: row["Group"] ? 800 : null,
+                              fontWeight: row["Group"] ? 800 : "normal",
+                              textAlign: column.id === "Location" ? "center" : "left",
                             }}
-                            key={column.id}
-                            style={{ minWidth: column.minWidth }}
                           >
-                            {profileDateFieldsArray.includes(column.label)
-                              ? convertToLocaleDateString(row[column.id])
-                              : row[column.id] === null
-                              ? ""
-                              : `${row[column.id]}`}
+                            {column.id === "Location" ? (
+                              <IconButton
+                                onClick={() => handleMapOpen(row["Location"])}
+                                aria-label="location"
+                                sx={iconsExtraSxCell}
+                              >
+                                <Stack direction="column" alignItems="center">
+                                  <MDBIcon  fas icon="fa-solid fa-location-dot" className="responsiveAction-icon" />
+                                </Stack>
+                              </IconButton>
+                            ) : profileDateFieldsArray.includes(column.label) ? (
+                              convertToLocaleDateString(row[column.id])
+                            ) : row[column.id] === null ? (
+                              ""
+                            ) : (
+                              row[column.id]
+                            )}
                           </TableCell>
                         </Tooltip>
                       ))}
-                      </TableRow>
+                    </TableRow>
                   );
                 })}
               </TableBody>
             </Table>
+
           </TableContainer>
         </Paper>
       ) : (
@@ -542,6 +564,7 @@ export default function SummaryTable(props) {
           }}
         />
       )}
+      <RouteMap open={mapOpen} handleClose={handleMapClose} mapId={mapId} />
     </Box>
   );
 }

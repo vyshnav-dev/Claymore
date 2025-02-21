@@ -41,7 +41,8 @@ export default function UserInputField({
   direction,
   maxLength,
   onBlurAction,
-  decimalLength
+  decimalLength,
+  max
 }) {
   const [tabPressed, setTabPressed] = useState(false);
 
@@ -108,6 +109,7 @@ export default function UserInputField({
       InputProps={{
         inputProps: {
           maxLength: maxLength,
+          max:max,
           autoComplete: `off`,
           ...(type === "date"
             ? {

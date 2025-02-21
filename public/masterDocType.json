@@ -1,40 +1,40 @@
-{   
-    "MastersTagId": {
-      "Customer": 3,
-      "Outlet": 3,
-      "Product": 11,
-      "Unit": 14,
-      "Warehouse": 13,
-      "Salesman": 30,
-      "ProductType": 12
+{
+  "MastersTagId": {
+    "Customer": 3,
+    "Outlet": 3,
+    "Product": 11,
+    "Unit": 14,
+    "Warehouse": 13,
+    "Salesman": 30,
+    "ProductType": 12
+  },
+  "TransactionData": {
+    "16": {
+      "DocType": 3,
+      "Screen": "Request"
     },
-    "TransactionData": {
-      "16": 
-      {
-        "DocType":3,
-        "Screen":"Request"
-
-      },
-      "17":{
-        "DocType":1,
-        "Screen":"Order"
-
-      },
-      "18": {
-        "DocType":2,
-        "Screen":"Sales"
-
-      },
-      "19": {
-        "DocType":4,
-        "Screen":"Receipt"
-
-      },
-      "20": {
-        "DocType":5,
-        "Screen":"Return"
-
-      }
+    "17": {
+      "DocType": 1,
+      "Screen": "Order"
+    },
+    "18": {
+      "DocType": 2,
+      "Screen": "Sales"
+    },
+    "19": {
+      "DocType": 4,
+      "Screen": "Receipt"
+    },
+    "20": {
+      "DocType": 5,
+      "Screen": "Return"
     }
+  },
+  "FixedValues": {
+    "DisplayDecimals": 4,
+    "RoundingDecimals": 4,
+    "MinDisplayDecimals": 2,
+    "SalesScreenMenuId": 18,
+    "DashBoardMenuId": 21
   }
-  
+}

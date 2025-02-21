@@ -487,7 +487,7 @@ const MemoizedTableRow = ({ row, index, rowClick, handleRowChange, bodyCell, fie
                             minWidth: field.RowSpan ? `${250 * field.RowSpan}px` : "250px"
                         }}
                     >
-                        <FormControl>
+                        <FormControl disabled={row['RiskData'] == false}>
                             <RadioGroup
                                 row
                                 aria-labelledby="risk-radio-group-label"

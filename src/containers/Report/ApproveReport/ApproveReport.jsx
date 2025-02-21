@@ -98,7 +98,7 @@ function BasicBreadcrumbs({ viewAction, status }) {
                     aria-label="breadcrumb"
                 >
                     <Typography underline="hover" sx={style} key="1">
-                    Inspection Report
+                    Authorize Report
                     </Typography>
                     <Typography underline="hover" sx={style} key="1"></Typography>
                 </Breadcrumbs>
@@ -153,7 +153,7 @@ const icon = (
     </Paper>
 );
 
-export default function InspectionReport({ userAction, disabledDetailed }) {
+export default function ApproveReport({ userAction, disabledDetailed }) {
     const [mainDetails, setMainDetails] = useState({
         fromDate: currentDate,
         toDate: currentDate,
@@ -183,7 +183,7 @@ export default function InspectionReport({ userAction, disabledDetailed }) {
         setChecked((prev) => !prev);
     };
 
-    const { getinspectionreport } = reportApis();
+    const { getapprovereport } = reportApis();
     useEffect(() => {
         const fetchData = async () => {
             await tagDetails();
@@ -195,12 +195,12 @@ export default function InspectionReport({ userAction, disabledDetailed }) {
         const currentSearchKey = latestSearchKeyRef.current;
         try {
             if (
-                mainDetails?.fromDate &&
-                mainDetails?.toDate
+                mainDetails.fromDate &&
+                mainDetails.toDate
             ) {
-                const response = await getinspectionreport({
-                    fromDate: mainDetails?.fromDate,
-                    toDate: mainDetails?.toDate,
+                const response = await getapprovereport({
+                    fromDate: mainDetails.fromDate,
+                    toDate: mainDetails.toDate,
                     client: mainDetails?.Client,
                     status: mainDetails?.Status,
                     pageNo: pageNumber,
@@ -259,7 +259,6 @@ export default function InspectionReport({ userAction, disabledDetailed }) {
         latestSearchKeyRef.current = ""
         setchangesTriggered(!changesTriggered);
       };
-
     const handleIconsClick = async (value) => {
         switch (value.trim()) {
             case "close":
@@ -283,7 +282,7 @@ export default function InspectionReport({ userAction, disabledDetailed }) {
     };
 
     const handleExcel = async () => {
-        const response = await getinspectionreport({
+        const response = await getapprovereport({
             fromDate: mainDetails.fromDate,
             toDate: mainDetails.toDate,
             client: mainDetails?.Client,
@@ -297,7 +296,7 @@ export default function InspectionReport({ userAction, disabledDetailed }) {
         ];
         const filteredRows = JSON.parse(response?.result)?.Data;
         await ExcelExport({
-            reportName: "Inspection Report",
+            reportName: "Authorize Report",
             filteredRows,
             excludedFields,
         });
@@ -410,7 +409,7 @@ export default function InspectionReport({ userAction, disabledDetailed }) {
                                     formDataName={"Client_Name"}
                                 />
 
-                                {/* <AutoSelect
+                                <AutoSelect
                                     key={"Status"}
                                     formData={mainDetails}
                                     setFormData={setMainDetails}
@@ -420,9 +419,9 @@ export default function InspectionReport({ userAction, disabledDetailed }) {
                                     required={false}
                                     label={"Status"}
                                     ColumnSpan={0}
-                                    Menu={[{ "Id": 1, "Name": "Allocated" }, { "Id": 2, "Name": "Working" }, { "Id": 3, "Name": "Closed" }]}
+                                    Menu={[{ "Id": 1, "Name": "Pending" }, { "Id": 2, "Name": "Approved" }, { "Id": 3, "Name": "Rejected" }]}
 
-                                /> */}
+                                />
 
 
                                 <Box p={1.9}>
@@ -443,7 +442,7 @@ export default function InspectionReport({ userAction, disabledDetailed }) {
                     //  onSortChange={handleSortChange}
                     onSearchKeyChange={handleSearchKeyChange}
                     changesTriggered={changesTriggered}
-                    setchangesTriggered={resetChangesTrigger}
+                    // setchangesTriggered={resetChangesTrigger}
                     // onSelectedRowsChange={handleSelectedRowsChange}
                     // onRowDoubleClick={handleRowDoubleClick}
                     totalRows={totalRows}
@@ -464,5 +463,6 @@ export default function InspectionReport({ userAction, disabledDetailed }) {
         </Box>
     );
 }
+
 
 

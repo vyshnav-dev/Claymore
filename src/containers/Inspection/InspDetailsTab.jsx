@@ -28,7 +28,7 @@ export default function InspDetailsTab({formData,setFormData}) {
             label={"Date of Inspection"}
             name={"DateOfInspection"}
             type={"date"}
-            disabled={false}
+            disabled={true}
             mandatory={true}
             value={formData}
             setValue={setFormData}

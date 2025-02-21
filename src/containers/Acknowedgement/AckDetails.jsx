@@ -481,6 +481,7 @@ export default function AckDetails({
                                 value={mainDetails}
                                 setValue={setMainDetails}
                                 multiline={true}
+                                maxLength={70}
                             />
                             <UserInputField
                                 label={"Critical Finding"}
@@ -491,6 +492,7 @@ export default function AckDetails({
                                 value={mainDetails}
                                 setValue={setMainDetails}
                                 multiline={true}
+                                maxLength={70}
                             />
                             <UserInputField
                                 label={"Other Remarks"}
@@ -501,6 +503,7 @@ export default function AckDetails({
                                 value={mainDetails}
                                 setValue={setMainDetails}
                                 multiline={true}
+                                maxLength={70}
                             />
                             <UserInputField
                                 label={"Target Date of Closure"}

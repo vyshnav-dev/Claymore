@@ -8,6 +8,8 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import { MDBIcon } from "mdb-react-ui-kit";
 import { Box } from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import ExpandCircleDownIcon from '@mui/icons-material/ExpandCircleDown';
 // import { useCustomTheme } from "../../config/themeContext";
 // import { icon } from "@fortawesome/fontawesome-svg-core";
 
@@ -24,28 +26,27 @@ const Accordion = styled((props) => (
 }));
 
 const AccordionSummary = styled((props) => {
-  const theme = useTheme();
-  
-  // const { currentTheme } = useCustomTheme();
+
   return (
     <MuiAccordionSummary
-      expandIcon={
-        props.expanded ? (
-          <RemoveCircleOutlineIcon
-            sx={{
-              fontSize: "1.25rem",
-              color:"#26668b"
-            }}
-          />
-        ): (
-          <AddCircleOutlineIcon
-            sx={{
-              fontSize: "1.25rem",
-              color:"#26668b"
-            }}
-          />
-        )
-      }
+      // expandIcon={
+      //   props.expanded ? (
+      //     <RemoveCircleOutlineIcon
+      //       sx={{
+      //         fontSize: "1.25rem",
+      //         color:"#26668b"
+      //       }}
+      //     />
+      //   ): (
+      //     <AddCircleOutlineIcon
+      //       sx={{
+      //         fontSize: "1.25rem",
+      //         color:"#26668b"
+      //       }}
+      //     />
+      //   )
+      // }
+      expandIcon={<ExpandCircleDownIcon sx={{color:"#26668b"}} />}
       {...props}
     />
   );
@@ -77,17 +78,14 @@ export default function CustomizedAccordions({
   expanded,
   onChange,
 }) {
-  // const { currentTheme } = useCustomTheme();
-  // const theme = useTheme();
   
   return (
     <div>
-      <Accordion expanded={expanded} onChange={onChange}>
+      <Accordion defaultExpanded onChange={onChange}>
         <AccordionSummary
           aria-controls="panel1d-content"
           id="panel1d-header"
-          expanded={expanded}
-          // theme={theme}
+          // expanded={expanded}
         >
           {icons && (
      <Box style={{ position: "relative", width: "30px" }}>
