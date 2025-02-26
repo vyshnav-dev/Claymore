@@ -13,6 +13,7 @@ import ConfirmationAlert from "../../component/Alerts/ConfirmationAlert";
 import ActionButton from "../../component/Buttons/ActionButton";
 import { useAlert } from "../../component/Alerts/AlertContext";
 import {
+    IMAGE_URL,
     primaryColor,
     secondaryColor,
     thirdColor,
@@ -95,7 +96,9 @@ function BasicBreadcrumbs() {
         </div>
     );
 }
-const DefaultIcons = ({ iconsClick, detailPageId, userAction }) => {
+const DefaultIcons = ({ iconsClick, detailPageId, userAction, certify }) => {
+
+
     const hasAproove = userAction.some((action) => action.Action == "Authorise");
     return (
         <Box
@@ -147,18 +150,32 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction }) => {
                 <>
                     {detailPageId != 0 ? (
                         <>
-                            <ActionButton
-                                iconsClick={iconsClick}
-                                icon={"fa-solid fa-thumbs-up"}
-                                caption={"Approve"}
-                                iconName={"approve"}
-                            />
-                            <ActionButton
-                                iconsClick={iconsClick}
-                                icon={"fa-solid fa-ban"}
-                                caption={"Reject"}
-                                iconName={"reject"}
-                            />
+                            {!certify && (
+                                <>
+                                    <ActionButton
+                                        iconsClick={iconsClick}
+                                        icon={"fa-solid fa-thumbs-up"}
+                                        caption={"Approve"}
+                                        iconName={"approve"}
+                                    />
+                                    <ActionButton
+                                        iconsClick={iconsClick}
+                                        icon={"fa-solid fa-ban"}
+                                        caption={"Reject"}
+                                        iconName={"reject"}
+                                    />
+                                </>
+                            )}
+
+                            {certify && (
+                                <ActionButton
+                                    iconsClick={iconsClick}
+                                    icon={"fa-solid fa-stamp"}
+                                    caption={"Certificate"}
+                                    iconName={"certificate"}
+                                />
+                            )}
+
                         </>
                     ) : null}
                 </>
@@ -406,7 +423,7 @@ export default function InspDetails({
         DocNo: null,
     });
 
-    const [exam,setExam] = useState();
+    const [exam, setExam] = useState();
 
     //----Fields-----
     const [viewFields, setViewFields] = useState([])
@@ -417,6 +434,7 @@ export default function InspDetails({
     const [selectedDatas, setselectedDatas] = React.useState([]); //selected rows details
     const [property, setProperty] = useState(false);
     const [itemLabel, setItemLabel] = useState('');
+    const [certify, setCertify] = useState(false);
 
     //TagAttachmentTab
     const [dbTagAttachmentDetails, setdbTagAttachmentDetails] = useState([])
@@ -424,7 +442,7 @@ export default function InspDetails({
 
     const { showAlert } = useAlert();
     const {
-        GetInspectionFields, getexaminationform, getdocno, getjoborderheaddetails, getInspectionDetails, upsertInspection, deleteInspection, upsertApprove, uploadAttachfiles
+        GetInspectionFields, getexaminationform, getdocno, getjoborderheaddetails, getInspectionDetails, upsertInspection, deleteInspection, upsertApprove, uploadAttachfiles, generatecertificate
     } = inspectionApis();
 
 
@@ -636,13 +654,15 @@ export default function InspDetails({
 
 
                 const result = JSON.parse(response?.result)
+
                 let updatedData = {
                     ...formData,
                     ...result,
                     InspectionInformation: result?.InspectionInformation ?? {}
                 }
-
-
+                if (result?.Status == 2 || result?.Status == 4) {
+                    setCertify(true)
+                }
                 setFormData(updatedData)
                 setTableBody(result?.Examination)
                 if (result?.Attachment?.length > 0) {
@@ -705,10 +725,10 @@ export default function InspDetails({
                     showAlert("info", `Please Provide ${emptyFields[0]}`);
                     return;
                 }
-                let isExam ;
+                let isExam;
                 const isValid = await validateFormData();
-                if(isValid){
-                     isExam = await validateExamination();
+                if (isValid) {
+                    isExam = await validateExamination();
                 }
                 if (isValid && isExam) {
                     setConfirmData({ message: "Save", type: "success" });
@@ -722,6 +742,9 @@ export default function InspDetails({
                 break;
             case "reject":
                 handleProperty(value);
+                break;
+            case "certificate":
+                handleCertificate();
                 break;
             case "delete":
                 setConfirmData({ message: "Delete", type: "danger" });
@@ -742,6 +765,7 @@ export default function InspDetails({
             setId(backId)
             setPageRender(3);
         }
+        setCertify(false)
     };
 
     const validateFormData = async () => {
@@ -792,7 +816,7 @@ export default function InspDetails({
         const filteredData = updatedChildData
             .filter(item => item.data === 0 || item.data == undefined)
             .map(({ tabName, slNo }) => ({ tabName, slNo }));
-            
+
         if (filteredData.length > 0) {
             filteredData.forEach(item => {
                 setExpanded(item.tabName)
@@ -803,98 +827,98 @@ export default function InspDetails({
         setExam(updatedChildData)
         return true
     }
-    
+
 
     const handleSave = async () => {
 
-        
+
 
 
 
         // if (!filteredData?.length) {
 
-            const validFieldNames = new Set(viewFields.map(field => field.FieldName));
+        const validFieldNames = new Set(viewFields.map(field => field.FieldName));
 
-            // Filter formData.InspectionInformation to keep only valid fields
-            const filteredInspectionInformation = Object.keys(formData?.InspectionInformation || {})
-                .filter(key => validFieldNames.has(key)) // Keep only keys that exist in viewFields
-                .reduce((obj, key) => {
-                    obj[key] = formData?.InspectionInformation[key];
-                    return obj;
-                }, {});
-            const inspectionInformationArray = [filteredInspectionInformation]
+        // Filter formData.InspectionInformation to keep only valid fields
+        const filteredInspectionInformation = Object.keys(formData?.InspectionInformation || {})
+            .filter(key => validFieldNames.has(key)) // Keep only keys that exist in viewFields
+            .reduce((obj, key) => {
+                obj[key] = formData?.InspectionInformation[key];
+                return obj;
+            }, {});
+        const inspectionInformationArray = [filteredInspectionInformation]
 
-            const saveData = {
-                id: formData?.Id,
-                docNo: formData?.DocNo,
-                product: formData?.Product,
-                list: formData?.List,
-                dateOfInspection: formData?.DateOfInspection,
-                expiryDate: formData?.ExpiryDate,
-                inspectionType: formData?.InspectionType,
-                previousInspectionReport: formData?.PreviousInspectionReport,
-                testMethod: formData?.TestMethod,
-                calibratedTestEquipment: formData?.CalibratedTestEquipment,
-                clientTestEquipment: formData?.ClientTestEquipment,
-                testDate: formData?.TestDate,
-                inspectionInformation: inspectionInformationArray,
-                examination: exam,
-                attachments: formData?.Attachment || []
-            };
-
-
-            const response = await upsertInspection(saveData);
-            if (response.status == "Success") {
-
-                showAlert("success", response?.message);
-
-                const detailId = Number(response.result)
-
-                const formDataFiles = new FormData();
-
-                let fileIndex = 0;
-                // Filter attachments that have a file and add them to the FormData
-                const attachmentsWithFiles = formData?.Attachment?.filter(attachment => attachment?.file);
+        const saveData = {
+            id: formData?.Id,
+            docNo: formData?.DocNo,
+            product: formData?.Product,
+            list: formData?.List,
+            dateOfInspection: formData?.DateOfInspection,
+            expiryDate: formData?.ExpiryDate,
+            inspectionType: formData?.InspectionType,
+            previousInspectionReport: formData?.PreviousInspectionReport,
+            testMethod: formData?.TestMethod,
+            calibratedTestEquipment: formData?.CalibratedTestEquipment,
+            clientTestEquipment: formData?.ClientTestEquipment,
+            testDate: formData?.TestDate,
+            inspectionInformation: inspectionInformationArray,
+            examination: exam,
+            attachments: formData?.Attachment || []
+        };
 
 
+        const response = await upsertInspection(saveData);
+        if (response.status == "Success") {
 
-                if (attachmentsWithFiles.length > 0) {
+            showAlert("success", response?.message);
 
-                    attachmentsWithFiles.forEach((attachment) => {
-                        if (attachment.file) {
-                            formDataFiles.append(
-                                `Attachments[${fileIndex}].SlNo`,
-                                attachment.SLNo
-                            );
-                            formDataFiles.append(
-                                `Attachments[${fileIndex}].previousFileName`,
-                                attachment.FileName
-                            );
-                            formDataFiles.append(
-                                `Attachments[${fileIndex}].FileContent`,
-                                attachment.file
-                            );
-                            fileIndex++;
-                        }
-                    });
-                    try {
+            const detailId = Number(response.result)
+
+            const formDataFiles = new FormData();
+
+            let fileIndex = 0;
+            // Filter attachments that have a file and add them to the FormData
+            const attachmentsWithFiles = formData?.Attachment?.filter(attachment => attachment?.file);
 
 
 
-                        const uploadResponse = await uploadAttachfiles(detailId, formDataFiles);
-                        if (uploadResponse.status === 'Success') {
-                            showAlert('success', uploadResponse?.message);
-                        }
-                    } catch (error) {
+            if (attachmentsWithFiles.length > 0) {
 
+                attachmentsWithFiles.forEach((attachment) => {
+                    if (attachment.file) {
+                        formDataFiles.append(
+                            `Attachments[${fileIndex}].SlNo`,
+                            attachment.SLNo
+                        );
+                        formDataFiles.append(
+                            `Attachments[${fileIndex}].previousFileName`,
+                            attachment.FileName
+                        );
+                        formDataFiles.append(
+                            `Attachments[${fileIndex}].FileContent`,
+                            attachment.file
+                        );
+                        fileIndex++;
                     }
+                });
+                try {
+
+
+
+                    const uploadResponse = await uploadAttachfiles(detailId, formDataFiles);
+                    if (uploadResponse.status === 'Success') {
+                        showAlert('success', uploadResponse?.message);
+                    }
+                } catch (error) {
 
                 }
-                // handleNew();
-                // const actionExists = userAction.some((action) => action.Action == "New");
-                // if (!actionExists) {
-                handleclose();
-                // }
+
+            }
+            // handleNew();
+            // const actionExists = userAction.some((action) => action.Action == "New");
+            // if (!actionExists) {
+            handleclose();
+            // }
 
             // }
 
@@ -939,6 +963,14 @@ export default function InspDetails({
         }
     };
 
+    const handleApproveClose = () => {
+        setProperty(false);
+        setMainDetails1({});
+    }
+
+    console.log('detail',detailPageId);
+    
+
     const handlePropertyConfirmation = async (status) => {
         if (status == 1) {
             if (!mainDetails1?.Remarks) {
@@ -955,6 +987,7 @@ export default function InspDetails({
         try {
             const response = await upsertApprove(saveData);
             if (response?.status === "Success") {
+                setCertify(true)
                 showAlert("success", response?.message);
                 setMainDetails1({})
             }
@@ -965,13 +998,36 @@ export default function InspDetails({
         }
     };
 
-    console.log('formdta',mainDetails1);
-    
+    const handleCertificate = async () => {
+        try {
+            const response = await generatecertificate({ inspectionId: detailPageId });
+            const myObject = JSON.parse(response?.result)
+            
+            if (response?.status === "Success") {
+                const popupWindow = window.open(
+                    myObject,
+                    "PDFPopup",
+                    "width=800,height=600,resizable=yes,scrollbars=yes"
+                );
+                if (!popupWindow) {
+                    alert("Popup blocked! Please allow popups for this site.");
+                }
+            } else {
+
+            }
+
+        } catch (error) {
+
+
+        }
+    };
+
 
     return (
-        <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
+        <Box sx={{ display: "flex", flexDirection: "column", width: "100%", position: 'relative' }}>
             <Box
                 sx={{
+                    position: 'fixed',
                     display: "flex",
                     width: "100%",
                     flexDirection: "row",
@@ -979,6 +1035,8 @@ export default function InspDetails({
                     paddingLeft: 1.5,
                     paddingRight: 1.5,
                     flexWrap: "wrap",
+                    zIndex: 5,
+                    backgroundColor: 'white'
                 }}
             >
                 <BasicBreadcrumbs />
@@ -987,6 +1045,7 @@ export default function InspDetails({
                     iconsClick={handleIconsClick}
                     userAction={userAction}
                     disabledDetailed={disabledDetailed}
+                    certify={certify}
                 />
             </Box>
             <Box
@@ -998,6 +1057,8 @@ export default function InspDetails({
                     overflowY: "auto",
                     scrollbarWidth: "thin",
                     paddingBottom: "30px",
+                    // maxHeight:"40vw"
+                    marginTop: '50px'
                 }}
             >
                 <Box
@@ -1033,7 +1094,7 @@ export default function InspDetails({
                     >
                         <Typography sx={{ fontWeight: 'bold', }}>{formData?.Product_Name}</Typography>
                         <UserInputField
-                            label={"Doc No"}
+                            label={"Certificate No"}
                             name={"DocNo"}
                             type={"text"}
                             disabled={true}
@@ -1182,7 +1243,7 @@ export default function InspDetails({
                 submite={handleConfirmSubmit}
             />
             <ApproveConfirmation
-                handleClose={() => setProperty(false)}
+                handleClose={handleApproveClose}
                 open={property}
                 data={confirmData}
                 submite={handlePropertyConfirmation}

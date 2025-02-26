@@ -42,7 +42,8 @@ export default function UserInputField({
   maxLength,
   onBlurAction,
   decimalLength,
-  max
+  max,
+  placeholder
 }) {
   const [tabPressed, setTabPressed] = useState(false);
 
@@ -105,6 +106,7 @@ export default function UserInputField({
       rows={multiline ? 3 : null}
       autoComplete="off"
       disabled={disabled}
+      placeholder={placeholder}
       onChange={handleChange}
       InputProps={{
         inputProps: {

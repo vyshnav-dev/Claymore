@@ -221,7 +221,7 @@ export default function TimeSheetReport({ userAction, disabledDetailed }) {
 
           settotalRows(totalRows);
           setTotalPages(totalPages);
-          setChecked(false);
+          // setChecked(false);
         } else {
           setRows([]);
         }
@@ -292,16 +292,13 @@ export default function TimeSheetReport({ userAction, disabledDetailed }) {
       search: "",
     });
     const excludedFields = [
-      "BE",
-      "Product",
-      "Unit",
-      "Warehouse",
-      "Bin",
-      "TransId",
+      "Id",
     ];
     const filteredRows = JSON.parse(response?.result)?.Data;
+    const formatedFrom = new Date(mainDetails?.fromDate).toLocaleDateString("en-GB").split("/").join("-");
+        const formatedTo = new Date(mainDetails?.toDate).toLocaleDateString("en-GB").split("/").join("-");
     await ExcelExport({
-      reportName: "Time sheet Report",
+      reportName: `Time sheet Report(${formatedFrom} - ${formatedTo})`,
       filteredRows,
       excludedFields,
     });

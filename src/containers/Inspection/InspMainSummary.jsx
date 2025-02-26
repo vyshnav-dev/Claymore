@@ -145,12 +145,7 @@ export default function InspMainSummary({
   const latestSearchKeyRef = useRef(searchKey);
   const { GetAllocatedJobOrderSummary,deleteAllocatedJobOrder} =
     allocationApis();
-  const [groupId, setGroupId] = useState(0);
-  const [parentList, setParentList] = useState([]);
-  const longPressTriggeredRef = useRef(false); // Persist flag
-  const longPressTimerRef = useRef(null); // Persist timer
-
-  const longPressThreshold = 500;
+  
 
   
 
@@ -231,7 +226,6 @@ export default function InspMainSummary({
     setselectedDatas(selectedRowsData);
   };
   const resetChangesTrigger = () => {
-    setGroupId(0);
     setchangesTriggered(false);
   };
   const handleDisplayLengthChange = (newDisplayLength) => {
@@ -372,28 +366,7 @@ export default function InspMainSummary({
     } catch (error) {}
   };
 
-  const handleLongPressStart = (event, row) => {
-    longPressTriggeredRef.current = false;
-    longPressTimerRef.current = setTimeout(() => {
-      longPressTriggeredRef.current = true;
-      const isHighlighted = row.Group;
-      if (isHighlighted) {
-        setGroupId(row?.Id);
-        setPageRender(3);
-        handleParentGroup(row?.Id)
-      } else {
-        setGroupId(0);
-      }
-    }, longPressThreshold);
-  };
-
-  // Function to handle the end of long press (mouse up or leave)
-  const handleLongPressEnd = () => {
-    if (longPressTimerRef.current) {
-      clearTimeout(longPressTimerRef.current);
-      longPressTimerRef.current = null;
-    }
-  };
+  
  
   
   
@@ -428,9 +401,6 @@ export default function InspMainSummary({
             onRowDoubleClick={handleRowDoubleClick}
             totalRows={totalRows}
             //   currentTheme={currentTheme}
-            handleLongPressStart={handleLongPressStart}
-            handleLongPressEnd={handleLongPressEnd}
-            parentList={parentList}
             totalPages={totalPages}
             hardRefresh={hardRefresh}
             IdName={"Id"}

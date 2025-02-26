@@ -7,10 +7,7 @@ import { useAlert } from "../../component/Alerts/AlertContext";
 import SummaryTable from "../../component/Table/SummaryTable";
 import { primaryColor } from "../../config/config";
 import ConfirmationAlert from "../../component/Alerts/ConfirmationAlert";
-import { masterApis } from "../../service/Master/master";
-// import MasterProductConfirmation from "./MasterProductConfirmation";
 import ExcelExport from "../../component/Excel/Excel";
-import { identity } from "lodash";
 import { inspectionApis } from "../../service/Inspection/inspection";
 
 function BasicBreadcrumbs() {
@@ -142,12 +139,6 @@ export default function RiskAssesmentSummary({
   const latestSearchKeyRef = useRef(searchKey);
   const { GetRisAssesmentSummary,deleteRiskAssesment } =
     inspectionApis();
-  const [groupId, setGroupId] = useState(0);
-  const [parentList, setParentList] = useState([]);
-  const longPressTriggeredRef = useRef(false); // Persist flag
-  const longPressTimerRef = useRef(null); // Persist timer
-
-  const longPressThreshold = 500;
 
   //Role Summary
   const fetchRoleSummary = async () => {
@@ -191,7 +182,7 @@ export default function RiskAssesmentSummary({
 
   React.useEffect(() => {
     fetchRoleSummary(); // Initial data fetch
-  }, [pageNumber, displayLength, searchKey, changesTriggered, groupId]);
+  }, [pageNumber, displayLength, searchKey, changesTriggered]);
 
 
 
@@ -211,7 +202,6 @@ export default function RiskAssesmentSummary({
     setselectedDatas(selectedRowsData);
   };
   const resetChangesTrigger = () => {
-    setGroupId(0);
     setchangesTriggered(false);
   };
   const handleDisplayLengthChange = (newDisplayLength) => {
@@ -373,7 +363,7 @@ export default function RiskAssesmentSummary({
             onRowDoubleClick={handleRowDoubleClick}
             totalRows={totalRows}
             //   currentTheme={currentTheme}
-            parentList={parentList}
+            // parentList={parentList}
             totalPages={totalPages}
             hardRefresh={hardRefresh}
             IdName={"Id"}

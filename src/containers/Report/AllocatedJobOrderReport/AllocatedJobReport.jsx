@@ -220,7 +220,7 @@ export default function AllocatedJobReport({ userAction, disabledDetailed }) {
 
                     settotalRows(totalRows);
                     setTotalPages(totalPages);
-                    setChecked(false);
+                    // setChecked(false);
                 } else {
                     setRows([]);
                 }
@@ -295,9 +295,11 @@ export default function AllocatedJobReport({ userAction, disabledDetailed }) {
         const excludedFields = [
             "Id",
         ];
+        const formatedFrom = new Date(mainDetails?.fromDate).toLocaleDateString("en-GB").split("/").join("-");
+        const formatedTo = new Date(mainDetails?.toDate).toLocaleDateString("en-GB").split("/").join("-");
         const filteredRows = JSON.parse(response?.result)?.Data;
         await ExcelExport({
-            reportName: "Allocated job orders Report",
+            reportName: `Allocated job orders Report(${formatedFrom} - ${formatedTo})`,
             filteredRows,
             excludedFields,
         });

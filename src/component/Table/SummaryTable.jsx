@@ -64,9 +64,6 @@ export default function SummaryTable(props) {
     hardRefresh,
     IdName,
     statusName,
-    handleLongPressStart,
-    handleLongPressEnd,
-    parentList,
   } = props;
   const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
@@ -81,7 +78,7 @@ export default function SummaryTable(props) {
   const profileDateFieldsArray = profileDateFields
     .split(",")
     .map((field) => field.trim());
-  const excludedFields = [statusName, "Group", "GroupId", "TotalRows", "UserName", "Time", "Id"];
+  const excludedFields = [statusName, "Group", "GroupId", "TotalRows", "UserName", "Time", "Id","Allocation"];
 
   //To apply some filters on table rows
   const initialColumns =
@@ -253,7 +250,6 @@ export default function SummaryTable(props) {
     setMapOpen(false)
   }
 
-  console.log('colmns', columns);
 
 
   return (
@@ -441,7 +437,7 @@ export default function SummaryTable(props) {
                         color: "white",
                         paddingTop: "3px",
                         paddingBottom: "3px",
-                        textAlign: "center",
+                        textAlign: column.id === "GeoLocation" ? "center" : "left",
                         position: "relative",
                       }}
                       onDoubleClick={() => handleDoubleClick(index)}
@@ -471,9 +467,6 @@ export default function SummaryTable(props) {
                     <TableRow
                       key={`${row[IdName]}-${index}`}
                       onClick={(event) => handleClick(event, row)}
-                      onMouseUp={handleLongPressEnd}
-                      onMouseLeave={handleLongPressEnd}
-                      onTouchEnd={handleLongPressEnd}
                       onDoubleClick={() => props.onRowDoubleClick(row[IdName], row)}
                       role="checkbox"
                       aria-checked={isItemSelected}
@@ -501,12 +494,12 @@ export default function SummaryTable(props) {
                               overflow: "hidden",
                               textOverflow: "ellipsis",
                               fontWeight: row["Group"] ? 800 : "normal",
-                              textAlign: column.id === "Location" ? "center" : "left",
+                              textAlign: column.id === "GeoLocation" ? "center" : "left",
                             }}
                           >
-                            {column.id === "Location" ? (
+                            {column.id === "GeoLocation" ? (
                               <IconButton
-                                onClick={() => handleMapOpen(row["Location"])}
+                                onClick={() => handleMapOpen(row["GeoLocation"])}
                                 aria-label="location"
                                 sx={iconsExtraSxCell}
                               >

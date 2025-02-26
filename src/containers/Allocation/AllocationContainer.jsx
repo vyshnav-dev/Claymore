@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { securityApis } from "../../service/Security/security";
 import AllocationSummary from "./AllocationSummary";
-// import AllocationDetails from "./AllocationDetails";
 
 export default function AllocationContainer() {
   const location = useLocation();

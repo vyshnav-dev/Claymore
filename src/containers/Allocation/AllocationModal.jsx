@@ -9,7 +9,6 @@ import {
 import React, { useState } from "react";
 import NormalButton from "../../component/Buttons/NormalButton";
 import { useAlert } from "../../component/Alerts/AlertContext";
-// import AllocationInfoTable from "./AllocationInfoTable";
 import MultiCheckBox from "../../component/MultiCheckBox.jsx/MultiCheckBox";
 import { allocationApis } from "../../service/Allocation/allocation";
 import UserInputField from "../../component/InputFields/UserInputField";

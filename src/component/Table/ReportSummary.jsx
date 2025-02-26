@@ -188,7 +188,6 @@ export default function ReportSummary(props) {
 
     return `${day}-${month}-${year}`;
   };
-  console.log('col',columns);
   
   return (
     <Box
@@ -393,7 +392,7 @@ export default function ReportSummary(props) {
                       {columns.map((column) => (
                         <Tooltip
                           title={
-                            column.id === "Technician" ? row[column.id]:column.id === "Product_Name" ? row[column.id] : null
+                            column.id === "Technician" ? row[column.id]:column.id === "ProductName" ? row[column.id] : null
                           }
                         >
                           <TableCell

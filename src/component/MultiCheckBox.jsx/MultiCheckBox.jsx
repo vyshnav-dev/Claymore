@@ -15,7 +15,6 @@ function MultiCheckBox({ formData, setFormData, tagId, sFieldName, label, isMand
 
 
   const [companyList, setcompanyList] = useState([]);
-  const [companyListExist, setCompanyListExist] = useState(formData[objectName] || []);
   const [changesTriggered, setchangesTriggered] = useState(false);
   const [searchTerm, setsearchTerm] = useState("")
   const [loading, setLoading] = useState(false)

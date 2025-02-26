@@ -11,5 +11,6 @@
     "IMAGE_URL":"http://103.120.178.195/",
     "allowedExtensionsReceipt":["jpg", "jpeg", "png", "gif", "txt", "pdf", "xls", "xlsx", "doc", "docx"],
     "allowedExtensionsTagAttachments":["jpg", "jpeg", "png", "gif", "txt", "pdf", "xls", "xlsx", "doc", "docx"],
-    "reportDateFields":"Created On,Modified On,CreatedOn,ModifiedOn,Created Date,Stock Date,Doc Date,Reconciliation Date,Date,Targetdate Of Closure,TargetdateOfClosure,Date Of Inspection"
+    "reportDateFields":"Created On,Modified On,CreatedOn,ModifiedOn,Created Date,Stock Date,Doc Date,Reconciliation Date,Date,Targetdate Of Closure,TargetdateOfClosure,Date Of Inspection",
+    "rowsPerSheet":10000
 }

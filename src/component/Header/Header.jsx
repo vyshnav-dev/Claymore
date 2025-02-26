@@ -105,7 +105,7 @@ function Header() {
     setAnchorElUser(null);
   };
 
-  console.log('menu',menu);
+  // console.log('menu',menu);
   
   
   const handleClickEvent = async (menu) => {
@@ -267,7 +267,7 @@ function Header() {
   return (
     <>
       <AppBar
-        position="static"
+        // position="static"
         style={{
           backgroundColor: primaryColor,
           position: "sticky",

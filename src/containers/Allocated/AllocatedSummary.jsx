@@ -156,13 +156,6 @@ export default function AllocatedSummary({
   const [addMenu, setAddMenu] = useState(false);
   const { GetAllocatedJobOrderSummary,deleteAllocatedJobOrder  } =
     allocationApis();
-  const [groupId, setGroupId] = useState(0);
-  const [parentList, setParentList] = useState([]);
-  const longPressTriggeredRef = useRef(false); // Persist flag
-  const longPressTimerRef = useRef(null); // Persist timer
-
-  const longPressThreshold = 500;
-
 
   //Role Summary
   const fetchRoleSummary = async () => {
@@ -359,27 +352,7 @@ export default function AllocatedSummary({
     } catch (error) {}
   };
 
-  const handleLongPressStart = (event, row) => {
-    longPressTriggeredRef.current = false;
-    longPressTimerRef.current = setTimeout(() => {
-      longPressTriggeredRef.current = true;
-      const isHighlighted = row.Group;
-      if (isHighlighted) {
-        setGroupId(row?.Id);
-        setPageRender(1);
-      } else {
-        setGroupId(0);
-      }
-    }, longPressThreshold);
-  };
-
-  // Function to handle the end of long press (mouse up or leave)
-  const handleLongPressEnd = () => {
-    if (longPressTimerRef.current) {
-      clearTimeout(longPressTimerRef.current);
-      longPressTimerRef.current = null;
-    }
-  };
+ 
  
   
   
@@ -414,9 +387,6 @@ export default function AllocatedSummary({
             onRowDoubleClick={handleRowDoubleClick}
             totalRows={totalRows}
             //   currentTheme={currentTheme}
-            handleLongPressStart={handleLongPressStart}
-            handleLongPressEnd={handleLongPressEnd}
-            parentList={parentList}
             totalPages={totalPages}
             hardRefresh={hardRefresh}
             IdName={"Id"}

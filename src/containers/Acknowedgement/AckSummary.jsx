@@ -140,15 +140,8 @@ export default function AckSummary({
   const [confirmAlert, setConfirmAlert] = useState(false); //To handle alert open
   const [confirmData, setConfirmData] = useState({}); //To pass alert data
   const latestSearchKeyRef = useRef(searchKey);
-  const [property, setProperty] = useState(false);
   const { getAcknowledgementSummary,deleteAcknowledgement } =
     inspectionApis();
-  const [groupId, setGroupId] = useState(0);
-  const [parentList, setParentList] = useState([]);
-  const longPressTriggeredRef = useRef(false); // Persist flag
-  const longPressTimerRef = useRef(null); // Persist timer
-
-  const longPressThreshold = 500;
 
 
   //Role Summary
@@ -195,7 +188,7 @@ export default function AckSummary({
 
   React.useEffect(() => {
     fetchRoleSummary(); // Initial data fetch
-  }, [pageNumber, displayLength, searchKey, changesTriggered, groupId]);
+  }, [pageNumber, displayLength, searchKey, changesTriggered]);
 
 
   
@@ -216,7 +209,6 @@ export default function AckSummary({
     setselectedDatas(selectedRowsData);
   };
   const resetChangesTrigger = () => {
-    setGroupId(0);
     setchangesTriggered(false);
   };
   const handleDisplayLengthChange = (newDisplayLength) => {
@@ -345,27 +337,7 @@ export default function AckSummary({
     } catch (error) {}
   };
 
-  const handleLongPressStart = (event, row) => {
-    longPressTriggeredRef.current = false;
-    longPressTimerRef.current = setTimeout(() => {
-      longPressTriggeredRef.current = true;
-      const isHighlighted = row.Group;
-      if (isHighlighted) {
-        setGroupId(row?.Id);
-        setPageRender(1);
-      } else {
-        setGroupId(0);
-      }
-    }, longPressThreshold);
-  };
-
-  // Function to handle the end of long press (mouse up or leave)
-  const handleLongPressEnd = () => {
-    if (longPressTimerRef.current) {
-      clearTimeout(longPressTimerRef.current);
-      longPressTimerRef.current = null;
-    }
-  };
+ 
  
   
   
@@ -400,9 +372,6 @@ export default function AckSummary({
             onRowDoubleClick={handleRowDoubleClick}
             totalRows={totalRows}
             //   currentTheme={currentTheme}
-            handleLongPressStart={handleLongPressStart}
-            handleLongPressEnd={handleLongPressEnd}
-            parentList={parentList}
             totalPages={totalPages}
             hardRefresh={hardRefresh}
             IdName={"Id"}

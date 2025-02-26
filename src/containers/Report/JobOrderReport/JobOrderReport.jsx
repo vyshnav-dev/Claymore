@@ -227,7 +227,7 @@ export default function JobOrderReport({ userAction, disabledDetailed }) {
 
           settotalRows(totalRows);
           setTotalPages(totalPages);
-          setChecked(false);
+          // setChecked(false);
         } else {
           setRows([]);
         }
@@ -299,16 +299,13 @@ export default function JobOrderReport({ userAction, disabledDetailed }) {
       search: "",
     });
     const excludedFields = [
-      "BE",
-      "Product",
-      "Unit",
-      "Warehouse",
-      "Bin",
       "Id",
     ];
+    const formatedFrom = new Date(mainDetails?.fromDate).toLocaleDateString("en-GB").split("/").join("-");
+        const formatedTo = new Date(mainDetails?.toDate).toLocaleDateString("en-GB").split("/").join("-");
     const filteredRows = JSON.parse(response?.result)?.Data;
     await ExcelExport({
-      reportName: "Pending Job Order Report",
+      reportName: `Pending Job Order Report(${formatedFrom} - ${formatedTo})`,
       filteredRows,
       excludedFields,
     });

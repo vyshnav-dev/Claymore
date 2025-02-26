@@ -397,6 +397,36 @@ const inspectionApis = () => {
     }
   };
 
+  const generatecertificate = async (payload) => {
+    try {
+      const response = await makeAuthorizedRequestBase(
+        "get",
+        "document/generatecertificate",
+        payload,
+        true
+      );
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const getpendingapproval = async (payload) => {
+    try {
+      const response = await makeAuthorizedRequestBase(
+        "get",
+        "approve/getpendingapproval",
+        payload,
+        true
+      );
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+
+
 
   
 
@@ -430,6 +460,8 @@ const inspectionApis = () => {
     upsertAcknowledgement,
     deleteAcknowledgement,
     upsertApprove,
+    generatecertificate,
+    getpendingapproval
   }
 }
 

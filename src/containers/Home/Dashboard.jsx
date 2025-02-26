@@ -21,6 +21,10 @@ import DashboardBox from "./DashboardCard";
 import BarChart from "./BarChart";
 import { dashboardApis } from "../../service/Dashboard/dashboard";
 import UserInputField from "../../component/InputFields/UserInputField";
+import { inspectionApis } from "../../service/Inspection/inspection";
+import WarningAmberIcon from "@mui/icons-material/WarningAmber";
+import AlertComponent from "./AlertComponent";
+import CloseIcon from "@mui/icons-material/Close";
 
 const getRandomColor = () => {
   const hue = Math.floor(Math.random() * 360); // Random hue (0-360)
@@ -50,10 +54,12 @@ const ShakingIconButton = styled(IconButton)(({ isshaking }) => ({
 }));
 const currentDate = new Date().toISOString().split("T")[0];
 export default function Dashboard() {
+  const [alertVisible, setAlertVisible] = useState(false);
   const [shake, setShake] = useState(true);
   const [userAction, setuserAction] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [preference, setpreference] = useState({});
+  const [popupopen, setPopUpOpen] = useState(false);
+  const [rows, setRows] = useState([]);
   const [type, setType] = useState(1)
 
   const [dateform, setDateForm] = useState({
@@ -64,19 +70,25 @@ export default function Dashboard() {
   const [charts, setCharts] = useState([])
 
   const { getdashboarddetails } = dashboardApis();
+  const { getuseractionsforscreen} = securityApis();
+  const { getpendingapproval} = inspectionApis();
 
   const isXlDevices = useMediaQuery("(min-width: 1600px)");
   const isLgDevices = useMediaQuery("(min-width: 1200px)");
   const isMdDevices = useMediaQuery("(min-width: 900px)");
   const isSmDevices = useMediaQuery("(min-width: 600px)");
 
-  // const navigate = useNavigate();
-  // const { getuseractionsforscreen } = securityApis();
+  const navigate = useNavigate();
 
-  
+  const handleNotificationClick = () => {
+    setShake(false); // Start the shake animation
+    setAlertVisible(true);
+    setTimeout(() => setShake(false), 1000); // Stop shaking after 2 seconds
+  };
+
   useEffect(() => {
     if (shake) {
-      setTimeout(() => setShake(false), 2000); // Stop shaking after 2 seconds
+      setTimeout(() => setShake(false), 1000); // Stop shaking after 2 seconds
     }
   }, [shake]);
 
@@ -91,36 +103,68 @@ export default function Dashboard() {
           ? "repeat(2, 1fr)"
           : "repeat(1, 1fr)";
 
-  // useEffect(() => {
-  //   const fetchUserActions = async () => {
-  //     try {
-  //       // Call both APIs using Promise.all for concurrent execution
-  //       const [userActionsResponse, settingsResponse] = await Promise.all([
-  //         getuseractionsforscreen({ ScreenId: FixedValues.DashBoardMenuId }),
-  //       ]);
+  useEffect(() => {
+    const fetchUserActions = async () => {
+      try {
+        // Call both APIs using Promise.all for concurrent execution
+        const [userActionsResponse] = await Promise.all([
+          getuseractionsforscreen({ ScreenId: FixedValues.DashBoardMenuId }),
+        ]);
 
-  //       // Process user actions response
-  //       if (userActionsResponse?.result) {
-  //         const userActionsData = JSON.parse(userActionsResponse.result);
-  //         setuserAction(userActionsData);
-  //       }
+        // Process user actions response
+        if (userActionsResponse?.result) {
+          const userActionsData = JSON.parse(userActionsResponse.result);
+          setuserAction(userActionsData);
+        }
 
-  //       // Process settings response
-  //       if (settingsResponse?.status === "Success") {
-  //         const settingsData = JSON.parse(settingsResponse.result);
-  //         setpreference(settingsData[0]);
-  //       }
-  //     } catch (error) {
-  //       navigate("/home");
-  //     } finally {
-  //       setLoading(false); // Mark loading as complete
-  //     }
-  //   };
-  //   fetchUserActions();
-  // }, []);
+        
+      } catch (error) {
+        navigate("/home");
+      } finally {
+        setLoading(false); // Mark loading as complete
+      }
+    };
+    fetchUserActions();
+  }, []);
 
- 
+  useEffect(() => {
+    const fetchNotification = async () => {
+      setShake(true)
+      try {
+        const response = await getpendingapproval();
+        if (response?.result) {
+          const data = JSON.parse(response.result);
+          setRows(data);
+        }
+      } catch (error) {
+        console.error("Error fetching notifications:", error);
+      }
+    };
+  
+    if (
+      !loading &&
+      !alertVisible &&
+      userAction.some((action) => action.ActionId == 13)
+    ) {
+      fetchNotification(); // Initial call
+      const interval = setInterval(fetchNotification, 60000); // Call every 5 seconds
+  
+      return () => clearInterval(interval); // Cleanup on unmount
+    }
+  }, [loading]);
+  
 
+  const handleCloseAlert = () => {
+    setAlertVisible(false);
+  };
+
+  const handleNotificationPopupOpen = () => {
+    setPopUpOpen(true);
+  };
+  const handleNotificationPopupClose = () => {
+    setPopUpOpen(false);
+    setAlertVisible(false);
+  };
   
 
   
@@ -341,7 +385,72 @@ const handleDate = (data) =>{
       </Box>
 
 
+          {/* Notification Icon */}
+      {!loading &&
+        !alertVisible &&
+        userAction.some((action) => action.ActionId == 13) &&
+        rows.length > 0 && (
+          <Tooltip title="Authorize Orders">
+            <ShakingIconButton
+              isshaking={shake}
+              onClick={handleNotificationClick}
+            >
+              <WarningAmberIcon color="warning" />
+            </ShakingIconButton>
+          </Tooltip>
+        )}
 
+      {/* Alert Popup */}
+      {!loading &&
+        alertVisible &&
+        userAction.some((action) => action.ActionId == 13)&&
+        rows.length > 0 && (
+          <Slide direction="left" in={alertVisible} mountOnEnter unmountOnExit>
+            <Box
+              sx={{
+                position: "fixed",
+                top: 60,
+                right: 20,
+                maxWidth: 300,
+                zIndex: 1300,
+              }}
+            >
+              <Alert
+                severity="warning"
+                icon={<WarningAmberIcon />}
+                action={
+                  <>
+                    <Button
+                      color="inherit"
+                      size="small"
+                      onClick={handleNotificationPopupOpen}
+                    >
+                      View
+                    </Button>
+                    <IconButton
+                      aria-label="close"
+                      color="inherit"
+                      size="small"
+                      onClick={handleCloseAlert}
+                    >
+                      <CloseIcon />
+                    </IconButton>
+                  </>
+                }
+              >
+                <Typography variant="body2">
+                  You have products to Authorize.
+                </Typography>
+              </Alert>
+            </Box>
+          </Slide>
+        )}
+
+      <AlertComponent
+        open={popupopen}
+        onClose={handleNotificationPopupClose}
+        rows={rows}
+      />
 
     </div>
   );

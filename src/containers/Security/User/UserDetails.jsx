@@ -249,7 +249,8 @@ export default function UserDetails({
       UserType: 0,
       UserTypeName: "",
       ImagePath: "",
-      Inspector: ''
+      Inspector: '',
+      InActive:false,
     });
     setDetailPageId(0);
     setImageUpload(null);
@@ -364,6 +365,7 @@ export default function UserDetails({
       userType: mainDetails?.UserType,
       role: mainDetails?.Role,
       inspector: mainDetails?.Inspector,
+      inActive:mainDetails?.InActive,
       password: detailPageId === 0 ? encryptedPassword : "",
     };
 
@@ -678,6 +680,21 @@ export default function UserDetails({
               Menu={[{ "Id": 1, "Name": "Web" }, { "Id": 2, "Name": "Mob" }, { "Id": 3, "Name": "Both" }]}
 
             />
+            <AutoSelect
+              key={"status"}
+              formData={mainDetails}
+              setFormData={setMainDetails}
+              autoId={"userType"}
+              formDataName={`InActive_Name`}
+              formDataiId={"InActive"}
+              required={true}
+              label={"Status"}
+              languageName={"english"}
+              ColumnSpan={0}
+              // disabled={disabledDetailed}
+              Menu={[{ "Id": true, "Name": "inActive" }, { "Id": false, "Name": "Active" }]}
+
+            />
 
             <UserInputField
               label={"Mobile"}
@@ -698,7 +715,7 @@ export default function UserDetails({
               setValue={setMainDetails}
             />
 
-            <Box
+            {/* <Box
               sx={{
                 display: "flex",
                 justifyContent: "center",
@@ -763,7 +780,7 @@ export default function UserDetails({
                   onChange={handleImageUpload}
                 />
               </Stack>
-            </Box>
+            </Box> */}
           </Box>
         </Box>
       </Box>

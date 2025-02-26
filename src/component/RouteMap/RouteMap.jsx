@@ -26,14 +26,11 @@ const createCustomIcon = (color) =>
   });
 
 export default function RouteMap({ open, handleClose, mapId }) {
-  console.log('mid', mapId);
 
   // const { GetGeoLocation } = routeApis();
   const [locations, setLocations] = React.useState([]); // Default to empty array
   const [centerLocation, setCenterLocation] = useState([]);
-  const [loading, setLoading] = React.useState(true); // Loading state
-  const [error, setError] = React.useState(""); // Error state
-  const { showAlert } = useAlert();
+  const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
     if (open) {
@@ -49,7 +46,6 @@ export default function RouteMap({ open, handleClose, mapId }) {
         const [lat, lng] = mapId.split(",").map(Number); // Convert lat/lng to numbers
 
         const filteredLocations = [{ lat, lng }];
-        console.log('filter', filteredLocations);
 
         if (filteredLocations.length === 0) {
           // If no valid locations are found, set a default location (e.g., a known place)

@@ -66,7 +66,6 @@ export default function InspSummaryTable(props) {
     hardRefresh,
     IdName,
     statusName,
-    handleLongPressEnd,
     getAssignjoborderlist,
     mainDetails,
     setMainDetails,
@@ -74,6 +73,7 @@ export default function InspSummaryTable(props) {
   } = props;
   const [selected, setSelected] = React.useState([]);
   const [selectedPd, setSelectedPd] = React.useState([]);
+  const [pdStatus, setPdStatus] = React.useState([]);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(25);
   const [searchTerm, setSearchTerm] = React.useState("");
@@ -185,11 +185,14 @@ export default function InspSummaryTable(props) {
     let newSelected = [];
     const selectedIndexpd = selectedPd.indexOf(row['Product']);
     let newSelectedPd = [];
+    const selectedStatusIndex = pdStatus.indexOf(row);
+    let newSelectedStatus = [];
 
 
-    if (selectedIndex === -1 || selectedIndexpd === -1) {
+    if (selectedIndex === -1 || selectedIndexpd === -1 || selectedStatusIndex === -1) {
       newSelected = newSelected.concat(selected, row[IdName]); // Add the entire row object
       newSelectedPd = newSelectedPd.concat(selectedPd, row['Product']); // Add the entire row object
+      newSelectedStatus = newSelectedStatus.concat(pdStatus,row)
     } else {
       newSelected = [
         ...selected.slice(0, selectedIndex),
@@ -199,10 +202,15 @@ export default function InspSummaryTable(props) {
         ...selectedPd.slice(0, selectedIndexpd),
         ...selectedPd.slice(selectedIndexpd + 1),
       ];
+      newSelectedStatus = [
+        ...pdStatus.slice(0, selectedStatusIndex),
+        ...pdStatus.slice(selectedStatusIndex + 1),
+      ];
     }
 
     setSelected(newSelected);
     setSelectedPd(newSelectedPd);
+    setPdStatus(newSelectedStatus);
   };
 
   //To change page //remove event if Nan comes in pagination
@@ -240,6 +248,10 @@ export default function InspSummaryTable(props) {
   React.useEffect(() => {
     props.onSelectedProductChange(selectedPd);
   }, [selectedPd]);
+
+  React.useEffect(() => {
+    props.onSelectedStatusChange(pdStatus);
+  }, [pdStatus]);
 
   //To convert date and time to dd/mm/yyyy format
   const convertToLocaleDateString = (dateString) => {
@@ -505,10 +517,6 @@ export default function InspSummaryTable(props) {
                       key={`${row[IdName]}-${index}`}
                       onClick={(event) => handleClick(event, row)}
                       // onMouseDown={(event) => handleLongPressStart(event, row)}
-                      onMouseUp={handleLongPressEnd}
-                      onMouseLeave={handleLongPressEnd} // In case the user drags out of the row
-                      // onTouchStart={(event) => handleLongPressStart(event, row)} // For mobile
-                      onTouchEnd={handleLongPressEnd}
                       role="checkbox"
                       aria-checked={isItemSelected}
                       onDoubleClick={() => props.onRowDoubleClick(row[IdName], row)}

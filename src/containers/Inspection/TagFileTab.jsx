@@ -1,6 +1,8 @@
 import React, { useRef, useState } from "react";
 import {
   Box,
+  Dialog,
+  DialogContent,
   IconButton,
   Paper,
   Stack,
@@ -22,6 +24,8 @@ import { allowedExtensionsTagAttachments,IMAGE_URL, thirdColor,secondaryColor } 
 import { useAlert } from "../../component/Alerts/AlertContext";
 import NormalButton from "../../component/Buttons/NormalButton";
 import { inspectionApis } from "../../service/Inspection/inspection";
+import CloseIcon from '@mui/icons-material/Close';
+import BrokenImageIcon from '@mui/icons-material/BrokenImage';
 
 export default function TagFileTab({
   expanded,
@@ -61,6 +65,10 @@ export default function TagFileTab({
 
    const [selectedObj, setSelectedObj] = useState(null)
    const [selectedIndex, setSelectedIndex] = useState(null)
+
+  //  image dailog
+  const [openDialog, setOpenDialog] = useState(false);
+  const [dialogImageSrc, setDialogImageSrc] = useState('');
 
    const handleConfrimClose = () => {
     setConfirmAlert(false);
@@ -435,7 +443,14 @@ export default function TagFileTab({
     }
   };
 
-  useEffect(() => {}, [autoCompleteData]);
+  const handleClickOpen = (imageUrl) => {
+    setOpenDialog(true);
+    setDialogImageSrc(imageUrl);
+  };
+
+  const handleDialogClose = () => {
+    setOpenDialog(false);
+  };
 
  
   return (
@@ -516,7 +531,7 @@ export default function TagFileTab({
                     <TableCell sx={headerCellStyle}>{languageDatasJson.ReferenceNumber}</TableCell> */}
                     <TableCell sx={headerCellStyle}>File</TableCell>
                     {!disabledDetailed &&
-                    <TableCell sx={headerCellStyle}>Edit</TableCell>
+                    <TableCell sx={headerCellStyle}>Image</TableCell>
                     }
                     {!disabledDetailed &&
                     <TableCell sx={headerCellStyle}>Delete</TableCell>
@@ -570,20 +585,13 @@ export default function TagFileTab({
                               textAlign: "center",
                             }}
                           >
-                            <IconButton
-                              onClick={() => handleEdit(index, fileObj)}
-                              aria-label="delete"
-                              sx={iconsExtraSx}
-                            >
-                              <Stack direction="column" alignItems="center">
-                                <MDBIcon
-                                  fas
-                                  icon="fa-solid fa-pen"
-                                  style={styleIcon}
-                                  className="responsiveAction-icon"
-                                />
-                              </Stack>
-                            </IconButton>
+                            {fileObj?.FileName_Url ?(<img
+                              src={fileObj?.FileName_Url}
+                              alt="Thumbnail"
+                              style={{ cursor: 'pointer', width: '30px', height: '30px' }} // Adjust the style as needed
+                              onClick={() => handleClickOpen(fileObj?.FileName_Url)}
+                            />):(<><BrokenImageIcon sx={{ color: secondaryColor }} /><span>No image</span></>)}
+                            
                           </TableCell>
                           }
                           {!disabledDetailed &&
@@ -620,6 +628,42 @@ export default function TagFileTab({
         </Box>
         {/* } */}
       </TagAccordions>
+      <Dialog
+        open={openDialog}
+        onClose={handleDialogClose}
+        aria-labelledby="image-dialog-title"
+        sx={{
+          '& .MuiDialog-container': {
+            '& .MuiPaper-root': {
+              width: '60%', // Set the dialog width to 60% of the screen size
+              maxHeight: '80vh',
+            },
+          },
+        }}
+      >
+        <IconButton
+          aria-label="close"
+          onClick={handleDialogClose}
+          sx={{
+            position: 'absolute',
+            right: 20,
+            top: 8,
+            color: "#FFF",
+            backgroundColor: secondaryColor,
+            '&:hover': { // Overrides the default hover style
+              backgroundColor: secondaryColor, // Keeps the same background color on hover
+              // Optionally, you can adjust the opacity to 1 if it still fades
+              opacity: 1,
+            },
+          }}
+        >
+          <CloseIcon />
+        </IconButton>
+        <DialogContent dividers>
+          <img src={dialogImageSrc} alt="Full Size" style={{ width: '100%', height: 'auto' }} />
+        </DialogContent>
+      </Dialog>
+
       <ConfirmationAlert2
         handleClose={handleConfrimClose}
         open={confirmAlert}

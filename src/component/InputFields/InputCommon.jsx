@@ -897,7 +897,7 @@ export default function InputCommon({
   const effectiveWidth = fullwidth ? fullwidth : width + ColumnSpan * 50;
 
   // Estimate the average width per character in pixels (adjust this value as needed)
-  const averageCharWidth = 8;
+  const averageCharWidth = 6;
 
   // Calculate the character threshold based on the effective width
   const tooltipThreshold = Math.floor(effectiveWidth / averageCharWidth);
@@ -908,7 +908,6 @@ export default function InputCommon({
       title={inputValue || ""}
       disableHoverListener={inputValue?.length <= tooltipThreshold}
       disableFocusListener={inputValue?.length <= tooltipThreshold}
-      disableTouchListener={inputValue?.length <= tooltipThreshold}
       // optionally, you can add enterDelay/leaveDelay if you want
       // e.g. enterDelay={800} leaveDelay={0}
       placement="top"

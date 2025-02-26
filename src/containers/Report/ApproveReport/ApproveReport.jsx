@@ -220,7 +220,7 @@ export default function ApproveReport({ userAction, disabledDetailed }) {
 
                     settotalRows(totalRows);
                     setTotalPages(totalPages);
-                    setChecked(false);
+                    // setChecked(false);
                 } else {
                     setRows([]);
                 }
@@ -294,9 +294,11 @@ export default function ApproveReport({ userAction, disabledDetailed }) {
         const excludedFields = [
             "Id",
         ];
+        const formatedFrom = new Date(mainDetails?.fromDate).toLocaleDateString("en-GB").split("/").join("-");
+        const formatedTo = new Date(mainDetails?.toDate).toLocaleDateString("en-GB").split("/").join("-");
         const filteredRows = JSON.parse(response?.result)?.Data;
         await ExcelExport({
-            reportName: "Authorize Report",
+            reportName: `Authorize Report(${formatedFrom} - ${formatedTo})`,
             filteredRows,
             excludedFields,
         });

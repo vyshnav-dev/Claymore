@@ -538,7 +538,7 @@ export default function RiskAssesmentDetails({
                 }));
             }
         }
-        if(mainDetails?.Allocation)
+        if(mainDetails?.Allocation && detailPageId == 0)
         {
             fetchHeadData();
         }
@@ -583,9 +583,6 @@ export default function RiskAssesmentDetails({
                 setConfirmData({ message: "Delete", type: "danger" });
                 setConfirmType("delete");
                 setConfirmAlert(true);
-                break;
-            case "property":
-                handleProperty();
                 break;
             default:
                 break;
@@ -711,9 +708,10 @@ export default function RiskAssesmentDetails({
 
 
     return (
-        <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
+        <Box sx={{ display: "flex", flexDirection: "column", width: "100%",position: 'relative' }}>
             <Box
                 sx={{
+                    position: 'fixed',
                     display: "flex",
                     width: "100%",
                     flexDirection: "row",
@@ -721,6 +719,8 @@ export default function RiskAssesmentDetails({
                     paddingLeft: 1.5,
                     paddingRight: 1.5,
                     flexWrap: "wrap",
+                    zIndex:5,
+                    backgroundColor:'white'
                 }}
             >
                 <BasicBreadcrumbs />
@@ -740,6 +740,7 @@ export default function RiskAssesmentDetails({
                     overflowY: "auto",
                     scrollbarWidth: "thin",
                     paddingBottom: "30px",
+                    marginTop: '50px'
                 }}
             >
                 <Box

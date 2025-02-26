@@ -17,21 +17,10 @@ import { useAlert } from '../../component/Alerts/AlertContext';
 
 const InspBodyTable = ({ fields, tableData, settableData, Batch, setBatch, preview = false, language = "english", languageId = 1, typeName }) => {
 
-    const { showAlert } = useAlert();
-
-    const [activeRowIndex, setActiveRowIndex] = useState(null);
+    
     const [loading, setloading] = useState(false)
 
 
-
-
-    //Bifurcation states
-    const [bifurcationPopupOpen, setBifurcationPopupOpen] = useState(false);
-    const [selectedHeader, setSelectedHeader] = useState('');
-
-
-
-    const [canFocus, setCanFocus] = useState(true);
 
     const cellStyle = useMemo(() => ({
         padding: "0px",
@@ -70,100 +59,6 @@ const InspBodyTable = ({ fields, tableData, settableData, Batch, setBatch, previ
 
 
 
-    const rowClick = (index) => {
-        // if(!formData.language_Name){
-        //   showAlert("info","Choose language")
-        //   return
-        // }
-        setActiveRowIndex(index)
-    }
-
-
-
-
-
-
-
-
-    // const handleRowChange = (index, field, data) => {
-    //     console.log('field', field);
-
-    //     if (preview) {
-    //         return;
-    //     }
-
-    //     const fieldName = field.FieldName;
-
-    //     settableData(prevRows => {
-    //         const updatedRows = [...prevRows];
-    //         console.log('upd', updatedRows);
-
-    //         if (field.FieldDisplayType === "check type") {
-    //             const checkValues = ['s', 'ns', 'na', 'se'];
-
-    //             let newArray = updatedRows.find(item => item.Name === typeName);
-
-    //             const Data1 = [...newArray.Data];
-
-    //             // Check if field.FieldName is in checkValues
-    //             if (checkValues.includes(fieldName)) {
-    //                 // Set the selected field to the provided data
-    //                 Data1[index] = {
-    //                     ...Data1[index],
-    //                     [fieldName]: data
-    //                 };
-
-    //                 // Set all other fields in checkValues to 0
-    //                 checkValues.forEach(key => {
-    //                     if (key !== fieldName) {
-    //                         Data1[index][key] = 0; // Set value to 0 for other keys
-    //                     }
-    //                 });
-    //             } else {
-    //                 // Set default values for all keys in checkValues to 0 if not already present
-    //                 checkValues.forEach(key => {
-    //                     if (!(key in Data1[index])) {
-    //                         Data1[index][key] = 0;
-    //                     }
-    //                 });
-    //             }
-
-    //             newArray = {
-    //                 ...newArray,
-    //                 Data: Data1
-    //             };
-
-    //             const typeIndex = updatedRows.findIndex(item => item.Name === typeName);
-    //             updatedRows[typeIndex] = {
-    //                 ...newArray
-    //             };
-    //         } 
-    //          else if (data) {
-    //             const { name, value } = data;
-
-    //             let newArray = updatedRows.find(item => item.Name === typeName);
-    //             const Data1 = [...newArray.Data];
-    //             Data1[index] = {
-    //                 ...Data1[index],
-    //                 [name]: value
-    //             };
-
-    //             newArray = {
-    //                 ...newArray,
-    //                 Data: Data1
-    //             };
-
-    //             const typeIndex = updatedRows.findIndex(item => item.Name === typeName);
-    //             updatedRows[typeIndex] = {
-    //                 ...newArray
-    //             };
-    //         }
-
-    //         return updatedRows;
-    //     });
-    // };
-
-
     const handleRowChange = (index, field, data) => {
         
         
@@ -176,26 +71,7 @@ const InspBodyTable = ({ fields, tableData, settableData, Batch, setBatch, previ
         settableData(prevRows => {
             const updatedRows = [...prevRows];
 
-            // if (field.FieldDisplayType == "risk") {
-                
-            //     let newArray = updatedRows.find((item)=>item.Name === typeName)
-                
-            //     const Data1 = [...newArray.items]
-            //     Data1[index] = {
-            //         ...Data1[index],
-            //         [field.FieldName]: data
-            //     };
-            //     newArray = {
-            //         ...newArray,
-            //         items:Data1
-            //     }
-            //     let typeIndex = updatedRows.findIndex((item)=>item.Name === typeName)
-            //     updatedRows[typeIndex] = {
-            //         ...newArray
-            //     };
-
-            // }
-            // else 
+             
             if (field.FieldDisplayType == "check type"){
                 let newArray = updatedRows.find((item)=>item.Category_Name === typeName)
                 
@@ -239,82 +115,7 @@ const InspBodyTable = ({ fields, tableData, settableData, Batch, setBatch, previ
             
         });
     };
-    const validateFormData = () => {
-
-
-        // Filter out tableData where both field and caption are empty
-        const filteredRows = tableData.filter(row => row.field !== 0 && row.caption !== '' && row.width !== 0);
-
-        const missingFieldRows = tableData.filter(row => (row.field == 0) || (!row.field));
-        const missingCaptionRows = tableData.filter(row => row.caption === '');
-        const missingWidthRows = tableData.filter(row => row.width === 0);
-        // Show specific alerts based on the missing conditions
-        if (missingFieldRows.length > 0) {
-            showAlert('info', "Some tableData are missing the 'field' value.");
-            return false;
-        }
-
-        if (missingCaptionRows.length > 0) {
-            showAlert('info', "Some tableData are missing the 'caption' value.");
-            return false;
-        }
-
-        if (missingWidthRows.length > 0) {
-            showAlert('info', "Some tableData are missing the 'width' value.");
-            return false;
-        }
-        // If no valid tableData remain after filtering, handle that scenario
-        if (filteredRows.length === 0) {
-            showAlert('info', "No valid tableData to save");
-            return false;
-        }
-
-        return true;
-    };
-
-
-    const handleHeaderClick = (header) => {
-
-
-        setSelectedHeader(header);
-        setBifurcationPopupOpen(true);
-    };
-
-
-
-
-
-
-
-
-    // After selecting items from popup
-    // const handleItemsSelected = (selectedItems) => {
-    //   setItemPopupOpen(false);
-    //   // Insert one new row per selected item at the end of tableData
-    //   settableData(prevRows => {
-    //     const updatedRows = [...prevRows];
-    //     selectedItems.forEach(item => {
-    //       const newRow = createNewRow();
-    //       // Set the Item field with item.Id and Item_Name with item.Name
-    //       newRow["Item"] = item.Id;
-    //       newRow["Item_Name"] = item.Name;
-    //       updatedRows.push(newRow);
-    //     });
-    //     return updatedRows;
-    //   });
-    // };
-
-
-
-    useEffect(() => {
-
-        if (canFocus == false) {
-
-
-
-            setCanFocus(true)
-        }
-    }, [document.activeElement])
+   
 
 
     const sortedFields = useMemo(() => {
@@ -332,15 +133,7 @@ const InspBodyTable = ({ fields, tableData, settableData, Batch, setBatch, previ
 
             <>
                 <Loader loader={loading} />
-                {/* <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '8px' }}>
-
-                    <Tooltip title="Delete Selected Rows">
-                        <IconButton sx={{ fontSize: "16px" }} onClick={handleDeleteSelectedRows} color="error">
-                            <MDBIcon fas icon="trash" />
-                        </IconButton>
-                    </Tooltip>
-
-                </Box> */}
+               
 
                 <Box
                     sx={{
@@ -377,10 +170,9 @@ const InspBodyTable = ({ fields, tableData, settableData, Batch, setBatch, previ
 
                                     {!preview && <TableCell sx={{ ...headerCellStyle, minWidth: "50px" }}> SI no</TableCell>}
                                     {sortedFields.map((field, idx) => {
-                                        // const isClickable = inputConfig?.bBifurcation? field.FieldName=="AddCharge" : false;
-                                        const isClickable = field?.FieldName == "AddCharge" ? true : false;
+                                        
                                         return (
-                                            <TableCell onClick={() => isClickable && handleHeaderClick(field.FieldName)} key={idx} sx={{ ...headerCellStyle, minWidth: "100px",maxWidth: "fit-Content" }}>
+                                            <TableCell  key={idx} sx={{ ...headerCellStyle, minWidth: "100px",maxWidth: "fit-Content" }}>
                                                 {field.Caption}
                                             </TableCell>
                                         )
@@ -394,12 +186,10 @@ const InspBodyTable = ({ fields, tableData, settableData, Batch, setBatch, previ
                                         key={index}
                                         row={row}
                                         index={index}
-                                        rowClick={rowClick}
                                         handleRowChange={handleRowChange}
                                         bodyCell={bodyCell}
                                         tableData={tableData}
                                         fields={sortedFields}
-                                        showAlert={showAlert}
                                         language={language}
                                     />
                                 ))}
@@ -408,15 +198,7 @@ const InspBodyTable = ({ fields, tableData, settableData, Batch, setBatch, previ
                     </TableContainer>
                 </Box>
             </>
-            {/* {itemPopupOpen &&
-          <ItemSelectionPopup
-        open={itemPopupOpen}
-        onClose={handleClosePopup}
-        onSelect={handleItemsSelected}
-        allowMultipleSelection={itemPopupRowIndex === tableData.length - 1}
-        
-      />
-    } */}
+            
 
         </Box>
 
@@ -435,80 +217,6 @@ const MemoizedTableRow = ({ row, index, rowClick, handleRowChange, bodyCell, fie
         "& .MuiFormControlLabel-label": {
             fontSize: 12, // Adjust the label font size as needed
         },
-    };
-
-    const [anchorEl, setAnchorEl] = useState(null);
-    const [showIcons, setShowIcons] = useState(false);
-
-    //Batch
-    const [batchPopupOpen, setBatchPopupOpen] = useState(false);
-    const [currentRowIndex, setCurrentRowIndex] = useState(null);
-    const [selectedBatchData, setSelectedBatchData] = useState([])
-    const [selectedQuantity, setSelectedQuantity] = useState(null)
-    const [selectedIsino, setselectedIsino] = useState(null)
-
-
-
-    const handleMenuClick = (event) => {
-        setAnchorEl(event.currentTarget);
-    };
-
-    const handleMenuClose = () => {
-        setAnchorEl(null);
-    };
-
-    const handleMouseEnter = () => {
-        setShowIcons(true);
-    };
-
-    const handleMouseLeave = () => {
-        setShowIcons(false);
-    };
-
-    const isMenuOpen = Boolean(anchorEl);
-
-    //#region batch row
-    const handleBatchClick = (rowIndex) => {
-        if (!row.Quantity > 0) {
-
-
-            showAlert("info", "Enter quntity")
-
-            return
-
-        }
-
-
-        const selectedBatch = Batch.filter(batch => batch.iSiNo === row.iSiNo);
-        setCurrentRowIndex(rowIndex);
-        setBatchPopupOpen(true);
-        setSelectedBatchData(selectedBatch);
-        setSelectedQuantity(row.fQty);
-        setselectedIsino(row.iSiNo)
-    };
-
-
-
-
-
-
-
-
-
-
-
-
-    const handleBlur = () => {
-        setTimeout(() => {
-            if (ref.current && !ref.current.contains(document.activeElement)) {
-                rowClick(0);
-            }
-        }, 0);
-    };
-    const handleChange = (e) => {
-        const updatedValue = { ...value }; // Ensure `value` is treated as an object
-        updatedValue[fieldName] = e.target.checked; // Update the specific field
-        changeValue(updatedValue); // Pass the updated object to the parent
     };
 
     const renderCellContent = (field, index) => {
@@ -644,33 +352,12 @@ const MemoizedTableRow = ({ row, index, rowClick, handleRowChange, bodyCell, fie
     return (
         <TableRow
             sx={{ height: "30px", padding: "0px" }}
-            onClick={() => rowClick(index)}
-            onFocus={() => rowClick(index)}
-            //onMouseEnter={() => rowClick(index)}  // Add this line
-
-            onMouseLeave={handleMenuClose}
 
 
         >
-            {/* Checkbox column */}
-            {/* <TableCell sx={{ ...bodyCell, minWidth: "30px", paddingLeft: "0px", textAlign: "center", width: "30px" }}>
-                <Checkbox
-                    checked={row.selected || false}
-                    onChange={(e) => handleSelectRow(index, e.target.checked)}
-                    onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                            // Toggle the checkbox value when Enter is pressed
-                            handleSelectRow(index, !row.selected);
-                        }
-                    }}
-                    inputProps={{ "aria-label": "controlled" }}
-                    sx={{ padding: 0, width: "20px", transform: "scale(0.7)", }}
-                    color="default" />
-            </TableCell> */}
             <TableCell
                 sx={{ ...bodyCell, minWidth: "30px", textAlign: "left", paddingLeft: "10px", width: "50px", position: "relative" }}
-                onMouseEnter={handleMouseEnter}
-                onMouseLeave={handleMouseLeave}
+                
             >
                 {row.SlNo}
 

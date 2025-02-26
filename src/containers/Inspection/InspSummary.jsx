@@ -142,6 +142,7 @@ export default function InspSummary({
   const [changesTriggered, setchangesTriggered] = React.useState(false); //Any changes made like delete, add new role then makes it true for refreshing the table
   const [selectedDatas, setselectedDatas] = React.useState([]); //selected rows details
   const [selectedProduct, setselectedProduct] = React.useState([]);
+  const [selectedStatus, setselectedStatus] = React.useState([]);
   const [totalRows, settotalRows] = useState(null); // Total rows of Api response
   const [refreshFlag, setrefreshFlag] = React.useState(true); //To take data from Data base
   const [searchKey, setsearchKey] = useState(""); //Table Searching
@@ -150,15 +151,12 @@ export default function InspSummary({
   const [confirmAlert, setConfirmAlert] = useState(false); //To handle alert open
   const [confirmData, setConfirmData] = useState({}); //To pass alert data
   const latestSearchKeyRef = useRef(searchKey);
+
+  const loginName = localStorage.getItem("LoginName");
   
   const { getInspectionSummary,deleteInspection,getAssignjoborderlist,getjoborderproductlistsummary} =
     inspectionApis();
-  const [groupId, setGroupId] = useState(0);
-  const [parentList, setParentList] = useState([]);
-  const longPressTriggeredRef = useRef(false); // Persist flag
-  const longPressTimerRef = useRef(null); // Persist timer
-
-  const longPressThreshold = 500;
+  
 
   //Role Summary
   const fetchRoleSummary = async () => {
@@ -244,6 +242,15 @@ export default function InspSummary({
 
   const handleRowDoubleClick = (rowiId,row) => {
     if (rowiId > 0) {
+      // if(menuIdLocal == 29 && row.CreatedBy !== loginName){
+      //   showAlert('info',"You can't edit")
+      //     return;
+      // }
+      if(menuIdLocal === 29 && (row?.Status === 'Approved' || row?.Status === 'Rejected'))
+        {
+          showAlert('info',"This product is Authorized can't edit")
+          return;
+        }
       setId(rowiId);
       setProductId(row?.Product)
       setPageRender(2);
@@ -261,8 +268,10 @@ export default function InspSummary({
   const handleSelectedRowsChangeProduct = (selectedRowsData) => {
     setselectedProduct(selectedRowsData);
   };
+  const handleSelectedRowsChangeStatus = (selectedRowsData) => {
+    setselectedStatus(selectedRowsData);
+  };
   const resetChangesTrigger = () => {
-    setGroupId(0);
     setchangesTriggered(false);
   };
   const handleDisplayLengthChange = (newDisplayLength) => {
@@ -309,6 +318,7 @@ export default function InspSummary({
     setMainDetails({})
     setNewId(false)
     setPageRender(1);
+    setselectedStatus([])
   };
 
   
@@ -323,6 +333,11 @@ export default function InspSummary({
             ? "Select row to Edit "
             : "Can't Edit Multiple Role"
         );
+        return;
+      }
+      if(menuIdLocal == 29 && (selectedStatus[0]?.Status === 'Approved' || selectedStatus[0]?.Status === 'Rejected'))
+      {
+        showAlert('info',"This product is Authorized can't edit")
         return;
       }
       setId(selectedDatas[0]);
@@ -407,27 +422,7 @@ export default function InspSummary({
     } catch (error) {}
   };
 
-  const handleLongPressStart = (event, row) => {
-    longPressTriggeredRef.current = false;
-    longPressTimerRef.current = setTimeout(() => {
-      longPressTriggeredRef.current = true;
-      const isHighlighted = row.Group;
-      if (isHighlighted) {
-        setGroupId(row?.Id);
-        setPageRender(1);
-      } else {
-        setGroupId(0);
-      }
-    }, longPressThreshold);
-  };
-
-  // Function to handle the end of long press (mouse up or leave)
-  const handleLongPressEnd = () => {
-    if (longPressTimerRef.current) {
-      clearTimeout(longPressTimerRef.current);
-      longPressTimerRef.current = null;
-    }
-  };
+  
  
   
   
@@ -460,16 +455,14 @@ export default function InspSummary({
             setchangesTriggered={resetChangesTrigger}
             onSelectedRowsChange={handleSelectedRowsChange}
             onSelectedProductChange={handleSelectedRowsChangeProduct}
+            onSelectedStatusChange={handleSelectedRowsChangeStatus}
             onRowDoubleClick={handleRowDoubleClick}
             totalRows={totalRows}
             //   currentTheme={currentTheme}
-            handleLongPressStart={handleLongPressStart}
-            handleLongPressEnd={handleLongPressEnd}
-            parentList={parentList}
             totalPages={totalPages}
             hardRefresh={hardRefresh}
             IdName={"Id"} 
-            statusName={menuIdLocal !== 31 ?"Status":''}
+            // statusName={menuIdLocal !== 31 ?"Status":''}
             getAssignjoborderlist={getAssignjoborderlist}
             mainDetails={mainDetails}
             setMainDetails={setMainDetails}

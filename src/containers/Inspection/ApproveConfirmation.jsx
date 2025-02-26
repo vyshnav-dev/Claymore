@@ -82,6 +82,7 @@ export default function ApproveConfirmation({
                 setValue={setMainDetails}
                 multiline={true}
                 width={400}
+                placeholder={"Add Remarks..."}
             />
               )}
               
