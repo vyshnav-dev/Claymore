@@ -45,9 +45,10 @@ const ExcelExport = async ({ reportName, filteredRows, excludedFields}) => {
     sheet = workbook.addWorksheet(`${reportName} - ${sheetNumber}`);
     currentRowCount = 0; // Reset row count for the new sheet
 
+
     const headers = Object.keys(filteredRows[0] || {}).filter(header => !excludedFields.includes(header));
     headers.forEach((header, index) => {
-      sheet.getColumn(index + 1).width = 20;
+      sheet.getColumn(index + 1).width = 25;
     });
     const lastColumnLetter = columnIndexToLetter(headers.length);
     // Add the first two rows as in the image

@@ -28,6 +28,7 @@ import TabFields from "./TabFields";
 import Loader from "../../component/Loader/Loader";
 import ApproveConfirmation from "./ApproveConfirmation";
 import TagFileTab from "./TagFileTab";
+import { allocationApis } from "../../service/Allocation/allocation";
 const currentDate = new Date().toISOString().split("T")[0];
 function CustomTabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -146,11 +147,22 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction, certify }) => {
                     ) : null}
                 </>
             )}
-            {userAction.some((action) => action.Action == "Authorise") && (
-                <>
-                    {detailPageId != 0 ? (
+            <ActionButton
+                iconsClick={iconsClick}
+                icon={"fa-solid fa-circle-arrow-left"}
+                caption={"Prev"}
+                iconName={"prev"}
+            />
+            <ActionButton
+                iconsClick={iconsClick}
+                icon={"fa-solid fa-circle-arrow-right"}
+                caption={"Next"}
+                iconName={"next"}
+            />
+            
+                    {hasAproove && detailPageId != 0 ? (
                         <>
-                            {!certify && (
+                            {certify == 1 ? (
                                 <>
                                     <ActionButton
                                         iconsClick={iconsClick}
@@ -164,24 +176,31 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction, certify }) => {
                                         caption={"Reject"}
                                         iconName={"reject"}
                                     />
+                                    <ActionButton
+                                        iconsClick={iconsClick}
+                                        icon={"fa-solid fa-file-pen"}
+                                        caption={"Correction"}
+                                        iconName={"correction"}
+                                    />
+                                    <ActionButton
+                                        iconsClick={iconsClick}
+                                        icon={"fa-regular fa-rectangle-xmark"}
+                                        caption={"Suspend"}
+                                        iconName={"suspend"}
+                                    />
                                 </>
-                            )}
-
-                            {certify && (
+                            ):certify == 2 ?  (
                                 <ActionButton
                                     iconsClick={iconsClick}
                                     icon={"fa-solid fa-stamp"}
                                     caption={"Certificate"}
                                     iconName={"certificate"}
                                 />
-                            )}
-
+                            ):null}
                         </>
                     ) : null}
-                </>
-            )}
-
-
+              
+            
 
 
 
@@ -347,7 +366,7 @@ const tableFields = [
         Mandatory: true,
         MandatoryInGroup: false,
         MandatoryInRevision: false,
-        MaxSize: 0,
+        MaxSize: 100,
         MaximumValue: null,
         MergeField: false,
         MinimumValue: null,
@@ -434,7 +453,7 @@ export default function InspDetails({
     const [selectedDatas, setselectedDatas] = React.useState([]); //selected rows details
     const [property, setProperty] = useState(false);
     const [itemLabel, setItemLabel] = useState('');
-    const [certify, setCertify] = useState(false);
+    const [certify, setCertify] = useState(0);
 
     //TagAttachmentTab
     const [dbTagAttachmentDetails, setdbTagAttachmentDetails] = useState([])
@@ -445,6 +464,7 @@ export default function InspDetails({
         GetInspectionFields, getexaminationform, getdocno, getjoborderheaddetails, getInspectionDetails, upsertInspection, deleteInspection, upsertApprove, uploadAttachfiles, generatecertificate
     } = inspectionApis();
 
+    const { getrecordprevnext } =allocationApis()
 
     useEffect(() => {
         const fetchData = async () => {
@@ -654,6 +674,7 @@ export default function InspDetails({
 
 
                 const result = JSON.parse(response?.result)
+                
 
                 let updatedData = {
                     ...formData,
@@ -661,7 +682,11 @@ export default function InspDetails({
                     InspectionInformation: result?.InspectionInformation ?? {}
                 }
                 if (result?.Status == 2 || result?.Status == 4) {
-                    setCertify(true)
+                    setCertify(2)
+                }
+                else if (result?.Status == 6)
+                {
+                    setCertify(1)
                 }
                 setFormData(updatedData)
                 setTableBody(result?.Examination)
@@ -688,15 +713,12 @@ export default function InspDetails({
     // ---- Aproove method----
 
     const handleProperty = (value) => {
-        // if (selectedDatas.length === 0) {
-        //     showAlert("info", "Select rows to Authorize");
-        //     return;
-        // }
+        
         setItemLabel(value)
         setConfirmData({
             message: `You want to Approve.`,
             type: "info",
-            header: "Authorization",
+            header: value == 'correction'? 'Correction':value == 'suspend'? 'Suspend':"Authorization" ,
         });
         setProperty(true);
     };
@@ -737,10 +759,22 @@ export default function InspDetails({
                 }
 
                 break;
+            case "prev":
+                handlePrevNext(1);
+                break;
+            case "next":
+                handlePrevNext(2);
+                break;
             case "approve":
                 handleProperty(value);
                 break;
             case "reject":
+                handleProperty(value);
+                break;
+            case "correction":
+                handleProperty(value);
+                break;
+            case "suspend":
                 handleProperty(value);
                 break;
             case "certificate":
@@ -763,10 +797,23 @@ export default function InspDetails({
         }
         else {
             setId(backId)
-            setPageRender(3);
+            setPageRender(2);
         }
-        setCertify(false)
+        setCertify(1)
     };
+
+
+    const handlePrevNext = async (value) =>{
+        const response = await getrecordprevnext({
+            category:3,
+            id: detailPageId,
+            type:value
+        })
+        if (response.status == "Success") {
+            console.log('res1',response);
+            
+        }
+    }
 
     const validateFormData = async () => {
 
@@ -968,11 +1015,10 @@ export default function InspDetails({
         setMainDetails1({});
     }
 
-    console.log('detail',detailPageId);
-    
+
 
     const handlePropertyConfirmation = async (status) => {
-        if (status == 1) {
+        if (status == 1 || status == 3 || status == 4) {
             if (!mainDetails1?.Remarks) {
                 showAlert("info", `Please Provide Remarks`);
                 return;
@@ -987,8 +1033,9 @@ export default function InspDetails({
         try {
             const response = await upsertApprove(saveData);
             if (response?.status === "Success") {
-                setCertify(true)
+                // setCertify(true)
                 showAlert("success", response?.message);
+                handleclose();
                 setMainDetails1({})
             }
         } catch (error) {
@@ -1002,7 +1049,7 @@ export default function InspDetails({
         try {
             const response = await generatecertificate({ inspectionId: detailPageId });
             const myObject = JSON.parse(response?.result)
-            
+
             if (response?.status === "Success") {
                 const popupWindow = window.open(
                     myObject,
@@ -1101,6 +1148,7 @@ export default function InspDetails({
                             mandatory={true}
                             value={formData}
                             setValue={setFormData}
+                            maxLength={50}
                         />
 
                         <Box sx={{
@@ -1247,7 +1295,7 @@ export default function InspDetails({
                 open={property}
                 data={confirmData}
                 submite={handlePropertyConfirmation}
-                selectedDatas={selectedDatas?.length === 1 ? selectedDatas[0] : null}
+                // selectedDatas={selectedDatas?.length === 1 ? selectedDatas[0] : null}
                 itemLabel={itemLabel}
                 mainDetails={mainDetails1}
                 setMainDetails={setMainDetails1}

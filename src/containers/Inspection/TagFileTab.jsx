@@ -323,36 +323,7 @@ export default function TagFileTab({
   };
   //#endregion file download
 
-  //#region  File edit
-  const handleEdit = (index, fileObj) => {
 
-    
-    if(disabledDetailed){
-      return
-    }
-    // setautoCompleteData({
-    //   ...autoCompleteData,
-    //   AttachType_Name: fileObj.AttachType_Name,
-    //   AttachType: fileObj.AttachType,
-    //   RefNo: fileObj?.RefNo,
-    // });
-
-    const file = fileObj?.file;
-    if (file) {
-      newFileRef.current = file; // Store the file in the ref
-    }
-    const fileInput = document.querySelector('input[type="file"]');
-    const myFile = new File(["Hello World!"], fileObj.FileName, {
-      type: "text/plain",
-      lastModified: new Date(),
-    });
-
-    // Now let's create a DataTransfer to get a FileList
-    const dataTransfer = new DataTransfer();
-    dataTransfer.items.add(myFile);
-    fileInput.files = dataTransfer.files;
-    seteditFileIndex(index);
-  };
 
    //#region Delete file
   //To delete

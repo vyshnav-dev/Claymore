@@ -391,9 +391,9 @@ export default function ReportSummary(props) {
 
                       {columns.map((column) => (
                         <Tooltip
-                          title={
-                            column.id === "Technician" ? row[column.id]:column.id === "ProductName" ? row[column.id] : null
-                          }
+              
+                            title={["Technician", "ProductName","Client"]?.includes(column.id) ? row[column.id] : null}
+                          
                         >
                           <TableCell
                             sx={{

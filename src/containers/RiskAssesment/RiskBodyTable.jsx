@@ -52,6 +52,8 @@ const RiskBodyTable = ({ fields, tableData, settableData, preview = false, langu
             return
         }
 
+        
+
         const fieldName = field.FieldName;
 
         settableData(prevRows => {
@@ -62,10 +64,22 @@ const RiskBodyTable = ({ fields, tableData, settableData, preview = false, langu
                 let newArray = updatedRows.find((item) => item.Name === typeName)
 
                 const Data1 = [...newArray.Items]
+
+                if(data == false)
+            {
+                Data1[index] = {
+                    ...Data1[index],
+                    [field.FieldName]: data,
+                    ['RiskLevel']:0
+                };
+            }
+            else{
                 Data1[index] = {
                     ...Data1[index],
                     [field.FieldName]: data
                 };
+            }
+            
                 newArray = {
                     ...newArray,
                     Items: Data1
@@ -77,9 +91,12 @@ const RiskBodyTable = ({ fields, tableData, settableData, preview = false, langu
 
             }
             else if (field.FieldDisplayType == "level") {
+
                 let newArray = updatedRows.find((item) => item.Name === typeName)
 
                 const Data1 = [...newArray.Items]
+                
+                
                 Data1[index] = {
                     ...Data1[index],
                     [field.FieldName]: data

@@ -32,7 +32,7 @@ const iconsExtraSx = {
   marginRight: 1,
 };
 
-export default function StaticTable({ rows,excludedColumns = [] }) {
+export default function TimeRecordTable({ rows,excludedColumns = [] }) {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(25);
   const totalPages = Math.ceil(rows.length / rowsPerPage);
@@ -65,7 +65,7 @@ export default function StaticTable({ rows,excludedColumns = [] }) {
       sx={{
         width: "98%",
         margin: "auto",
-        boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)",
+        // boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)",
         paddingLeft: "10px",
         paddingRight: "10px",
         paddingBottom: "5px",
@@ -83,7 +83,7 @@ export default function StaticTable({ rows,excludedColumns = [] }) {
           marginTop:"10px"
         }}
       >
-        <FormControl>
+        {/* <FormControl>
           <InputLabel
             htmlFor="rows-per-page"
             sx={{
@@ -118,7 +118,7 @@ export default function StaticTable({ rows,excludedColumns = [] }) {
             <MenuItem value={50}>50</MenuItem>
             <MenuItem value={100}>100</MenuItem>
           </Select>
-        </FormControl>
+        </FormControl> */}
 
         {/* <div
           style={{ display: "flex", alignItems: "center", flexWrap: "wrap" }}
@@ -196,11 +196,24 @@ export default function StaticTable({ rows,excludedColumns = [] }) {
       </div>
 
       {currentRows.length > 0 ? (
-        <Paper sx={{ width: "100%", mb: 1 }}>
+        <Paper sx={{ width: "fit-Content", mb: 1 }}>
           <TableContainer sx={{ maxHeight: "60vh", overflow: "auto", scrollbarWidth: "thin" }}>
             <Table stickyHeader>
               <TableHead>
                 <TableRow>
+                <TableCell  sx={{
+                                            padding: "0px",
+                                            paddingLeft: "4px",
+                                            border: `1px solid ${thirdColor}`,
+                                            fontWeight: "600",
+                                            font: "14px",
+                                            backgroundColor: secondaryColor,
+                                            color: "white",
+                                            paddingTop: "3px",
+                                            paddingBottom: "3px",
+                                          }}>
+                                            Sl No
+                                            </TableCell>
                   {filteredKeys.map((key) => (
                     <TableCell key={key} sx={{
                                             padding: "0px",
@@ -221,6 +234,18 @@ export default function StaticTable({ rows,excludedColumns = [] }) {
               <TableBody>
                 {currentRows.map((row, index) => (
                   <TableRow  key={index} sx={{ backgroundColor: index % 2 === 1 ? thirdColor : null }}>
+                    <TableCell key={index}  sx={{
+                                                    padding: "0px",
+                                                    paddingLeft: "4px",
+                                                    border: `1px solid ${thirdColor}`,
+                                                    minWidth: "100px",
+                                                    color:row.color?row.color:"#000",
+                                                    whiteSpace: "nowrap",
+                                                    overflow: "hidden",
+                                                    textOverflow: "ellipsis",
+                                                    fontWeight: row["Group"] ? 800 : null,
+                                                    
+                                                  }}>{index + 1}</TableCell>
                     {filteredKeys.map((key, i) => (
                       <TableCell key={i}  sx={{
                                                     padding: "0px",
@@ -247,7 +272,7 @@ export default function StaticTable({ rows,excludedColumns = [] }) {
         </Box>
       )}
 
-      {totalPages > 0 && (
+      {/* {totalPages > 0 && (
         <Pagination
           count={totalPages}
           page={page + 1}
@@ -258,7 +283,8 @@ export default function StaticTable({ rows,excludedColumns = [] }) {
           showLastButton
           sx={{ display: "flex", justifyContent: "center", padding: "8px 0" }}
         />
-      )}
+      )} */}
     </Box>
   );
 }
+

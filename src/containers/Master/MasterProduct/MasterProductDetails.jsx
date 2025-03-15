@@ -255,7 +255,9 @@ export default function MasterProductDetails({
       case "save":
         const emptyFields = [];
         if (!mainDetails?.Name) emptyFields.push("Name");
-        if (!mainDetails.Code) emptyFields.push("Code");
+        if (!mainDetails?.Code) emptyFields.push("Code");
+        if (!mainDetails?.Type) emptyFields.push("Type");
+        if (!mainDetails?.InspFrequency) emptyFields.push("Inspection Frequency");
         if (emptyFields.length > 0) {
           showAlert("info", `Please Provide ${emptyFields[0]}`);
           return;

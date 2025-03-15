@@ -60,7 +60,7 @@ const AlertComponent = ({ open, onClose,rows }) => {
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
       
       <Box sx={{display:"flex",flexdirection:"row",width:"90%",p:2,justifyContent:"space-Between",alignItems:"center",margin:"auto"}}>
-        <Typography sx={{fontWeight:500,fontsize:"20px"}}> Job Orders To Authorize</Typography>
+        <Typography sx={{fontWeight:500,fontsize:"20px"}}> Job Orders To Authorise</Typography>
         <Box sx={{display:"flex",flexdirection:"row",justifyContent:"space-Between",alignItems:"center"}}>
 
         <ActionButton

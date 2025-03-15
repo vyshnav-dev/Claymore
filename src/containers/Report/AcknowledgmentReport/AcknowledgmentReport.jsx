@@ -98,7 +98,7 @@ function BasicBreadcrumbs({ viewAction, status }) {
                     aria-label="breadcrumb"
                 >
                     <Typography underline="hover" sx={style} key="1">
-                    Acknowledgment Report
+                        Acknowledgment Report
                     </Typography>
                     <Typography underline="hover" sx={style} key="1"></Typography>
                 </Breadcrumbs>
@@ -164,7 +164,7 @@ export default function AcknowledgmentReport({ userAction, disabledDetailed }) {
     const [confirmData, setConfirmData] = useState({});
     const [confirmType, setConfirmType] = useState(null);
     const {
-        getclientlist
+        getclientlist, GetTechnicianList
     } = allocationApis();
     const { showAlert } = useAlert();
     const [rows, setRows] = React.useState([]); //To Pass in Table
@@ -202,6 +202,7 @@ export default function AcknowledgmentReport({ userAction, disabledDetailed }) {
                     fromDate: mainDetails.fromDate,
                     toDate: mainDetails.toDate,
                     client: mainDetails?.Client,
+                    inspector: mainDetails?.Technician,
                     status: mainDetails?.Status,
                     pageNo: pageNumber,
                     pageSize: displayLength,
@@ -258,7 +259,7 @@ export default function AcknowledgmentReport({ userAction, disabledDetailed }) {
         setsearchKey("")
         latestSearchKeyRef.current = ""
         setchangesTriggered(!changesTriggered);
-      };
+    };
     const handleIconsClick = async (value) => {
         switch (value.trim()) {
             case "close":
@@ -286,6 +287,7 @@ export default function AcknowledgmentReport({ userAction, disabledDetailed }) {
             fromDate: mainDetails.fromDate,
             toDate: mainDetails.toDate,
             client: mainDetails?.Client,
+            inspector: mainDetails?.Technician,
             status: mainDetails?.Status,
             pageNumber: 0,
             pageSize: 0,
@@ -411,20 +413,16 @@ export default function AcknowledgmentReport({ userAction, disabledDetailed }) {
                                     formDataName={"Client_Name"}
                                 />
 
-                                {/* <AutoSelect
-                                    key={"Status"}
+                                <UserAutoComplete
+                                    apiKey={GetTechnicianList}
                                     formData={mainDetails}
                                     setFormData={setMainDetails}
-                                    autoId={"Status"}
-                                    formDataName={`Status_Name`}
-                                    formDataiId={"Status"}
+                                    label={"Technician"}
+                                    autoId={"Technician"}
                                     required={false}
-                                    label={"Status"}
-                                    ColumnSpan={0}
-                                    Menu={[{ "Id": 1, "Name": "Allocated" }, { "Id": 2, "Name": "Working" }, { "Id": 3, "Name": "Closed" }]}
-
-                                /> */}
-
+                                    formDataiId={"Technician"}
+                                    formDataName={"Technician_Name"}
+                                />
 
                                 <Box p={1.9}>
                                     <NormalButton label={"Search"} action={tagDetails} />

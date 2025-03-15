@@ -357,7 +357,7 @@ const tableFields = [
         Mandatory: true,
         MandatoryInGroup: false,
         MandatoryInRevision: false,
-        MaxSize: 0,
+        MaxSize: 500,
         MaximumValue: null,
         MergeField: false,
         MinimumValue: null,
@@ -444,6 +444,8 @@ export default function RiskAssesmentDetails({
     detailPageId: summaryId,
     userAction,
     disabledDetailed,
+    riskId,
+    setId
 }) {
 
     const currentDate = new Date().toISOString().split("T")[0];
@@ -591,7 +593,8 @@ export default function RiskAssesmentDetails({
     // Handlers for your icons
 
     const handleclose = () => {
-        setPageRender(1);
+        setId(riskId)
+        setPageRender(2);
         setIsGet(false)
     };
 
@@ -658,7 +661,7 @@ export default function RiskAssesmentDetails({
         if (response.status === "Success") {
             showAlert("success", response?.message);
             handleNew();
-            setPageRender(1);
+            setPageRender(2);
             // Check if "New" action exists, otherwise setPageRender
             // const actionExists = userAction.some(action => action.Action === "New");
             // if (!actionExists) {
@@ -701,7 +704,7 @@ export default function RiskAssesmentDetails({
             handleNew();
             const actionExists = userAction.some((action) => action.Action === "New");
             if (!actionExists) {
-                setPageRender(1);
+                setPageRender(2);
             }
         }
     };
@@ -821,7 +824,7 @@ export default function RiskAssesmentDetails({
                             mandatory={true}
                             value={mainDetails}
                             setValue={setMainDetails}
-                            maxLength={100}
+                            maxLength={50}
                         />
 
                         <UserInputField

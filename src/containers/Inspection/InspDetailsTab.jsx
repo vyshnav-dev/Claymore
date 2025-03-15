@@ -57,9 +57,10 @@ export default function InspDetailsTab({formData,setFormData}) {
             mandatory={true}
             value={formData}
             setValue={setFormData}
-            // onBlurAction={() => handleMasterExist(2)}
             maxLength={100}
+            DonotAllowSpecialChar={true}
         />
+        
         <UserInputField
             label={"Test Method"}
             name={"TestMethod"}
@@ -68,7 +69,6 @@ export default function InspDetailsTab({formData,setFormData}) {
             mandatory={true}
             value={formData}
             setValue={setFormData}
-            // onBlurAction={() => handleMasterExist(2)}
             maxLength={100}
         />
         <UserInputField
@@ -79,7 +79,6 @@ export default function InspDetailsTab({formData,setFormData}) {
             mandatory={true}
             value={formData}
             setValue={setFormData}
-            // onBlurAction={() => handleMasterExist(2)}
             maxLength={100}
         />
         <UserInputField
@@ -90,8 +89,8 @@ export default function InspDetailsTab({formData,setFormData}) {
             mandatory={true}
             value={formData}
             setValue={setFormData}
-            // onBlurAction={() => handleMasterExist(2)}
             maxLength={100}
+            DonotAllowSpecialChar={true}
         />
         <UserInputField
             label={"Calibrated Test Equipment"}
@@ -101,8 +100,8 @@ export default function InspDetailsTab({formData,setFormData}) {
             mandatory={true}
             value={formData}
             setValue={setFormData}
-            // onBlurAction={() => handleMasterExist(2)}
             maxLength={100}
+            DonotAllowSpecialChar={true}
         />
         <UserInputField
             label={"Client Test Equipment"}
@@ -112,8 +111,8 @@ export default function InspDetailsTab({formData,setFormData}) {
             mandatory={true}
             value={formData}
             setValue={setFormData}
-            // onBlurAction={() => handleMasterExist(2)}
             maxLength={100}
+            DonotAllowSpecialChar={true}
         />
        
         

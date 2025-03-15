@@ -1,6 +1,5 @@
 {
     "baseUrl" : "http://103.120.178.195/Sang.Claymore.API/",
-    "baseUrlMob":"http://103.120.178.195/Sang.StockCount.Mob.API/",
     "logo" : "/Images/sangsolution.png",
     "primaryColor" :"#00405e",
     "secondaryColor" :"#26668b",
@@ -12,5 +11,6 @@
     "allowedExtensionsReceipt":["jpg", "jpeg", "png", "gif", "txt", "pdf", "xls", "xlsx", "doc", "docx"],
     "allowedExtensionsTagAttachments":["jpg", "jpeg", "png", "gif", "txt", "pdf", "xls", "xlsx", "doc", "docx"],
     "reportDateFields":"Created On,Modified On,CreatedOn,ModifiedOn,Created Date,Stock Date,Doc Date,Reconciliation Date,Date,Targetdate Of Closure,TargetdateOfClosure,Date Of Inspection",
-    "rowsPerSheet":10000
+    "rowsPerSheet":10000,
+    "allowedExtensionsUser":["jpg", "jpeg", "png", "gif"]
 }

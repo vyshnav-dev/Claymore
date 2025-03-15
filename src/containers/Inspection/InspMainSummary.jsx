@@ -49,7 +49,7 @@ function BasicBreadcrumbs({mId}) {
           aria-label="breadcrumb"
         >
           <Typography underline="hover" sx={style} key="1">
-           { mId !== 31 ? 'Inspection ' :'Approve'}
+           { mId !== 31 ? 'Inspection ' :'Authorise'}
           </Typography>
         </Breadcrumbs>
       </Stack>
@@ -213,7 +213,7 @@ export default function InspMainSummary({
   const handleRowDoubleClick = (rowiId) => {
     if (rowiId > 0) {
       setId(rowiId);
-      setPageRender(3);
+      setPageRender(2);
     }
   };
 
@@ -290,7 +290,7 @@ export default function InspMainSummary({
     } else {
       setId(0);
     }
-    setPageRender(3);
+    setPageRender(2);
   };
 
   //Delete alert open

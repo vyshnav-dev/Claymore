@@ -40,6 +40,7 @@ import {
 import UserAutoComplete from "../AutoComplete/UserAutoComplete";
 import RouteMap from "../RouteMap/RouteMap";
 import { MDBIcon } from "mdb-react-ui-kit";
+import AutoSelect from "../AutoComplete/AutoSelect";
 
 const iconsExtraSx = {
   fontSize: "0.8rem",
@@ -69,7 +70,8 @@ export default function InspSummaryTable(props) {
     getAssignjoborderlist,
     mainDetails,
     setMainDetails,
-    id
+    id,
+    menuIdLocal
   } = props;
   const [selected, setSelected] = React.useState([]);
   const [selectedPd, setSelectedPd] = React.useState([]);
@@ -192,7 +194,7 @@ export default function InspSummaryTable(props) {
     if (selectedIndex === -1 || selectedIndexpd === -1 || selectedStatusIndex === -1) {
       newSelected = newSelected.concat(selected, row[IdName]); // Add the entire row object
       newSelectedPd = newSelectedPd.concat(selectedPd, row['Product']); // Add the entire row object
-      newSelectedStatus = newSelectedStatus.concat(pdStatus,row)
+      newSelectedStatus = newSelectedStatus.concat(pdStatus, row)
     } else {
       newSelected = [
         ...selected.slice(0, selectedIndex),
@@ -237,7 +239,7 @@ export default function InspSummaryTable(props) {
     setPage(0); // Reset page to 0
     props.onpageNumberChange(1); // Call the callback function with 0 if needed
     props.setchangesTriggered(false);
-    setSelected([]);  
+    setSelected([]);
     setSearchTerm("")
   }, [props.changesTriggered]);
 
@@ -270,7 +272,7 @@ export default function InspSummaryTable(props) {
 
     return `${day}-${month}-${year}`;
   };
-  
+
   const handleMapOpen = (id) => {
     setMapId(id)
     setMapOpen(true)
@@ -373,6 +375,23 @@ export default function InspSummaryTable(props) {
               />
             </Box>
           }
+          {menuIdLocal == 31 &&
+            <Box sx={{ display: 'flex', flexWrap: "wrap", gap: .5, mr: 1, mb: 1, }}>
+              <AutoSelect
+                key={"Status"}
+                formData={mainDetails}
+                setFormData={setMainDetails}
+                autoId={"Status"}
+                formDataName={`Status_Name`}
+                formDataiId={"Status"}
+                required={false}
+                label={"Status"}
+                ColumnSpan={0}
+                Menu={[{ "Id": 1, "Name": "Approved" }, { "Id": 2, "Name": "Rejected" }, { "Id": 3, "Name": "Pending" }, { "Id": 4, "Name": "Correction" }, { "Id": 5, "Name": "Suspended" }]}
+
+              />
+            </Box>
+          }
 
           <TextField
             margin="normal"
@@ -469,7 +488,7 @@ export default function InspSummaryTable(props) {
           >
             <Table stickyHeader sx={{ minWidth: 750 }}>
               <TableHead>
-                <TableRow sx={{ position: "sticky", top: 0,zIndex:3 }}>
+                <TableRow sx={{ position: "sticky", top: 0, zIndex: 3 }}>
                   {columns.map((column, index) => (
                     <TableCell
                       key={column.id}
@@ -542,7 +561,7 @@ export default function InspSummaryTable(props) {
                       {columns.map((column) => (
                         <Tooltip
                           title={
-                            column.id === "Narration" ? row[column.id] : null
+                            column.id === "RejectRemarks" ? row[column.id] : null
                           }
                         >
                           <TableCell
@@ -556,24 +575,24 @@ export default function InspSummaryTable(props) {
                               overflow: "hidden",
                               textOverflow: "ellipsis",
                               fontWeight: row["Group"] ? 800 : null,
-                              textAlign: column.id === "Location" ? "center" : "left",
+                              textAlign: column.id === "GeoLocation" ? "center" : "left",
                               // backgroundColor:row[column.id] ==='Approved'?'green':row[column.id] ==='Rejected'?'red':null,
                               // color:row[column.id] ==='Approved'|| row[column.id] ==='Rejected'?'white':null
                             }}
                             key={column.id}
                             style={{ minWidth: column.minWidth }}
                           >
-                            {column.id === "Location" ? (
+                            {column.id === "GeoLocation" ? (
                               <IconButton
-                                onClick={() => handleMapOpen(row["Location"])}
+                                onClick={() => handleMapOpen(row["GeoLocation"])}
                                 aria-label="location"
                                 sx={iconsExtraSxCell}
                               >
                                 <Stack direction="column" alignItems="center">
-                                  <MDBIcon  fas icon="fa-solid fa-location-dot" className="responsiveAction-icon" />
+                                  <MDBIcon fas icon="fa-solid fa-location-dot" className="responsiveAction-icon" />
                                 </Stack>
                               </IconButton>
-                            ) :profileDateFieldsArray.includes(column.label)
+                            ) : profileDateFieldsArray.includes(column.label)
                               ? convertToLocaleDateString(row[column.id])
                               : row[column.id] === null
                                 ? ""

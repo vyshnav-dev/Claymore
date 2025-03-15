@@ -17,6 +17,8 @@ export let allowedExtensionsTagAttachments = null
 export let MastersTagId = null
 export let TransactionData = null
 export let FixedValues = null
+export let allowedExtensionsUser = null
+
 
 export const getConfig = () => {
     if (!config) {
@@ -47,4 +49,5 @@ export const getConfig = () => {
     MastersTagId = config1.MastersTagId
     TransactionData = config1.TransactionData
     FixedValues = config1.FixedValues
+    allowedExtensionsUser = config.allowedExtensionsUser
 }

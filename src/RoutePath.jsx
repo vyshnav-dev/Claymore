@@ -127,7 +127,7 @@ export default function RoutePath() {
               }
             />
             <Route
-              path="/sub"
+              path="/form"
               element={
                 <ProtectedRoute>
                   <PDContainer />
@@ -135,7 +135,7 @@ export default function RoutePath() {
               }
             />
             <Route
-              path="/form"
+              path="/subCategory"
               element={
                 <ProtectedRoute>
                   <FormBodyContainer />

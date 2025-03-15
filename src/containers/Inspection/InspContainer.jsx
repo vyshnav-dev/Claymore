@@ -13,6 +13,7 @@ export default function InspContainer() {
   const [mainDetails, setMainDetails] = useState({
     Allocation: null,
     JobOrderNo: null,
+    Status:null,
   });
   const [newId,setNewId] = useState(false);
   const [productId, setProductId] = useState(0);
@@ -57,7 +58,7 @@ export default function InspContainer() {
           screenId={menuId}
           menuIdLocal={menuIdLocal}
         />
-      ) : page === 3 ? (
+      ) : page === 2 ? (
         <InspSummary
           setPageRender={setPage}
           setId={setId}
@@ -71,7 +72,7 @@ export default function InspContainer() {
           setMainDetails={setMainDetails}
           setNewId={setNewId}
         />
-      ) : page === 2 ? (
+      ) : page === 3 ? (
         <InspDetails
           setPageRender={setPage}
           detailPageId={id}

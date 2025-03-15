@@ -50,7 +50,7 @@ function BasicBreadcrumbs({mId}) {
           aria-label="breadcrumb"
         >
           <Typography underline="hover" sx={style} key="1">
-            { mId !== 31 ? 'Inspection Product list ' :'Approve Product list'}
+            { mId !== 31 ? 'Inspection Product list ' :'Authorise Product list'}
           </Typography>
         </Breadcrumbs>
       </Stack>
@@ -195,7 +195,8 @@ export default function InspSummary({
           pageNo: pageNumber,
           pageSize: displayLength,
           search: currentSearchKey,
-          type:Type
+          type:Type,
+          status:mainDetails?.Status
         });
       }
       // setMainDetails({
@@ -235,7 +236,7 @@ export default function InspSummary({
 
   React.useEffect(() => {
     fetchRoleSummary(); // Initial data fetch
-  }, [pageNumber, displayLength, searchKey, changesTriggered,mainDetails?.Allocation]);
+  }, [pageNumber, displayLength, searchKey, changesTriggered,mainDetails?.Allocation,mainDetails?.Status]);
 
 
  
@@ -253,7 +254,7 @@ export default function InspSummary({
         }
       setId(rowiId);
       setProductId(row?.Product)
-      setPageRender(2);
+      setPageRender(3);
     }
   };
 
@@ -345,7 +346,7 @@ export default function InspSummary({
     } else {
       setId(0);
     }
-    setPageRender(2);
+    setPageRender(3);
   };
 
   //Delete alert open
@@ -467,6 +468,7 @@ export default function InspSummary({
             mainDetails={mainDetails}
             setMainDetails={setMainDetails}
             id={Id}
+            menuIdLocal={menuIdLocal}
           />
         </Box>
         <ConfirmationAlert

@@ -7,11 +7,7 @@ import { useAlert } from "../../component/Alerts/AlertContext";
 import SummaryTable from "../../component/Table/SummaryTable";
 import { primaryColor } from "../../config/config";
 import ConfirmationAlert from "../../component/Alerts/ConfirmationAlert";
-import { masterApis } from "../../service/Master/master";
-// import MasterProductConfirmation from "./MasterProductConfirmation";
 import ExcelExport from "../../component/Excel/Excel";
-import { identity } from "lodash";
-import { inspectionApis } from "../../service/Inspection/inspection";
 import { allocationApis } from "../../service/Allocation/allocation";
 
 function BasicBreadcrumbs() {
@@ -383,13 +379,7 @@ export default function TimeRecordSummary({
           data={confirmData}
           submite={handledeleteRole}
         />
-        {/* <MasterProductConfirmation
-          handleClose={() => setProperty(false)}
-          open={property}
-          data={confirmData}
-          submite={handlePropertyConfirmation}
-          selectedDatas={selectedDatas?.length === 1 ? selectedDatas[0] : null}
-        /> */}
+        
       </Box>
     </>
   );

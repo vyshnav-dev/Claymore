@@ -18,6 +18,7 @@ import ConfirmationAlert from "../../../component/Alerts/ConfirmationAlert";
 import ActionButton from "../../../component/Buttons/ActionButton";
 import { useAlert } from "../../../component/Alerts/AlertContext";
 import {
+  allowedExtensionsUser,
   baseUrl,
   primaryColor,
   secondaryColor,
@@ -35,6 +36,8 @@ import InputCommon from "../../../component/InputFields/InputCommon";
 
 import { encrypt } from "../../../service/Security/encryptionUtils";
 import { allocationApis } from "../../../service/Allocation/allocation";
+import UserPhotoUpload from "../../../component/FileUpload/UserPhotoUpload";
+import ResetPasswordAlert from "../../../component/Alerts/ResetPasswordAlert";
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -150,6 +153,15 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction }) => {
         </>
       )}
 
+      {(userAction.some((action) => action.Action === "Update Password") && detailPageId) ? (
+        <ActionButton
+          iconsClick={iconsClick}
+          icon={"fa-solid fa-screwdriver-wrench"}
+          caption={"Reset Password"}
+          iconName={"reset"}
+        />
+      ) : null}
+
       <ActionButton
         iconsClick={iconsClick}
         icon={"fa-solid fa-xmark"}
@@ -173,14 +185,13 @@ export default function UserDetails({
   disabledDetailed,
 }) {
 
-  const userData = JSON.parse(localStorage.getItem("ClaymoreUserData"))[0];
 
   const [mainDetails, setMainDetails] = useState({});
   const [detailPageId, setDetailPageId] = useState(summaryId);
   const [confirmAlert, setConfirmAlert] = useState(false);
   const [confirmData, setConfirmData] = useState({});
   const [confirmType, setConfirmType] = useState(null);
-  const [imageUpload, setImageUpload] = useState(null);
+  const [resetPassword, setResetPassword] = useState(false);
 
   const {
     getuserdetails,
@@ -214,10 +225,15 @@ export default function UserDetails({
         });
         if (response?.status === "Success") {
           const myObject = JSON.parse(response?.result);
-          if (myObject[0]?.ImagePath) {
+          if (myObject[0]?.ImagePath || myObject[0]?.SignaturePath ) {
             setMainDetails({
               ...myObject[0],
-              ImagePath: baseUrl + myObject[0]?.ImagePath,
+              image: myObject[0]?.Image,
+              image_preview: myObject[0]?.ImagePath,
+              image_previousFileName: myObject[0]?.Image,
+              signature: myObject[0]?.Signature,
+              signature_preview: myObject[0]?.SignaturePath,
+              signature_previousFileName: myObject[0]?.Signature
             });
           } else {
             setMainDetails(myObject[0]);
@@ -248,12 +264,19 @@ export default function UserDetails({
       Type: "",
       UserType: 0,
       UserTypeName: "",
-      ImagePath: "",
+      image: "",
+      image_file: "",
+      image_preview: "",
+      signature: "",
+      signature_file: "",
+      signature_preview: "",
       Inspector: '',
-      InActive:false,
+      InActive_Name:"Active",
+      InActive: false,
+      image_previousFileName: "",
+      signature_previousFileName: "",
     });
     setDetailPageId(0);
-    setImageUpload(null);
   };
 
   const emailRegex =
@@ -281,7 +304,7 @@ export default function UserDetails({
           showAlert("info", "Employee must contain at least one letter.");
           return;
         }
-        
+
         if (!mainDetails.LoginName) {
           emptyFields.push("Login Name");
         } else if (!namePattern.test(mainDetails.LoginName)) {
@@ -299,7 +322,7 @@ export default function UserDetails({
           emptyFields.push("Confirm Password");
         if (!mainDetails.Timezone) emptyFields.push("Time Zone");
         if (!mainDetails.UserType) emptyFields.push("User Type");
-        // if (!mainDetails.Mobile) emptyFields.push("Mobile No");
+        // if (!mainDetails.) emptyFields.push("Mobile No");
         // if (!mainDetails.Phone) emptyFields.push("Phone No");
         if (mainDetails.Mobile && !/^[0-9]{10,15}$/.test(mainDetails.Mobile))
           emptyFields.push("Valid Mobile Number");
@@ -331,6 +354,9 @@ export default function UserDetails({
         setConfirmData({ message: "Save", type: "success" });
         setConfirmType("save");
         setConfirmAlert(true);
+        break;
+        case "reset":
+        setResetPassword(true);
         break;
       case "delete":
         setConfirmData({ message: "Delete", type: "danger" });
@@ -365,14 +391,20 @@ export default function UserDetails({
       userType: mainDetails?.UserType,
       role: mainDetails?.Role,
       inspector: mainDetails?.Inspector,
-      inActive:mainDetails?.InActive,
+      inActive: mainDetails?.InActive,
       password: detailPageId === 0 ? encryptedPassword : "",
+      image: mainDetails.image,
+      signature: mainDetails.signature,
     };
 
     const response = await upsertuser(saveData);
     if (response.status === "Success") {
-      if (imageUpload) {
-        postUploadUserFile(Number(response?.result));
+      const numericId = parseInt(response.result, 10); //To edit profile after newly inserted. here detailpage id changes from 0 to new id(response.result gives new id)
+      // setDetailPageId(numericId);
+
+      if (mainDetails.image_file || mainDetails.signature_file) {
+
+        await handleFileUpload(numericId);
       }
       showAlert("success", response?.message);
       handleNew();
@@ -399,6 +431,9 @@ export default function UserDetails({
         return;
       }
       deleteClick();
+    }
+    else if (confirmType == "image" || confirmType == "signature") {
+      handledeletePhoto(confirmType)
     }
     setConfirmAlert(false);
     setConfirmData({});
@@ -443,34 +478,147 @@ export default function UserDetails({
     }
   };
 
-  const handleImageUpload = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      setImageUpload(file);
-      setMainDetails({ ...mainDetails, ImagePath: URL.createObjectURL(file) });
+
+
+  //Upload 
+  const uploadIconstyle = {
+    backgroundColor: "#fff", // Set a background color
+    borderRadius: "50%", // Make the button round
+    padding: "5px", // Padding to make the icon look bigger and floating
+    boxShadow: "0px 4px 12px rgba(0,0,0,0.2)", // Add shadow to make it look floating
+  };
+
+  const handleUploadClick = (field) => () => {
+    if (disabledDetailed) {
+      return
     }
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".jpg,.jpeg,.png,.gif"; // Accept only specific file types
+    input.onchange = (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const fileExtension = file.name.split('.').pop().toLowerCase();
+
+        // Check if the selected file has an allowed extension
+        if (!allowedExtensionsUser.includes(fileExtension)) {
+
+
+          showAlert('info', `Allowed file Type : ${allowedExtensionsUser.join(', ')}`);
+          return;
+        }
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          // Store the Base64 string for preview purposes
+          setMainDetails((prev) => ({
+            ...prev,
+            [field + "_preview"]: e.target.result,
+            // [field] :file.name
+          }));
+          // Store the file object for upload
+          setMainDetails((prev) => ({
+            ...prev,
+            [field + "_file"]: file,  // Ensure this is a File object
+          }));
+        };
+        reader.readAsDataURL(file);
+      }
+    };
+    input.click();
   };
 
-  const handleRemoveImage = () => {
-    setImageUpload(null);
-    setMainDetails({ ...mainDetails, ImagePath: "" });
+
+
+
+  const handleDeleteClick = (field) => () => {
+    if (disabledDetailed) {
+      return
+    }
+    if (mainDetails[`${field}_previousFileName`] == "") {
+
+      setMainDetails((prev) => ({
+        ...prev,
+        [field]: "",
+        [`${field}_file`]: "",
+        [`${field}_preview`]: ""
+      }));
+      return
+    }
+
+    // Set confirmation data for deleting the photo
+    setConfirmData({ message: "delete", type: "danger" });
+    setConfirmType(field);
+    setConfirmAlert(true);
+    // setFormData((prev) => ({ ...prev,[`${field}`]: "",   [`${field}_file`]: "", [`${field}_preview`]:""  }));
   };
 
-  const postUploadUserFile = async (id) => {
-    if (!imageUpload) {
+
+  const handleFileUpload = async (userId) => {
+
+
+
+
+
+    if (!mainDetails.image_file && !mainDetails.signature_file) {
+
       return;
     }
 
     const formDataFiles = new FormData();
-    formDataFiles.append("previousFileName", mainDetails?.Photo || "");
-    formDataFiles.append(`fileContent`, imageUpload || "");
-    const response = await uploaduserfile(id, formDataFiles);
+    let fileIndex = 0;
+    if (mainDetails.image_file) {
+      formDataFiles.append(`userFiles[${fileIndex}].FieldType`, 'Image');
+      formDataFiles.append(`userFiles[${fileIndex}].previousFileName`, mainDetails?.image_previousFileName || '');
+      formDataFiles.append(`userFiles[${fileIndex}].FileContent`, mainDetails.image_file);
+      fileIndex++;
+    }
+    if (mainDetails.signature_file) {
+      formDataFiles.append(`userFiles[${fileIndex}].FieldType`, 'Signature');
+      formDataFiles.append(`userFiles[${fileIndex}].previousFileName`, mainDetails?.signature_previousFileName || '');
+      formDataFiles.append(`userFiles[${fileIndex}].FileContent`, mainDetails.signature_file);
+    }
+
+    try {
+
+      const uploadResponse = await uploaduserfile(userId, formDataFiles);
+
+    } catch (uploadError) {
+
+    }
   };
 
-  const deleteUploadImage = async (id) => {
-    const response = await deleteuserfile(id, mainDetails?.Photo);
-  }
+  const handledeletePhoto = async (field) => {
+    const deletePayload = { id: detailPageId, fileName: mainDetails[`${field}_previousFileName`], fieldType: field };
 
+
+    try {
+      const response = await deleteuserfile(deletePayload);
+
+      if (response?.status === "Success") {
+
+        showAlert("success", response?.message)
+
+        setMainDetails((prev) => ({
+          ...prev,
+          [field]: "",
+          [`${field}_file`]: "",
+          [`${field}_preview`]: "",
+          [`${field}_previousFileName`]: ""
+        }));
+      }
+    } catch (error) {
+
+      // if(error){
+
+
+      //     warningOpen();
+      //     setWaringData({ message:  error?.message, type: "warning" });
+
+      // }
+    } finally {
+
+    }
+  };
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
@@ -560,30 +708,6 @@ export default function UserDetails({
               maxLength={50}
               onBlurAction={handleUserExist}
             />
-            {/* <InputCommon
-              label={"User Code"}
-              name={"Employee"}
-              type={"text"}
-              mandatory={true}
-              disabled={false}
-              value={mainDetails.Employee}
-              setValue={(data) => {
-                const { name, value } = data
-                setMainDetails({ ...mainDetails, [name]: value })
-              }}
-              maxLength={50}
-            /> */}
-            {/* <AutoComplete
-              apiKey={getroleslist}
-              formData={mainDetails}
-              setFormData={setMainDetails}
-              label={"Role"}
-              autoId={"role"}
-              required={true}
-              formDataName={"RoleName"}
-              formDataiId={"RoleId"}
-
-            /> */}
 
             <UserAutoComplete
               apiKey={getroleslist}
@@ -607,6 +731,7 @@ export default function UserDetails({
                 const { name, value } = data
                 setMainDetails({ ...mainDetails, [name]: value })
               }}
+
             />
 
             <UserAutoComplete
@@ -676,7 +801,6 @@ export default function UserDetails({
               label={"User Type"}
               languageName={"english"}
               ColumnSpan={0}
-              // disabled={disabledDetailed}
               Menu={[{ "Id": 1, "Name": "Web" }, { "Id": 2, "Name": "Mob" }, { "Id": 3, "Name": "Both" }]}
 
             />
@@ -691,8 +815,7 @@ export default function UserDetails({
               label={"Status"}
               languageName={"english"}
               ColumnSpan={0}
-              // disabled={disabledDetailed}
-              Menu={[{ "Id": true, "Name": "inActive" }, { "Id": false, "Name": "Active" }]}
+              Menu={[{ "Id": true, "Name": "Inactive" }, { "Id": false, "Name": "Active" }]}
 
             />
 
@@ -704,7 +827,7 @@ export default function UserDetails({
               value={mainDetails}
               setValue={setMainDetails}
             />
-            
+
 
             <UserInputField
               label={"Phone"}
@@ -715,72 +838,26 @@ export default function UserDetails({
               setValue={setMainDetails}
             />
 
-            {/* <Box
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                width: "100%",
-                paddingTop: 1,
-              }}
-            >
-              <Stack direction="row" spacing={2}>
-                <Badge
-                  overlap="circular"
-                  anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-                  badgeContent={
-                    <>
-                      {mainDetails?.ImagePath ? (
-                        <Tooltip title={"Remove Photo"}>
-                          <SmallAvatar
-                            onClick={handleRemoveImage}
-                            alt="Remy Sharp"
-                            sizes="small"
-                            sx={{ cursor: "pointer", backgroundColor: "lightBlue" }}
-                          >
-                            <RemoveIcon sx={{ p: 0.7 }} />
-                          </SmallAvatar>
-                        </Tooltip>
-                      ) : (
-                        <Tooltip title={"Add Photo"}>
-                          <SmallAvatar
-                            onClick={() =>
-                              document
-                                .getElementById("image-upload-input")
-                                .click()
-                            }
-                            alt="Remy Sharp"
-                            sizes="small"
-                            sx={{ cursor: "pointer", backgroundColor: "lightBlue" }}
-                          >
-                            <AddIcon sx={{ p: 0.7 }} />
-                          </SmallAvatar>
-                        </Tooltip>
-                      )}
-                    </>
-                  }
-                >
-                  <Avatar
-                    alt="User Photo"
-                    src={mainDetails?.ImagePath}
-                    sx={{
-                      width: 100,
-                      height: 100,
-                      border: 4,
-                      borderColor: thirdColor,
-                    }} // Adjust size as needed
-                  />
-                </Badge>
+            <UserPhotoUpload
+              formData={mainDetails}
+              handleUploadClick={handleUploadClick}
+              handleDeleteClick={handleDeleteClick}
+              uploadIconstyle={uploadIconstyle}
+              field={"image"}
+              label={"Photo"}
+              disabled={disabledDetailed}
+            />
+            <UserPhotoUpload
+              formData={mainDetails}
+              handleUploadClick={handleUploadClick}
+              handleDeleteClick={handleDeleteClick}
+              uploadIconstyle={uploadIconstyle}
+              field={"signature"}
+              label={"Signature"}
+              disabled={disabledDetailed}
+            />
 
-                <input
-                  id="image-upload-input"
-                  type="file"
-                  accept="image/*"
-                  style={{ display: "none" }}
-                  onChange={handleImageUpload}
-                />
-              </Stack>
-            </Box> */}
+
           </Box>
         </Box>
       </Box>
@@ -790,6 +867,12 @@ export default function UserDetails({
         open={confirmAlert}
         data={confirmData}
         submite={handleConfirmSubmit}
+      />
+
+      <ResetPasswordAlert
+        handleClose={() => setResetPassword(false)}
+        open={resetPassword}
+        detailPageId={detailPageId}
       />
     </Box>
   );

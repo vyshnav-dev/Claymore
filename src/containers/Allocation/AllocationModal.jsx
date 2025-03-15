@@ -69,6 +69,8 @@ export default function AllocationModal({ handleCloseModal, selected, hardRefres
                 });
                 if (response?.status === "Success") {
                     const myObject = JSON.parse(response.result);
+                    
+                    
 
                     setMainDetails(myObject?.PendingJobOrderDetails);
                     setProducts(myObject?.ProductDetails)
@@ -81,7 +83,8 @@ export default function AllocationModal({ handleCloseModal, selected, hardRefres
         fetchData();
     }, [selected]);
 
-    const handleSave = async () => {
+    const handleSave = async (e) => {
+        // e.preventDefault();
         const emptyFields = [];
         if (!formData?.details?.length) emptyFields.push("Technician");
         if (emptyFields.length > 0) {

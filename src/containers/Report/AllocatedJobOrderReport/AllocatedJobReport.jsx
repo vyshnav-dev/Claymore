@@ -159,12 +159,13 @@ export default function AllocatedJobReport({ userAction, disabledDetailed }) {
         toDate: currentDate,
         Client: null,
         Status: null,
+        Technician: null,
     });
     const [confirmAlert, setConfirmAlert] = useState(false);
     const [confirmData, setConfirmData] = useState({});
     const [confirmType, setConfirmType] = useState(null);
     const {
-        getclientlist
+        getclientlist, GetTechnicianList
     } = allocationApis();
     const { showAlert } = useAlert();
     const [rows, setRows] = React.useState([]); //To Pass in Table
@@ -203,6 +204,7 @@ export default function AllocatedJobReport({ userAction, disabledDetailed }) {
                     toDate: mainDetails.toDate,
                     client: mainDetails?.Client,
                     status: mainDetails?.Status,
+                    inspector: mainDetails?.Technician,
                     pageNo: pageNumber,
                     pageSize: displayLength,
                     search: currentSearchKey,
@@ -258,7 +260,7 @@ export default function AllocatedJobReport({ userAction, disabledDetailed }) {
         setsearchKey("")
         latestSearchKeyRef.current = ""
         setchangesTriggered(!changesTriggered);
-      };
+    };
 
     const handleIconsClick = async (value) => {
         switch (value.trim()) {
@@ -288,6 +290,7 @@ export default function AllocatedJobReport({ userAction, disabledDetailed }) {
             toDate: mainDetails.toDate,
             client: mainDetails?.Client,
             status: mainDetails?.Status,
+            inspector: mainDetails?.Technician,
             pageNumber: 0,
             pageSize: 0,
             search: "",
@@ -410,6 +413,17 @@ export default function AllocatedJobReport({ userAction, disabledDetailed }) {
                                     required={false}
                                     formDataiId={"Client"}
                                     formDataName={"Client_Name"}
+                                />
+
+                                <UserAutoComplete
+                                    apiKey={GetTechnicianList}
+                                    formData={mainDetails}
+                                    setFormData={setMainDetails}
+                                    label={"Technician"}
+                                    autoId={"Technician"}
+                                    required={false}
+                                    formDataiId={"Technician"}
+                                    formDataName={"Technician_Name"}
                                 />
 
                                 <AutoSelect

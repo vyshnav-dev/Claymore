@@ -34,7 +34,7 @@ const Item = styled("div")`
   }
 `;
 
-const SearchBox = ({ initialItems, search, handleSelectedIds, params, changeTriggered, setchangesTriggered, initialCheckedIds, disabled, searchTerm, setsearchTerm, formData_obj, sFieldName }) => {
+const SearchBox = ({ initialItems, search, handleSelectedIds,setchangesTriggered, initialCheckedIds, disabled, searchTerm, setsearchTerm, formData_obj, sFieldName }) => {
 
   
 
@@ -79,36 +79,17 @@ const SearchBox = ({ initialItems, search, handleSelectedIds, params, changeTrig
         // Update formData with the merged selected items
         handleSelectedIds(selectedFormatted);
         setLoading1(true)
-        // Reorder initialItems: Move selected items to the top
-        const selectedItems = initialItems.filter((item) => allSelectedIds.includes(item.Id));
-        const unselectedItems = initialItems.filter((item) => !allSelectedIds.includes(item.Id));
   
         setItems(updatedItems);
         setchangesTriggered(true); // This ensures the UI updates properly
         setsearchTerm(""); // Reset search if needed
   
-        // Update the state of initialItems (if managed externally, update via a parent state)
-        // initialItems.length = 0;
-        // initialItems.push(...selectedItems, ...unselectedItems);
-        // setLoading(initialItems)
         return updatedItems;
       });
     }
   };
   
 
-
-  // useEffect(() => {
-  //   // Reset all items when changeTriggered changes
-  //   if (changeTriggered) {
-  //     const resetItems = initialItems.reduce(
-  //       (acc, item) => ({ ...acc, [item.Id]: false }),
-  //       {}
-  //     );
-  //     setItems(resetItems);
-  //     setchangesTriggered(false);
-  //   }
-  // }, [changeTriggered, initialItems]);
 
   useEffect(() => {
     if (!loading1 && initialItems && initialItems.length > 0) {

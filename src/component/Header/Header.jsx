@@ -45,7 +45,7 @@ function Header() {
 
   const userData = JSON.parse(localStorage.getItem("ClaymoreUserData"))[0];
 
-  
+
 
   React.useEffect(() => {
     fetchData();
@@ -53,16 +53,16 @@ function Header() {
 
   const fetchData = async () => {
     const response = await getscreensforuser();
-    
+
     if (response?.status === "Success") {
       const myObject = JSON.parse(response.result);
-   
+
       setMenu(myObject);
-  
+
     }
-     else {
+    else {
       setMenu([]);
-    
+
     }
   };
 
@@ -74,15 +74,13 @@ function Header() {
 
   const handleSubMenu = (event, Id) => {
     const parentArray = menu?.some((list) => list?.Parent === Id?.ScreenId)
-    if(!parentArray)
-    {
-      
-     if(Id?.ScreenId === 31)
-      {
-        navigate("/approve", { state : Id });
+    if (!parentArray) {
+
+      if (Id?.ScreenId === 31) {
+        navigate("/approve", { state: Id });
       }
     }
-    else{
+    else {
       setAnchorEl(event.currentTarget);
       setMenuId(Id?.ScreenId);
     }
@@ -105,69 +103,67 @@ function Header() {
     setAnchorElUser(null);
   };
 
-  // console.log('menu',menu);
-  
-  
+  console.log('menu', menu);
+
+
   const handleClickEvent = async (menu) => {
 
-    if (menu?.Parent === 6) {
+    if (menu?.Parent === 1) {
       if (menu?.ScreenId === 24) {
-        navigate("/user", { state: menu});
+        navigate("/user", { state: menu });
       } else if (menu?.ScreenId === 7) {
-        navigate("/role", { state: menu});
-      } 
+        navigate("/role", { state: menu });
+      }else if (menu?.ScreenId === 43) {
+        navigate("/reset-password", { state: menu });
+      }
     }
-    else if(menu?.Parent === 26){
-      if(menu?.ScreenId === 27)
-      {
-        navigate("/risk", { state:menu });
+    else if (menu?.Parent === 26) {
+      if (menu?.ScreenId === 27) {
+        navigate("/risk", { state: menu });
       }
-      else if(menu?.ScreenId === 28)
-      {
-        navigate("/timesheet", { state:menu });
+      else if (menu?.ScreenId === 28) {
+        navigate("/timesheet", { state: menu });
       }
-      else if(menu?.ScreenId === 29)
-      {
-        navigate("/inspection", { state:menu });
+      else if (menu?.ScreenId === 29) {
+        navigate("/inspection", { state: menu });
       }
-      else if(menu?.ScreenId === 30)
-      {
-        navigate("/acknowledgement", { state:menu });
+      else if (menu?.ScreenId === 30) {
+        navigate("/acknowledgement", { state: menu });
       }
-    } 
-     else if (menu?.Parent === 1) {
-      if ((menu?.ScreenId === 2)) {
+    }
+    else if (menu?.Parent === 2) {
+      if ((menu?.ScreenId === 3)) {
         navigate("/product", { state: menu });
-      } else if (menu?.ScreenId === 3) {
-        navigate("/categories", { state: menu });
       } else if (menu?.ScreenId === 4) {
-        navigate("/form", { state: menu });
+        navigate("/categories", { state: menu });
       } else if (menu?.ScreenId === 5) {
-        navigate("/sub", { state: menu });
+        navigate("/subCategory", { state: menu });
+      } else if (menu?.ScreenId === 6) {
+        navigate("/form", { state: menu });
       }
-    }  else if (menu?.Parent === 25) {
+    } else if (menu?.Parent === 25) {
       if (menu?.ScreenId === 32) {
         navigate("/pending", { state: menu });
-      }else if (menu?.ScreenId === 33) {
+      } else if (menu?.ScreenId === 33) {
         navigate("/allocated", { state: menu });
       }
     }
-    else if(menu?.Parent === 34){
+    else if (menu?.Parent === 34) {
       if (menu?.ScreenId === 35) {
-        navigate("/joborderreport", { state: menu});
-      }else if (menu?.ScreenId === 36) {
+        navigate("/joborderreport", { state: menu });
+      } else if (menu?.ScreenId === 36) {
         navigate("/allocatedjoborder", { state: menu });
-      }else if (menu?.ScreenId === 37) {
+      } else if (menu?.ScreenId === 37) {
         navigate("/inspectionreport", { state: menu });
-      }else if (menu?.ScreenId === 38) {
+      } else if (menu?.ScreenId === 38) {
         navigate("/unallocated", { state: menu });
-      }else if (menu?.ScreenId === 39) {
+      } else if (menu?.ScreenId === 39) {
         navigate("/timesheetreport", { state: menu });
-      }else if (menu?.ScreenId === 40) {
+      } else if (menu?.ScreenId === 40) {
         navigate("/riskreport", { state: menu });
-      }else if (menu?.ScreenId === 41) {
+      } else if (menu?.ScreenId === 41) {
         navigate("/acknowledgmentreport", { state: menu });
-      }else if (menu?.ScreenId === 42) {
+      } else if (menu?.ScreenId === 42) {
         navigate("/authorizereport", { state: menu });
       }
     }
@@ -177,16 +173,15 @@ function Header() {
     handleMenuList();
   };
 
-  const handleMobMenu = (id,menu) => {
+  const handleMobMenu = (id, menu) => {
     if (id === 5) {
       navigate("/home");
     }
-    else if(id === 31)
-      {
-        navigate("/approve", { state:menu });
-        setAnchorElNav(null);
-      }
-      
+    else if (id === 31) {
+      navigate("/approve", { state: menu });
+      setAnchorElNav(null);
+    }
+
     else {
       setActiveSubMenuId(id);
     }
@@ -207,7 +202,7 @@ function Header() {
       .map((menuList) => (
         <MenuItem
           key={menuList.ScreenId}
-          onClick={() => handleMobMenu(menuList.ScreenId,menuList)}
+          onClick={() => handleMobMenu(menuList.ScreenId, menuList)}
           sx={{
             fontSize: "0.875rem", // Reduce text size for individual MenuItem
             padding: "4px 8px", // Reduce padding (gap) for individual MenuItem
@@ -274,9 +269,9 @@ function Header() {
           zIndex: 100, // Adjust the z-index as needed
           top: 0,
           boxShadow: "0px 5px 15px rgba(0, 0, 0, 0.3)",
-          height:"50px",
-          justifyContent:"center"
-          
+          height: "50px",
+          justifyContent: "center"
+
         }}
       >
         <Container maxWidth={false}>
@@ -324,25 +319,25 @@ function Header() {
                   justifyContent: "flex-start", // Center the content horizontally for individual MenuItem
                 }}
                 slotProps={{
-                paper: {
-                  sx: {
-                    maxHeight: 400,
-                    overflowY: "auto",
-                    "&::-webkit-scrollbar": {
-                      width: "6px",
+                  paper: {
+                    sx: {
+                      maxHeight: 400,
+                      overflowY: "auto",
+                      "&::-webkit-scrollbar": {
+                        width: "6px",
+                      },
+                      "&::-webkit-scrollbar-thumb": {
+                        backgroundColor: "#888",
+                        borderRadius: "3px",
+                      },
+                      "&::-webkit-scrollbar-track": {
+                        backgroundColor: "#f0f0f0",
+                      },
+                      scrollbarWidth: "thin",
+                      scrollbarColor: "#888 #f0f0f0",
                     },
-                    "&::-webkit-scrollbar-thumb": {
-                      backgroundColor: "#888",
-                      borderRadius: "3px",
-                    },
-                    "&::-webkit-scrollbar-track": {
-                      backgroundColor: "#f0f0f0",
-                    },
-                    scrollbarWidth: "thin",
-                    scrollbarColor: "#888 #f0f0f0",
                   },
-                },
-              }}
+                }}
               >
                 {menuItems}
               </Menu>

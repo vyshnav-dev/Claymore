@@ -1,6 +1,8 @@
 import { TextField, useTheme } from "@mui/material";
 import React, { useState } from "react";
 import { styled } from "@mui/system";
+import { validateInput } from "./ValidateInput";
+import { useAlert } from "../Alerts/AlertContext";
 
 const CustomTextField = styled(TextField)({
   '& .MuiInputBase-root': {
@@ -27,6 +29,18 @@ const CustomTextField = styled(TextField)({
   },
 });
 
+const errorMessages = {
+  minimumValue: "minimumValue",
+  maximumValue: "maximumValue",
+  invalidInteger: "invalidInteger",
+  invalidNumber: "invalidNumber",
+  allowNegative: "allowNegative",
+  specialCharacter: "specialCharacter",
+  regexFailed: "regexFailed",
+  integerRange: "integerRange",
+  maxSize: "maxSize"
+};
+
 
 export default function UserInputField({
   name,
@@ -43,13 +57,16 @@ export default function UserInputField({
   onBlurAction,
   decimalLength,
   max,
-  placeholder
+  placeholder,
+  DonotAllowSpecialChar,
 }) {
   const [tabPressed, setTabPressed] = useState(false);
 
+  const { showAlert } = useAlert();
+
   const handleChange = (event) => {
 
-    const inputValue = event.target.value;
+    let inputValue = event.target.value;
     if (type === "number") {
       // Regular expression for numbers with optional decimal places
       const decimalRegex = decimalLength !== undefined
@@ -60,6 +77,24 @@ export default function UserInputField({
       if (!decimalRegex.test(inputValue) || inputValue.includes('e') || inputValue.includes('+') || inputValue.includes('-')) {
         return;
       }
+    }
+    if (type === 'text') {
+      const errorResponse = validateInput({
+        type,
+        value: event?.target?.value ?? "",
+        // minimumValue: MinimumValue,
+        // maximumValue: MaximumValue,
+        // allowNegative: AllowNegative, // or false based on your requirement
+        // regularExpression: RegularExpression,
+        donotAllowSpecialChar: DonotAllowSpecialChar,
+        
+
+      });
+      if (errorResponse == errorMessages.specialCharacter) {
+        showAlert("info", `special characters not allowed`);
+        inputValue = ""; // Reset value if invalid
+      }
+      
     }
     
 

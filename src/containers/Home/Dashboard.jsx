@@ -439,7 +439,7 @@ const handleDate = (data) =>{
                 }
               >
                 <Typography variant="body2">
-                  You have products to Authorize.
+                  You have products to Authorise.
                 </Typography>
               </Alert>
             </Box>

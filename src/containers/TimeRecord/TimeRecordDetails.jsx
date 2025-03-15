@@ -37,6 +37,8 @@ import ImageModal from "../../component/Modal/ImageModal";
 import { inspectionApis } from "../../service/Inspection/inspection";
 import UserAutoComplete from "../../component/AutoComplete/UserAutoComplete";
 import { allocationApis } from "../../service/Allocation/allocation";
+import StaticTable from "../Home/StaticTable";
+import TimeRecordTable from "./TimeRecordTable";
 
 const currentDate = new Date().toISOString().split("T")[0];
 function CustomTabPanel(props) {
@@ -190,6 +192,7 @@ export default function TimeRecordDetails({
     const [confirmType, setConfirmType] = useState(null);
     const [tableBody, setTableBody] = useState(bodyData);
     const [isImageModalOpenSign, setIsImageModalOpenSign] = useState(false);
+    const [rows, setRows] = useState([]);
 
 
     const { showAlert } = useAlert();
@@ -229,21 +232,25 @@ export default function TimeRecordDetails({
                 });
                 if (response?.status === "Success") {
                     const myObject = JSON.parse(response?.result);
+                    console.log('my',myObject);
+                    
                     if (myObject) {
-                        const formattedDate = myObject[0]?.DateOfInspection?.split("T")[0];
+                        const formattedDate = myObject?.DateOfInspection?.split("T")[0];
 
                         // Update the main details with the formatted date
                         setMainDetails({
-                            ...myObject[0],
+                            ...myObject,
                             DateOfInspection: formattedDate,
                         });
                     }
+
+                    setRows(myObject?.EquipmentDescription)
 
                     // Map the values from myObject to bodyData
                     const updatedBodyData = bodyData.map((item) => {
                         return {
                             ...item,
-                            Checked: myObject[0][item.key] !== undefined ? myObject[0][item.key] : item.Checked,
+                            Checked: myObject[item.key] !== undefined ? myObject[item.key] : item.Checked,
                         };
                     });
 
@@ -455,6 +462,8 @@ export default function TimeRecordDetails({
         }
     };
 
+    console.log('row',rows);
+    
 
     return (
         <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
@@ -531,7 +540,7 @@ export default function TimeRecordDetails({
 
                             {/* {sign ? ( */}
                             <Box sx={{ display: 'flex' }}>
-                                <Tooltip title="Inspector Sign">
+                                <Tooltip title="Technician Sign">
                                     <IconButton
                                         onClick={handleImageClickSign}
                                         aria-label="signature"
@@ -622,7 +631,7 @@ export default function TimeRecordDetails({
 
 
                             <UserInputField
-                                label={"Inspector"}
+                                label={"Technician"}
                                 name={"Inspector_Name"}
                                 type={"text"}
                                 disabled={false}
@@ -716,7 +725,7 @@ export default function TimeRecordDetails({
                                 paddingTop: 1,
                             }}
                         >
-                            <Typography variant="body1">Customer Data</Typography>
+                            <Typography variant="body1">Equpment Description</Typography>
                             <Box
                                 sx={{
                                     borderBottom: "1px dotted",
@@ -726,82 +735,10 @@ export default function TimeRecordDetails({
                             />
                         </Box>
 
+                                <TimeRecordTable rows={rows} excludedColumns={["Id","Time"]}/>
 
-
-                        <Box sx={{
-                            display: "flex",
-                            width: "100%",
-                            flexDirection: "row",
-                            justifyContent: "flex-start", // Changed from center to flex-start
-                            padding: 1,
-                            gap: "10px",
-
-                            flexWrap: "wrap",
-                            "@media (max-width: 768px)": {
-                                gap: "10px", // Reduced width for small screens
-                            },
-                            "@media (max-width: 420px)": {
-                                gap: "2px", // Reduced width for small screens
-                            },
-                        }}>
-
-                            <UserInputField
-                                label={"Customer Name"}
-                                name={"Client_Name"}
-                                type={"text"}
-                                disabled={false}
-                                mandatory={true}
-                                value={mainDetails}
-                                setValue={setMainDetails}
-                                maxLength={100}
-                            />
-
-                            <UserInputField
-                                label={"Company Name & Address"}
-                                name={"Address"}
-                                type={"text"}
-                                disabled={false}
-                                mandatory={true}
-                                value={mainDetails}
-                                setValue={setMainDetails}
-                                maxLength={100}
-                            />
-
-
-                            <UserInputField
-                                label={"Contact No"}
-                                name={"Contact"}
-                                type={"text"}
-                                disabled={false}
-                                mandatory={true}
-                                value={mainDetails}
-                                setValue={setMainDetails}
-                                maxLength={100}
-                            />
-
-                            <UserInputField
-                                label={"Equipment Location"}
-                                name={"Location"}
-                                type={"text"}
-                                disabled={false}
-                                mandatory={true}
-                                value={mainDetails}
-                                setValue={setMainDetails}
-                                maxLength={100}
-                            />
-
-                            <UserInputField
-                                label={"Equipment Description"}
-                                name={"EqpDescription"}
-                                type={"text"}
-                                disabled={false}
-                                mandatory={true}
-                                value={mainDetails}
-                                setValue={setMainDetails}
-                                multiline={true}
-                            />
-
-                        </Box>
+                       
+                       
 
                         <Box
                             sx={{
@@ -991,8 +928,9 @@ export default function TimeRecordDetails({
                     </Box>
 
                 </Box>
+                
             </Box>
-
+            
             <ConfirmationAlert
                 handleClose={handleConfrimClose}
                 open={confirmAlert}
@@ -1002,7 +940,7 @@ export default function TimeRecordDetails({
 
             <ImageModal
                 isOpen={isImageModalOpenSign}
-                // imageUrl={sign}
+                imageUrl={mainDetails?.Path}
                 handleCloseImagePopup={handleCloseImagePopupSign}
             />
 

@@ -97,7 +97,15 @@ export default function ApproveConfirmation({
                 <MDBBtn onClick={() => submite(1)} color={"danger"}>
                   Reject
                 </MDBBtn>
-              ) : (
+              ) :itemLabel === 'correction' ? (
+                <MDBBtn onClick={() => submite(3)} color={"primary"}>
+                  Correct
+                </MDBBtn>
+              ):itemLabel === 'suspend' ? (
+                <MDBBtn onClick={() => submite(4)} color={"danger"}>
+                  Suspend
+                </MDBBtn>
+              ):(
                 <MDBBtn onClick={() => submite(2)} color={"success"}>
                   Approve
                 </MDBBtn>

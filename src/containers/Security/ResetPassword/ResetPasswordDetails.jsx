@@ -3,17 +3,16 @@ import { Box, Stack, Button as ButtonM, Typography } from "@mui/material";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
 import PropTypes from "prop-types";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
-import { useEffect } from "react";
 import ConfirmationAlert from "../../../component/Alerts/ConfirmationAlert";
 import ActionButton from "../../../component/Buttons/ActionButton";
 import { useAlert } from "../../../component/Alerts/AlertContext";
 import { primaryColor } from "../../../config/config";
 import UserInputField from "../../../component/InputFields/UserInputField";
-import { stockCountApis } from "../../../service/Transaction/stockcount";
-
-import { reconciliationApis } from "../../../service/Transaction/reconciliation";
 import { securityApis } from "../../../service/Security/security";
-const currentDate = new Date().toISOString().split("T")[0];
+import { useNavigate } from "react-router-dom";
+import InputCommon from "../../../component/InputFields/InputCommon";
+import { encrypt } from "../../../service/Security/encryptionUtils";
+
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
 
@@ -89,7 +88,7 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
         scrollbarWidth: "thin",
       }}
     >
-      {userAction.some((action) => action.Action === "Save") && (
+      {userAction.some((action) => action.Action === "Access") && (
         <ActionButton
           iconsClick={iconsClick}
           icon={"save"}
@@ -110,15 +109,17 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
 
 export default function ResetPassworsDetails({ userAction, disabledDetailed }) {
   const [mainDetails, setMainDetails] = useState({
-    oldPassword: "",
-    newPassword: "",
+    OldPassword: "",
+    NewPassword: "",
+    UserId:0
   });
   const [confirmAlert, setConfirmAlert] = useState(false);
   const [confirmData, setConfirmData] = useState({});
   const [confirmType, setConfirmType] = useState(null);
 
   const { showAlert } = useAlert();
-  const {updatepassword} = securityApis()
+  const { updatepassword } = securityApis();
+  const navigate = useNavigate();
 
   const handleIconsClick = async (value) => {
     switch (value.trim()) {
@@ -127,21 +128,28 @@ export default function ResetPassworsDetails({ userAction, disabledDetailed }) {
         break;
       case "save":
         const emptyFields = [];
-        if (!mainDetails.oldPassword) emptyFields.push("Old Password");
-        if (!mainDetails.newPassword) emptyFields.push("New Password");
+        if (!mainDetails.OldPassword) emptyFields.push("Old Password");
+        if (!mainDetails.NewPassword) emptyFields.push("New Password");
+        if (!mainDetails.CPassword) emptyFields.push("Confirm Password");
         if (emptyFields.length > 0) {
           showAlert("info", `Please Provide ${emptyFields[0]}`);
           return;
         }
         if (
           !/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{6,}$/.test(
-            mainDetails.newPassword
+            mainDetails.NewPassword
           )
         ) {
           showAlert(
             "info",
             `Password must be at least 6 characters long and include at least one letter, one number, and one special character.`
           );
+          return;
+        }
+        if (
+          mainDetails.NewPassword !== mainDetails.CPassword
+        ) {
+          showAlert("info", `New Password and Confirm Password mismatch`);
           return;
         }
         setConfirmData({ message: "Save", type: "success" });
@@ -157,18 +165,24 @@ export default function ResetPassworsDetails({ userAction, disabledDetailed }) {
   // Handlers for your icons
 
   const handleclose = () => {
-    window.history.back();
+    navigate("/home");
   };
 
   const handleNew = () => {
-    setMainDetails({ oldPassword: "", newPassword: "" });
+    setMainDetails({ OldPassword: "", NewPassword: "" ,UserId:0});
   };
 
   const handleSave = async () => {
-    const response = await updatepassword(mainDetails);
+    const encryptedOldPassword = await encrypt(mainDetails?.OldPassword); 
+    const encryptedNewPassword = await encrypt(mainDetails?.NewPassword);
+    const saveData = {
+         oldPassword :encryptedOldPassword,
+         newPassword :encryptedNewPassword,
+        };
+    const response = await updatepassword(saveData);
     if (response.status === "Success") {
       showAlert("success", response?.message);
-      handleNew()
+      handleNew();
     }
   };
 
@@ -247,24 +261,46 @@ export default function ResetPassworsDetails({ userAction, disabledDetailed }) {
               },
             }}
           >
-            <UserInputField
+            <InputCommon
               label={"Old Password"}
-              name={"oldPassword"}
-              type={"text"}
+              name={"OldPassword"}
+              type={"password"}
               disabled={false}
               mandatory={true}
-              value={mainDetails}
-              setValue={setMainDetails}
+              value={mainDetails.OldPassword}
+              setValue={(data) => {
+                const { name, value } = data;
+                setMainDetails({ ...mainDetails, [name]: value });
+              }}
+              maxLength={60}
             />
 
-            <UserInputField
+            <InputCommon
               label={"New Password"}
-              name={"newPassword"}
-              type={"text"}
+              name={"NewPassword"}
+              type={"password"}
               disabled={false}
               mandatory={true}
-              value={mainDetails}
-              setValue={setMainDetails}
+              value={mainDetails.NewPassword}
+              setValue={(data) => {
+                const { name, value } = data;
+                setMainDetails({ ...mainDetails, [name]: value });
+              }}
+              maxLength={60}
+            />
+
+            <InputCommon
+              label={"Confirm Password"}
+              name={"CPassword"}
+              type={"password"}
+              disabled={false}
+              mandatory={true}
+              value={mainDetails.CPassword}
+              setValue={(data) => {
+                const { name, value } = data;
+                setMainDetails({ ...mainDetails, [name]: value });
+              }}
+              maxLength={60}
             />
           </Box>
         </Box>

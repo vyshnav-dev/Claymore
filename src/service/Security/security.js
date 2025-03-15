@@ -217,7 +217,7 @@ const securityApis = ()=>{
         try {
           const response = await makeAuthorizedRequestBase(
             "post",
-            `user/uploaduserfile?id=${id}`,
+            `user/uploaduserfiles?id=${id}`,
             payload,
             false
           );
@@ -227,25 +227,36 @@ const securityApis = ()=>{
         }
       };
 
-      const deleteuserfile= async (id,payload) => {
-        try {
-          const response = await makeAuthorizedRequestBase(
-            "delete",
-            `user/deleteuserfile?id=${id}&fileName=${payload}`,
-            payload,
-            false
-          );
-          return response;
-        } catch (error) {
-          throw error;
-        }
-      };
+      //Delete image or signature
+    const deleteuserfile = async (payload) => {
+  
+      try {
+        const response = await makeAuthorizedRequestBase("delete","user/deleteuserfile",payload);
+        return response;
+      } catch (error) {
+        // console.error(error);
+        throw error;
+      }
+    };
 
       const updatepassword = async (payload) => {
         try {
           const response = await makeAuthorizedRequestBase(
             "post",
             `user/updatepassword?oldPassword=${payload?.oldPassword}&newPassword=${payload?.newPassword}`,
+            payload,
+            false
+          );
+          return response;
+        } catch (error) {
+          throw error;
+        }
+      };
+      const updateuserpassword = async (payload) => {
+        try {
+          const response = await makeAuthorizedRequestBase(
+            "post",
+            `user/updateuserpassword?password=${payload?.newPassword}&userId=${payload?.UserId}`,
             payload,
             false
           );
@@ -274,7 +285,8 @@ const securityApis = ()=>{
         upsertrole,
         uploaduserfile,
         deleteuserfile,
-        updatepassword
+        updatepassword,
+        updateuserpassword
       }
 }
 

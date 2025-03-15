@@ -31,6 +31,8 @@ import ReportSummary from "../../../component/Table/ReportSummary";
 // import UserAutoComplete from "../../../component/AutoComplete/UserAutoComplete";
 import NormalButton from "../../../component/Buttons/NormalButton";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import UserAutoComplete from "../../../component/AutoComplete/UserAutoComplete";
+import { allocationApis } from "../../../service/Allocation/allocation";
 const currentDate = new Date().toISOString().split("T")[0];
 const suggestionType = [
   { Id: 1, Name: "Reconciliation Date" },
@@ -105,7 +107,7 @@ function BasicBreadcrumbs({ viewAction, status }) {
           aria-label="breadcrumb"
         >
           <Typography underline="hover" sx={style} key="1">
-          Time sheet Report
+            Time sheet Report
           </Typography>
           <Typography underline="hover" sx={style} key="1"></Typography>
         </Breadcrumbs>
@@ -186,6 +188,10 @@ export default function TimeSheetReport({ userAction, disabledDetailed }) {
     setChecked((prev) => !prev);
   };
 
+  const {
+    getclientlist, GetTechnicianList
+  } = allocationApis();
+
   const { gettimesheetreport } = reportApis();
   useEffect(() => {
     const fetchData = async () => {
@@ -199,11 +205,13 @@ export default function TimeSheetReport({ userAction, disabledDetailed }) {
     try {
       if (
         mainDetails.fromDate &&
-        mainDetails.toDate 
+        mainDetails.toDate
       ) {
         const response = await gettimesheetreport({
           fromDate: mainDetails.fromDate,
           toDate: mainDetails.toDate,
+          inspector: mainDetails?.Technician,
+          client: mainDetails?.Client,
           pageNo: pageNumber,
           pageSize: displayLength,
           search: currentSearchKey,
@@ -287,6 +295,8 @@ export default function TimeSheetReport({ userAction, disabledDetailed }) {
     const response = await gettimesheetreport({
       fromDate: mainDetails.fromDate,
       toDate: mainDetails.toDate,
+      inspector: mainDetails?.Technician,
+      client: mainDetails?.Client,
       pageNumber: 0,
       pageSize: 0,
       search: "",
@@ -296,7 +306,7 @@ export default function TimeSheetReport({ userAction, disabledDetailed }) {
     ];
     const filteredRows = JSON.parse(response?.result)?.Data;
     const formatedFrom = new Date(mainDetails?.fromDate).toLocaleDateString("en-GB").split("/").join("-");
-        const formatedTo = new Date(mainDetails?.toDate).toLocaleDateString("en-GB").split("/").join("-");
+    const formatedTo = new Date(mainDetails?.toDate).toLocaleDateString("en-GB").split("/").join("-");
     await ExcelExport({
       reportName: `Time sheet Report(${formatedFrom} - ${formatedTo})`,
       filteredRows,
@@ -398,6 +408,28 @@ export default function TimeSheetReport({ userAction, disabledDetailed }) {
                   value={mainDetails}
                   setValue={setMainDetails}
                 />
+
+                <UserAutoComplete
+                  apiKey={getclientlist}
+                  formData={mainDetails}
+                  setFormData={setMainDetails}
+                  label={"Client"}
+                  autoId={"Client"}
+                  required={false}
+                  formDataiId={"Client"}
+                  formDataName={"Client_Name"}
+                />
+
+                <UserAutoComplete
+                  apiKey={GetTechnicianList}
+                  formData={mainDetails}
+                  setFormData={setMainDetails}
+                  label={"Technician"}
+                  autoId={"Technician"}
+                  required={false}
+                  formDataiId={"Technician"}
+                  formDataName={"Technician_Name"}
+                />
                 <Box p={1.9}>
                   <NormalButton label={"Search"} action={tagDetails} />
                 </Box>
@@ -416,7 +448,7 @@ export default function TimeSheetReport({ userAction, disabledDetailed }) {
           //  onSortChange={handleSortChange}
           onSearchKeyChange={handleSearchKeyChange}
           changesTriggered={changesTriggered}
-        //   setchangesTriggered={resetChangesTrigger}
+          //   setchangesTriggered={resetChangesTrigger}
           // onSelectedRowsChange={handleSelectedRowsChange}
           // onRowDoubleClick={handleRowDoubleClick}
           totalRows={totalRows}

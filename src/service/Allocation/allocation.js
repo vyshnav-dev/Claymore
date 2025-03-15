@@ -123,6 +123,22 @@ const allocationApis = () => {
       throw error;
     }
   };
+
+  //#region prev-next
+
+  const getrecordprevnext = async (payload) => {
+    try {
+      const response = await makeAuthorizedRequestBase(
+        "get",
+        "allocation/getrecordnoprevnext",
+        payload,
+        true
+      );
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  };
   
 
 
@@ -137,7 +153,8 @@ const allocationApis = () => {
     UpsertJobOrderAllocation,
     GetAllocatedJobOrderSummary,
     GetAllocatedJobOrderDetails,
-    getclientlist
+    getclientlist,
+    getrecordprevnext
   }
 }
 

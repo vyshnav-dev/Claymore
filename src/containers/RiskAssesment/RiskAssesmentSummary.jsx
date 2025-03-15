@@ -123,6 +123,8 @@ export default function RiskAssesmentSummary({
   setPageRender,
   setId,
   userAction,
+  setRiskId,
+  Id
 }) {
   const [rows, setRows] = React.useState([]); //To Pass in Table
   const [displayLength, setdisplayLength] = React.useState(25); // Show Entries
@@ -147,18 +149,17 @@ export default function RiskAssesmentSummary({
 
     try {
       const response = await GetRisAssesmentSummary({
+        allocation:Id,
         pageNo: pageNumber,
         pageSize: displayLength,
         search: currentSearchKey,
       });
-
+      setRiskId(Id)
       setrefreshFlag(false);
       if (
-        response?.status === "Success" &&
-        currentSearchKey === latestSearchKeyRef.current
+        response?.status === "Success" 
       ) {
         const myObject = JSON.parse(response?.result);
-
         setRows(myObject?.Data);
 
         const totalRows = myObject?.Metadata.TotalRows;
@@ -189,7 +190,7 @@ export default function RiskAssesmentSummary({
   const handleRowDoubleClick = (rowiId) => {
     if (rowiId > 0) {
       setId(rowiId);
-      setPageRender(2);
+      setPageRender(3);
     }
   };
 
@@ -245,7 +246,8 @@ export default function RiskAssesmentSummary({
   };
 
   const handleclose = () => {
-    window.history.back();
+    // window.history.back();
+    setPageRender(1)
   };
 
   
@@ -266,7 +268,7 @@ export default function RiskAssesmentSummary({
     } else {
       setId(0);
     }
-    setPageRender(2);
+    setPageRender(3);
   };
 
   //Delete alert open

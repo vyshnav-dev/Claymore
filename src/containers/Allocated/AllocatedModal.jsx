@@ -67,6 +67,7 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
                 });
                 if (response?.status === "Success") {
                     const myObject = JSON.parse(response.result);
+                   
                     const detail = myObject?.jobOrderDetails
                     if (detail) {
                         const formattedDate = detail.Date?.split("T")[0];
