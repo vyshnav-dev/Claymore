@@ -129,40 +129,7 @@ export default function TagFileTab({
 
 
 
-  // Function to process the default values based on FieldType
-//   const processFieldValue = (fieldType, value) => {
-//     switch (fieldType.toLowerCase()) {
-//       case "text":
-//         return value ? value : "";
-//       case "numeric":
-//       case "float":
-//         return value ? parseFloat(value) : null;
-//       case "integer":
-//       case "big integer":
-//       case "tiny integer":
-//       case "small integer":
-//         return value ? parseInt(value) : null;
-//       case "date":
-//         return value ? TagDateFormat(DefaultValue) : null;
-//       case "time":
-//         return value || null;
-//       case "datetime":
-//         return value || null;
-//       case "tag":
-//         return value ? value : 0;
-//       case "boolean":
-//         return value ? value : false;
-//       default:
-//         return value || null;
-//     }
-//   };
-
-//   const dropdownField = fieldsWithStructure6.find(
-//     (field) => field.FieldDisplayType.toLowerCase() === "drop down"
-//   );
-//   const referenceField = fieldsWithStructure6.find(
-//     (field) => field.FieldDisplayType.toLowerCase() === "text box"
-//   );
+  
 
   //#region file upload
 
@@ -171,6 +138,7 @@ export default function TagFileTab({
       return
     }
     const file = event.target.files[0];
+    
     if (file) {
       const extension = file.name.split('.').pop().toLowerCase();
       if (allowedExtensionsTagAttachments.includes(extension)) {
@@ -198,6 +166,8 @@ export default function TagFileTab({
     const fileToAdd = newFileRef.current;
     const existingFile = formData?.Attachment[editFileIndex]?.FileName;
 
+    
+
     let errorMessage = "";
 
     const formData1 = new FormData();
@@ -219,31 +189,9 @@ export default function TagFileTab({
         // formData1.append("imageFiles", fileToAdd,modifiedName);
         // const response = await UploadFiles(master,formData1);
 
-        if (editFileIndex !== null) {
-          // Editing an existing file
-         
-            const updatedFiles = [...formData.Attachment];
-            const existingFile = updatedFiles[editFileIndex];
-            if (fileToAdd) {
-              updatedFiles[editFileIndex] = {
-                // FileName: modifiedName,
-                FileName: existingFile.FileName,
-                file: fileToAdd,
-                SLNo:existingFile.SLNo
-              };
-            } else {
-              updatedFiles[editFileIndex] = {
-                ...existingFile, // keep the existing fields
-                FileName: existingFile.FileName,
-                SLNo:existingFile.SLNo
-
-
-                // Don't update the file object
-              };
-            }  
-            updateFileTab(updatedFiles)
-          
-        } else {
+        
+        const url = URL.createObjectURL(fileToAdd);
+       
           const generateUniqueSLNo = () => {
             let newSLNo = formData?.Attachment.length > 0 ? Math.max(...formData?.Attachment.map(file => file.SLNo)) + 1 : 1;
             // Ensure SLNo does not already exist
@@ -260,10 +208,11 @@ export default function TagFileTab({
               FileName: fileToAdd?.name,
               file: fileToAdd, // Include the File object
               SLNo: newSLNo,
+              FileName_Url:url
             },
           ];
           updateFileTab(updatedFile)
-        }
+      
         // setFileNames(prevNames => [...prevNames, modifiedName]);
         newFileRef.current = null; // Clear the ref
 
@@ -284,11 +233,13 @@ export default function TagFileTab({
   const formatPath = (path) => path.replace(/^\.\.\//, IMAGE_URL + "/");
 
   const handleDownload = (fileObj) => {
+    
     if (fileObj.FileName_Url) {
       const imageExtensions = ["jpg", "jpeg", "png", "gif", "bmp", "webp"];
       const fileNameParts = fileObj.FileName.split(".");
       const extension = fileNameParts[fileNameParts.length - 1].toLowerCase();
       const formattedPath = formatPath(fileObj.FileName_Url);
+      
       if (imageExtensions.includes(extension)) {
         // Handle images: display in a new tab
         const htmlContent = `<html>
@@ -511,7 +462,7 @@ export default function TagFileTab({
                 </TableHead>
                 <TableBody>
                   {formData?.Attachment &&
-                    formData?.Attachment.map((fileObj, index) => {
+                    formData?.Attachment?.map((fileObj, index) => {
                       return (
                         <TableRow key={index}>
                           <TableCell

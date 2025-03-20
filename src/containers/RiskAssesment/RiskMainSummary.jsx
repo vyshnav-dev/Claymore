@@ -330,7 +330,7 @@ export default function RiskMainSummary({
       const filteredRows = JSON.parse(response?.result)?.Data;
 
       await ExcelExport({
-        reportName: "Time sheet Job Orders",
+        reportName: "Risk Assessment Job Orders",
         filteredRows,
         excludedFields,
       });

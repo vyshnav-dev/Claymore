@@ -43,6 +43,7 @@ import UserAutoComplete from "../../component/AutoComplete/UserAutoComplete";
 import { Info } from "@mui/icons-material";
 import MultiCheckBox from "../../component/MultiCheckBox.jsx/MultiCheckBox";
 import { inspectionApis } from "../../service/Inspection/inspection";
+import { allocationApis } from "../../service/Allocation/allocation";
 const currentDate = new Date().toISOString().split("T")[0];
 function CustomTabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -166,6 +167,18 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction }) => {
                         iconName={"save"}
                     />
                 )}
+            <ActionButton
+                iconsClick={iconsClick}
+                icon={"fa-solid fa-circle-arrow-left"}
+                caption={"Prev"}
+                iconName={"prev"}
+            />
+            <ActionButton
+                iconsClick={iconsClick}
+                icon={"fa-solid fa-circle-arrow-right"}
+                caption={"Next"}
+                iconName={"next"}
+            />
             {userAction.some((action) => action.Action === "Delete") && (
                 <>
                     {detailPageId != 0 ? (
@@ -179,7 +192,7 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction }) => {
                 </>
             )}
 
-            
+
 
             <ActionButton
                 iconsClick={iconsClick}
@@ -214,6 +227,10 @@ export default function AckDetails({
         deleteAcknowledgement
     } = inspectionApis();
 
+    const {
+        getrecordprevnext
+    } = allocationApis();
+
     useEffect(() => {
         const fetchData = async () => {
             await tagDetails();
@@ -231,16 +248,17 @@ export default function AckDetails({
                 });
                 if (response?.status === "Success") {
                     const myObject = JSON.parse(response?.result);
+
                     if (myObject) {
                         const formattedDate = myObject[0]?.TargetDateOfClosure?.split("T")[0];
-                        
+
                         // Update the main details with the formatted date
-                        setMainDetails( {
-                            ... myObject[0],
+                        setMainDetails({
+                            ...myObject[0],
                             TargetDateOfClosure: formattedDate,
                         });
                     }
-                    
+
                 } else {
                     handleNew();
                 }
@@ -260,13 +278,13 @@ export default function AckDetails({
             Id: detailPageId,
             Allocation: null,
         });
-        
+
         setDetailPageId(0);
     };
 
-    
 
-    
+
+
 
     const handleIconsClick = async (value) => {
         switch (value.trim()) {
@@ -282,23 +300,26 @@ export default function AckDetails({
                 // if (!mainDetails.CriticalFinding) emptyFields.push("Critical Finding");
                 // if (!mainDetails.TargetDateOfClosure) emptyFields.push("TargetDate Of Closure");
                 // if (!mainDetails.OtherRemarks) emptyFields.push("Other Remarks");
-                
+
                 if (emptyFields.length > 0) {
                     showAlert("info", `Please Provide ${emptyFields[0]}`);
                     return;
                 }
-                
+
                 setConfirmData({ message: "Save", type: "success" });
                 setConfirmType("save");
                 setConfirmAlert(true);
+                break;
+                case "prev":
+                handlePrevNext(1);
+                break;
+            case "next":
+                handlePrevNext(2);
                 break;
             case "delete":
                 setConfirmData({ message: "Delete", type: "danger" });
                 setConfirmType("delete");
                 setConfirmAlert(true);
-                break;
-            case "property":
-                handleProperty();
                 break;
             default:
                 break;
@@ -310,8 +331,22 @@ export default function AckDetails({
         setPageRender(1);
     };
 
+    const handlePrevNext = async (value) =>{
+        const response = await getrecordprevnext({
+            allocation:null,
+            category:4,
+            id: detailPageId,
+            type:value
+        })
+        if (response.status == "Success") {
+            const detailId = Number(response.result)
+            setDetailPageId(detailId)
+            
+        }
+    }
+
     const handleSave = async () => {
-       
+
         const saveData = {
             id: mainDetails?.Id,
             allocation: mainDetails?.Allocation,
@@ -319,11 +354,11 @@ export default function AckDetails({
             criticalFinding: mainDetails?.CriticalFinding,
             targetDateOfClosure: mainDetails?.TargetDateOfClosure,
             otherRemarks: mainDetails?.OtherRemarks,
-            
+
         };
         const response = await upsertAcknowledgement(saveData);
         if (response.status === "Success") {
-           
+
             showAlert("success", response?.message);
             handleNew();
             const actionExists = userAction.some((action) => action.Action === "New");
@@ -371,13 +406,13 @@ export default function AckDetails({
         }
     };
 
-   
 
-    
 
-   
 
-    
+
+
+
+
 
     return (
         <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
@@ -392,7 +427,7 @@ export default function AckDetails({
                     flexWrap: "wrap",
                 }}
             >
-                <BasicBreadcrumbs  />
+                <BasicBreadcrumbs />
                 <DefaultIcons
                     detailPageId={detailPageId}
                     iconsClick={handleIconsClick}

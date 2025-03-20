@@ -39,6 +39,7 @@ import UserAutoComplete from "../../component/AutoComplete/UserAutoComplete";
 import { allocationApis } from "../../service/Allocation/allocation";
 import StaticTable from "../Home/StaticTable";
 import TimeRecordTable from "./TimeRecordTable";
+import ImageNotSupportedIcon from '@mui/icons-material/ImageNotSupported';
 
 const currentDate = new Date().toISOString().split("T")[0];
 function CustomTabPanel(props) {
@@ -151,7 +152,18 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction }) => {
                     ) : null}
                 </>
             )}
-
+            <ActionButton
+                iconsClick={iconsClick}
+                icon={"fa-solid fa-circle-arrow-left"}
+                caption={"Prev"}
+                iconName={"prev"}
+            />
+            <ActionButton
+                iconsClick={iconsClick}
+                icon={"fa-solid fa-circle-arrow-right"}
+                caption={"Next"}
+                iconName={"next"}
+            />
 
 
             <ActionButton
@@ -184,7 +196,6 @@ export default function TimeRecordDetails({
 }) {
 
 
-    const userData = JSON.parse(localStorage.getItem("ClaymoreUserData"))[0];
     const [mainDetails, setMainDetails] = useState({});
     const [detailPageId, setDetailPageId] = useState(summaryId);
     const [confirmAlert, setConfirmAlert] = useState(false);
@@ -203,7 +214,7 @@ export default function TimeRecordDetails({
     } = inspectionApis();
 
     const {
-        GetTechnicianList
+        getrecordprevnext
     } = allocationApis();
 
     useEffect(() => {
@@ -232,8 +243,7 @@ export default function TimeRecordDetails({
                 });
                 if (response?.status === "Success") {
                     const myObject = JSON.parse(response?.result);
-                    console.log('my',myObject);
-                    
+
                     if (myObject) {
                         const formattedDate = myObject?.DateOfInspection?.split("T")[0];
 
@@ -264,6 +274,7 @@ export default function TimeRecordDetails({
             throw error;
         }
     };
+
 
 
 
@@ -336,6 +347,12 @@ export default function TimeRecordDetails({
                 setConfirmType("save");
                 setConfirmAlert(true);
                 break;
+            case "prev":
+                handlePrevNext(1);
+                break;
+            case "next":
+                handlePrevNext(2);
+                break;
             case "delete":
                 setConfirmData({ message: "Delete", type: "danger" });
                 setConfirmType("delete");
@@ -351,6 +368,20 @@ export default function TimeRecordDetails({
         setId(timeId)
         setPageRender(3);
     };
+
+    const handlePrevNext = async (value) => {
+        const response = await getrecordprevnext({
+            allocation: mainDetails?.Allocation,
+            category: 2,
+            id: detailPageId,
+            type: value
+        })
+        if (response.status == "Success") {
+            const detailId = Number(response.result)
+            setDetailPageId(detailId)
+
+        }
+    }
 
     const handleSave = async () => {
         const isAnyScopeOfWorkSelected = scopeOfWork.some((field) => mainDetails[field] === true);
@@ -462,13 +493,13 @@ export default function TimeRecordDetails({
         }
     };
 
-    console.log('row',rows);
-    
+
 
     return (
         <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
             <Box
                 sx={{
+                    position: 'fixed',
                     display: "flex",
                     width: "100%",
                     flexDirection: "row",
@@ -476,6 +507,8 @@ export default function TimeRecordDetails({
                     paddingLeft: 1.5,
                     paddingRight: 1.5,
                     flexWrap: "wrap",
+                    zIndex: 5,
+                    backgroundColor: 'white'
                 }}
             >
                 <BasicBreadcrumbs />
@@ -503,7 +536,7 @@ export default function TimeRecordDetails({
                         margin: "auto",
                         display: "flex",
                         flexDirection: "column",
-                        paddingTop: "10px",
+                        paddingTop: "50px",
                         gap: '50px'
                     }}
                 >
@@ -537,39 +570,6 @@ export default function TimeRecordDetails({
                                 setValue={setMainDetails}
                                 maxLength={100}
                             />
-
-                            {/* {sign ? ( */}
-                            <Box sx={{ display: 'flex' }}>
-                                <Tooltip title="Technician Sign">
-                                    <IconButton
-                                        onClick={handleImageClickSign}
-                                        aria-label="signature"
-                                    >
-                                        <NoteAltIcon
-                                            style={{
-                                                textTransform: "none",
-                                                color: `#26668b`,
-                                            }}
-                                        />
-                                    </IconButton>
-                                </Tooltip>
-
-                                <Tooltip title="Client Sign">
-                                    <IconButton
-                                        onClick={handleImageClickSign}
-                                        aria-label="signature"
-                                    >
-                                        <NoteAltIcon
-                                            style={{
-                                                textTransform: "none",
-                                                color: `#26668b`,
-                                            }}
-                                        />
-                                    </IconButton>
-                                </Tooltip>
-                            </Box>
-
-                            {/* // ) : null} */}
                         </Box>
 
 
@@ -677,7 +677,7 @@ export default function TimeRecordDetails({
                                 name={"SiteHour"}
                                 type={"text"}
                                 disabled={false}
-                                mandatory={true}
+                                mandatory={false}
                                 value={mainDetails}
                                 setValue={setMainDetails}
                                 maxLength={100}
@@ -687,7 +687,7 @@ export default function TimeRecordDetails({
                                 name={"TravelHour"}
                                 type={"text"}
                                 disabled={false}
-                                mandatory={true}
+                                mandatory={false}
                                 value={mainDetails}
                                 setValue={setMainDetails}
                                 maxLength={100}
@@ -707,7 +707,7 @@ export default function TimeRecordDetails({
                                 name={"Comments"}
                                 type={"text"}
                                 disabled={false}
-                                mandatory={true}
+                                mandatory={false}
                                 value={mainDetails}
                                 setValue={setMainDetails}
                                 maxLength={100}
@@ -725,7 +725,7 @@ export default function TimeRecordDetails({
                                 paddingTop: 1,
                             }}
                         >
-                            <Typography variant="body1">Equpment Description</Typography>
+                            <Typography variant="body1">Product Description</Typography>
                             <Box
                                 sx={{
                                     borderBottom: "1px dotted",
@@ -735,10 +735,37 @@ export default function TimeRecordDetails({
                             />
                         </Box>
 
-                                <TimeRecordTable rows={rows} excludedColumns={["Id","Time"]}/>
+                        <Box sx={{
+                            display: "flex",
+                            width: "100%",
+                            flexDirection: "row", // Changed from center to flex-start
+                            padding: 1,
+                            gap: "50px",
 
-                       
-                       
+                            flexWrap: "wrap",
+                            "@media (max-width: 768px)": {
+                                gap: "10px", // Reduced width for small screens
+                            },
+                            "@media (max-width: 420px)": {
+                                gap: "2px", // Reduced width for small screens
+                            },
+                        }}>
+                            <Box>
+                                <TimeRecordTable rows={rows} excludedColumns={["Id", "Time"]} />
+                            </Box>
+                            <UserInputField
+                                label={"Remarks"}
+                                name={"Remarks"}
+                                type={"text"}
+                                disabled={false}
+                                mandatory={false}
+                                value={mainDetails}
+                                setValue={setMainDetails}
+                                maxLength={100}
+                                multiline={true}
+                            />
+
+                        </Box>
 
                         <Box
                             sx={{
@@ -922,15 +949,31 @@ export default function TimeRecordDetails({
                                 <Typography>{docData}</Typography>
                             </Box>
 
-                        </Box>
 
+
+                        </Box>
+                        <Box sx={{ display: "flex", flexDirection: "column", alignItems: "end", p: 3 }}>
+                            {mainDetails?.ClientSignPath ? (
+                                <img
+                                    src={mainDetails?.ClientSignPath}
+                                    alt="Thumbnail"
+                                    style={{ cursor: "pointer", width: "50px", height: "50px" }}
+                                    onClick={handleImageClickSign}
+                                />
+                            ) : (
+                                <ImageNotSupportedIcon sx={{ color: secondaryColor }} />
+                            )}
+                            <Typography variant="body2" sx={{ mt: 1, color: "black",fontWeight:'bold' }}> {/* Adjust color as needed */}
+                                Client Sign
+                            </Typography>
+                        </Box>
 
                     </Box>
 
                 </Box>
-                
+
             </Box>
-            
+
             <ConfirmationAlert
                 handleClose={handleConfrimClose}
                 open={confirmAlert}
@@ -940,7 +983,7 @@ export default function TimeRecordDetails({
 
             <ImageModal
                 isOpen={isImageModalOpenSign}
-                imageUrl={mainDetails?.Path}
+                imageUrl={mainDetails?.ClientSignPath}
                 handleCloseImagePopup={handleCloseImagePopupSign}
             />
 

@@ -151,7 +151,7 @@ export default function TimeRecordSummary({
         pageNo: pageNumber,
         pageSize: displayLength,
         search: currentSearchKey,
-        type:1,
+        type:4,
       });
 
       setrefreshFlag(false);
@@ -317,7 +317,7 @@ export default function TimeRecordSummary({
   const handleExcelExport = async () => {
     try {
       const response = await GetAllocatedJobOrderSummary({
-        type:1,
+        type:4,
         pageNumber: 0,
         pageSize: 0,
         search: "",

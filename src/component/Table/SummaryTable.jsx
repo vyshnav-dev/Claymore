@@ -481,7 +481,7 @@ export default function SummaryTable(props) {
                       }}
                     >
                       {columns.map((column) => (
-                        <Tooltip key={column.id} title={column.id === "Narration" ? row[column.id] : ""}>
+                        <Tooltip key={column.id}  title={["Technician", "ProductName","Client"]?.includes(column.id) ? row[column.id] : null}>
                           <TableCell
                             key={column.id}
                             sx={{

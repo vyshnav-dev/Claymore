@@ -182,7 +182,7 @@ export default function UserSummary({ setPageRender, setId, userAction }) {
 
   React.useEffect(() => {
     fetchRoleSummary(); // Initial data fetch
-  }, [pageNumber, displayLength, searchKey, changesTriggered]);
+  }, [pageNumber, displayLength, searchKey, changesTriggered,refreshFlag]);
 
   const handleRowDoubleClick = (rowiId) => {
     if (rowiId > 0) {

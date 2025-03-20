@@ -66,8 +66,6 @@ export default function TimeRecordTable({ rows,excludedColumns = [] }) {
         width: "98%",
         margin: "auto",
         // boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)",
-        paddingLeft: "10px",
-        paddingRight: "10px",
         paddingBottom: "5px",
         paddingTop:"5px"
       }}
@@ -83,116 +81,7 @@ export default function TimeRecordTable({ rows,excludedColumns = [] }) {
           marginTop:"10px"
         }}
       >
-        {/* <FormControl>
-          <InputLabel
-            htmlFor="rows-per-page"
-            sx={{
-              "&.Mui-focused": {
-                color: "currentColor", // Keeps the current color
-              },
-            }}
-          >
-            Show Entries
-          </InputLabel>
-          <Select
-            value={rowsPerPage}
-            onChange={handleChangeRowsPerPage}
-            label="Rows per page"
-            inputProps={{
-              name: "rows-per-page",
-              id: "rows-per-page",
-            }}
-            sx={{
-              width: "120px",
-              height: "30px",
-              "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                borderColor: "currentColor", // Keeps the current border color
-              },
-              "&:hover .MuiOutlinedInput-notchedOutline": {
-                borderColor: "currentColor", // Optional: Keeps the border color on hover
-              },
-            }}
-          >
-         
-            <MenuItem value={25}>25</MenuItem>
-            <MenuItem value={50}>50</MenuItem>
-            <MenuItem value={100}>100</MenuItem>
-          </Select>
-        </FormControl> */}
-
-        {/* <div
-          style={{ display: "flex", alignItems: "center", flexWrap: "wrap" }}
-        >
-          <Tooltip title="Refresh">
-            <IconButton onClick={hardRefresh} sx={iconsExtraSx}>
-              <RefreshIcon />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="Fit Content">
-            <IconButton onClick={handleFitContent} sx={iconsExtraSx}>
-              <FitScreenIcon />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="Expand All">
-            <IconButton onClick={handleExpandAll} sx={iconsExtraSx}>
-              <FullscreenIcon />
-            </IconButton>
-          </Tooltip>
-          <TextField
-            margin="normal"
-            size="small"
-            id="search"
-            label="Search"
-            autoComplete="off"
-            value={searchTerm}
-            onChange={(event)=>setSearchTerm(event.target.value)}
-            onBlur={handleSearch}              
-            onKeyDown={handleKeyDown}            
-            sx={{
-              width: 200, // Default width
-              "@media (max-width: 600px)": {
-                width: 150, // Reduced width for small screens
-              },
-              "& .MuiOutlinedInput-root": {
-                height: 30, // Adjust the height of the input area
-                "& fieldset": {
-                  borderColor: `${primaryColor}`,
-                },
-                "&:hover fieldset": {
-                  borderColor: primaryColor,
-                },
-                "&.Mui-focused fieldset": {
-                  borderColor: primaryColor,
-                },
-              },
-              "& .MuiInputLabel-root": {
-                transform: "translate(10px, 5px) scale(0.9)", // Adjust label position when not focused
-                color: primaryColor,
-              },
-              "& .MuiInputLabel-shrink": {
-                transform: "translate(14px, -9px) scale(0.75)", // Adjust label position when focused
-                color: primaryColor,
-              },
-              "& .MuiInputBase-input": {
-                fontSize: "0.75rem", // Adjust the font size of the input text
-                color: primaryColor,
-              },
-              "& .MuiFormLabel-root.Mui-focused": {
-                color: primaryColor,
-              },
-            }}
-            InputProps={{
-              // (3) add a search icon as an end-adornment:
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton onClick={handleSearch} edge="end">
-                    <SearchIcon />
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
-          />
-        </div> */}
+        
       </div>
 
       {currentRows.length > 0 ? (

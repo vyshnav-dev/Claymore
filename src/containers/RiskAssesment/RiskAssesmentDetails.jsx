@@ -178,7 +178,7 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction }) => {
 
 
 
-            {/* <ActionButton
+            <ActionButton
                 iconsClick={iconsClick}
                 icon={"fa-solid fa-circle-arrow-left"}
                 caption={"Prev"}
@@ -189,7 +189,7 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction }) => {
                 icon={"fa-solid fa-circle-arrow-right"}
                 caption={"Next"}
                 iconName={"next"}
-            /> */}
+            />
             <ActionButton
                 iconsClick={iconsClick}
                 icon={"fa-solid fa-print"}
@@ -467,6 +467,9 @@ export default function RiskAssesmentDetails({
         getriskjoborderdetails,
         getAssignjoborderlist
     } = inspectionApis();
+    const {
+        getrecordprevnext
+    } = allocationApis();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -496,7 +499,7 @@ export default function RiskAssesmentDetails({
             throw error;
         }
     };
-
+    
     //Accordion 
     const handleChange = (panel) => (event, isExpanded) => {
         setExpanded(isExpanded ? panel : null);
@@ -578,8 +581,12 @@ export default function RiskAssesmentDetails({
                     setConfirmType("save");
                     setConfirmAlert(true);
                 }
-
-
+                break;
+                case "prev":
+                handlePrevNext(1);
+                break;
+            case "next":
+                handlePrevNext(2);
                 break;
             case "delete":
                 setConfirmData({ message: "Delete", type: "danger" });
@@ -598,6 +605,20 @@ export default function RiskAssesmentDetails({
         setIsGet(false)
     };
 
+
+    const handlePrevNext = async (value) =>{
+        const response = await getrecordprevnext({
+            allocation:mainDetails?.Allocation,
+            category:1,
+            id: detailPageId,
+            type:value
+        })
+        if (response.status == "Success") {
+            const detailId = Number(response.result)
+            setDetailPageId(detailId)
+            
+        }
+    }
 
     const detailsValidation = async () => {
         const updatedChildData = tableBody.flatMap(obj =>

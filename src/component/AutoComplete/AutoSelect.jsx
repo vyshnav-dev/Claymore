@@ -25,6 +25,7 @@ const AutoSelect = ({
   ColumnSpan = 0,
   Menu=[],
   tableField=false,
+  border
 }) => {
   const [searchkey, setsearchkey] = useState("");
   const [autoCompleteKey, setAutoCompleteKey] = useState(0);
@@ -348,7 +349,7 @@ const AutoSelect = ({
                 left: direction === "rtl" ? 0 : "auto", // Swap the position of the icons
               },
               "& fieldset": {
-                borderColor: `#ddd`,
+                borderColor: border?'currentColor':`#ddd`,
                 textAlign: direction === "rtl" ? "right" : "left",
               },
               "&:hover fieldset": {

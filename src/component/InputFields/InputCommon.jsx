@@ -1126,6 +1126,7 @@ export default function InputCommon({
               "& legend": {
                 width: direction === "rtl" ? "auto" : "max-content", // Let legend adjust width in RTL
               },
+              
             },
           }}
         />

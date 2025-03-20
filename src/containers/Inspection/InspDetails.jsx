@@ -159,48 +159,49 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction, certify }) => {
                 caption={"Next"}
                 iconName={"next"}
             />
-            
-                    {hasAproove && detailPageId != 0 ? (
+
+            {hasAproove && detailPageId != 0 ? (
+                <>
+                    {certify == 1 ? (
                         <>
-                            {certify == 1 ? (
-                                <>
-                                    <ActionButton
-                                        iconsClick={iconsClick}
-                                        icon={"fa-solid fa-thumbs-up"}
-                                        caption={"Approve"}
-                                        iconName={"approve"}
-                                    />
-                                    <ActionButton
-                                        iconsClick={iconsClick}
-                                        icon={"fa-solid fa-ban"}
-                                        caption={"Reject"}
-                                        iconName={"reject"}
-                                    />
-                                    <ActionButton
-                                        iconsClick={iconsClick}
-                                        icon={"fa-solid fa-file-pen"}
-                                        caption={"Correction"}
-                                        iconName={"correction"}
-                                    />
-                                    <ActionButton
-                                        iconsClick={iconsClick}
-                                        icon={"fa-regular fa-rectangle-xmark"}
-                                        caption={"Suspend"}
-                                        iconName={"suspend"}
-                                    />
-                                </>
-                            ):certify == 2 ?  (
+                            <ActionButton
+                                iconsClick={iconsClick}
+                                icon={"fa-solid fa-thumbs-up"}
+                                caption={"Approve"}
+                                iconName={"approve"}
+                            />
+                            <ActionButton
+                                iconsClick={iconsClick}
+                                icon={"fa-solid fa-ban"}
+                                caption={"Reject"}
+                                iconName={"reject"}
+                            /> 
                                 <ActionButton
-                                    iconsClick={iconsClick}
-                                    icon={"fa-solid fa-stamp"}
-                                    caption={"Certificate"}
-                                    iconName={"certificate"}
-                                />
-                            ):null}
+                                iconsClick={iconsClick}
+                                icon={"fa-solid fa-file-pen"}
+                                caption={"Correction"}
+                                iconName={"correction"}
+                            />
+                            
+                            <ActionButton
+                                iconsClick={iconsClick}
+                                icon={"fa-regular fa-rectangle-xmark"}
+                                caption={"Suspend"}
+                                iconName={"suspend"}
+                            />
                         </>
+                    ) : certify == 2 ? (
+                        <ActionButton
+                            iconsClick={iconsClick}
+                            icon={"fa-solid fa-stamp"}
+                            caption={"Certificate"}
+                            iconName={"certificate"}
+                        />
                     ) : null}
-              
-            
+                </>
+            ) : null}
+
+
 
 
 
@@ -406,6 +407,8 @@ export default function InspDetails({
 }) {
 
 
+
+
     const currentDate = new Date().toISOString().split("T")[0];
 
     const [formData, setFormData] = useState({
@@ -464,7 +467,7 @@ export default function InspDetails({
         GetInspectionFields, getexaminationform, getdocno, getjoborderheaddetails, getInspectionDetails, upsertInspection, deleteInspection, upsertApprove, uploadAttachfiles, generatecertificate
     } = inspectionApis();
 
-    const { getrecordprevnext } =allocationApis()
+    const { getrecordprevnext } = allocationApis()
 
     useEffect(() => {
         const fetchData = async () => {
@@ -674,7 +677,7 @@ export default function InspDetails({
 
 
                 const result = JSON.parse(response?.result)
-                
+
 
                 let updatedData = {
                     ...formData,
@@ -684,10 +687,13 @@ export default function InspDetails({
                 if (result?.Status == 2 || result?.Status == 4) {
                     setCertify(2)
                 }
-                else if (result?.Status == 6)
-                {
+                else if (result?.Status == 7 || result?.Status == 6) {
+                    setCertify(0)
+                }
+                else {
                     setCertify(1)
                 }
+
                 setFormData(updatedData)
                 setTableBody(result?.Examination)
                 if (result?.Attachment?.length > 0) {
@@ -713,12 +719,12 @@ export default function InspDetails({
     // ---- Aproove method----
 
     const handleProperty = (value) => {
-        
+
         setItemLabel(value)
         setConfirmData({
             message: `You want to Approve.`,
             type: "info",
-            header: value == 'correction'? 'Correction':value == 'suspend'? 'Suspend':"Authorization" ,
+            header: value == 'correction' ? 'Correction' : value == 'suspend' ? 'Suspend' : "Authorization",
         });
         setProperty(true);
     };
@@ -799,19 +805,23 @@ export default function InspDetails({
             setId(backId)
             setPageRender(2);
         }
-        setCertify(1)
+        setCertify(0)
     };
 
 
-    const handlePrevNext = async (value) =>{
+
+
+    const handlePrevNext = async (value) => {
         const response = await getrecordprevnext({
-            category:3,
+            allocation: formData?.Allocation,
+            category: 3,
             id: detailPageId,
-            type:value
+            type: value
         })
         if (response.status == "Success") {
-            console.log('res1',response);
-            
+            const detailId = Number(response.result)
+            setDetailPageId(detailId)
+
         }
     }
 

@@ -123,8 +123,6 @@ export default function MasterProductSummary({
   setPageRender,
   setId,
   userAction,
-  setGroup,
-  setGroupSelection,
 }) {
   const [rows, setRows] = React.useState([]); //To Pass in Table
   const [displayLength, setdisplayLength] = React.useState(25); // Show Entries
@@ -139,20 +137,14 @@ export default function MasterProductSummary({
   const [confirmAlert, setConfirmAlert] = useState(false); //To handle alert open
   const [confirmData, setConfirmData] = useState({}); //To pass alert data
   const latestSearchKeyRef = useRef(searchKey);
-  const [property, setProperty] = useState(false);
-  const { GetProductSummary, deleteProduct, updateproductproperties, gettagurl } =
+  const { GetProductSummary, deleteProduct, } =
     masterApis();
-  const [groupId, setGroupId] = useState(0);
   const [parentList, setParentList] = useState([]);
-  const longPressTriggeredRef = useRef(false); // Persist flag
-  const longPressTimerRef = useRef(null); // Persist timer
-
-  const longPressThreshold = 500;
+  
 
   //Role Summary
   const fetchRoleSummary = async () => {
     setselectedDatas([]);
-    setGroup(0);
     const currentSearchKey = latestSearchKeyRef.current;
 
     try {
@@ -192,12 +184,8 @@ export default function MasterProductSummary({
 
   React.useEffect(() => {
     fetchRoleSummary(); // Initial data fetch
-  }, [pageNumber, displayLength, searchKey, changesTriggered, groupId]);
+  }, [pageNumber, displayLength, searchKey, changesTriggered, refreshFlag]);
 
-
-  // useEffect(()=>{
-  //   handleParentGroup(0) 
-  // },[])
 
   const handleRowDoubleClick = (rowiId) => {
     if (rowiId > 0) {
@@ -215,7 +203,6 @@ export default function MasterProductSummary({
     setselectedDatas(selectedRowsData);
   };
   const resetChangesTrigger = () => {
-    setGroupId(0);
     setchangesTriggered(false);
   };
   const handleDisplayLengthChange = (newDisplayLength) => {
@@ -246,19 +233,6 @@ export default function MasterProductSummary({
       case "view":
         handleAdd("edit");
         break;
-      case "property":
-        handleProperty();
-        break;
-      case "addGroup":
-        handleAddGroup(1);
-        break;
-      case "group":
-        if (!selectedDatas?.length) {
-          showAlert("info", "Please Select row for Group");
-          return;
-        }
-        handleAddGroup(2);
-        break;
       case "excel":
         handleExcelExport();
         break;
@@ -277,7 +251,6 @@ export default function MasterProductSummary({
 
   // Handlers for your icons
   const handleAdd = (value) => {
-    setGroup(0);
     if (value === "edit") {
       if (selectedDatas.length !== 1) {
         showAlert(
@@ -305,18 +278,7 @@ export default function MasterProductSummary({
     handleConfrimOpen();
   };
 
-  const handleProperty = () => {
-    if (selectedDatas.length === 0) {
-      showAlert("info", "Select rows to Active/Inactive");
-      return;
-    }
-    setConfirmData({
-      message: `You want to Activate/Inactivate the property.`,
-      type: "info",
-      header: "Property",
-    });
-    setProperty(true);
-  };
+
 
 
   //To delete
@@ -350,46 +312,23 @@ export default function MasterProductSummary({
 
   const handleExcelExport = async () => {
     try {
-      const response = await gettagsummary({
-        tagId: 11,
-        refreshFlag: true,
-        pageNumber: 0,
-        pageSize: 0,
-        searchString: "",
+      const response = await GetProductSummary({
+        PageNo: 0,
+        PageSize: 0,
+        Search: '',
       });
       const excludedFields = ["Id"];
       const filteredRows = JSON.parse(response?.result)?.Data;
 
       await ExcelExport({
-        reportName: "Bin Summary",
+        reportName: "Product Summary",
         filteredRows,
         excludedFields,
       });
     } catch (error) {}
   };
 
-  const handleLongPressStart = (event, row) => {
-    longPressTriggeredRef.current = false;
-    longPressTimerRef.current = setTimeout(() => {
-      longPressTriggeredRef.current = true;
-      const isHighlighted = row.Group;
-      if (isHighlighted) {
-        setGroupId(row?.Id);
-        setPageRender(1);
-        // handleParentGroup(row?.Id)
-      } else {
-        setGroupId(0);
-      }
-    }, longPressThreshold);
-  };
-
-  // Function to handle the end of long press (mouse up or leave)
-  const handleLongPressEnd = () => {
-    if (longPressTimerRef.current) {
-      clearTimeout(longPressTimerRef.current);
-      longPressTimerRef.current = null;
-    }
-  };
+ 
  
   
   return (
@@ -422,10 +361,6 @@ export default function MasterProductSummary({
             onSelectedRowsChange={handleSelectedRowsChange}
             onRowDoubleClick={handleRowDoubleClick}
             totalRows={totalRows}
-            //   currentTheme={currentTheme}
-            handleLongPressStart={handleLongPressStart}
-            handleLongPressEnd={handleLongPressEnd}
-            // handleParentGroup={handleParentGroup}
             parentList={parentList}
             totalPages={totalPages}
             hardRefresh={hardRefresh}

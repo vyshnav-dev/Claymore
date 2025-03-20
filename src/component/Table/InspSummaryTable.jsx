@@ -387,6 +387,7 @@ export default function InspSummaryTable(props) {
                 required={false}
                 label={"Status"}
                 ColumnSpan={0}
+                border={true}
                 Menu={[{ "Id": 1, "Name": "Approved" }, { "Id": 2, "Name": "Rejected" }, { "Id": 3, "Name": "Pending" }, { "Id": 4, "Name": "Correction" }, { "Id": 5, "Name": "Suspended" }]}
 
               />
@@ -560,9 +561,7 @@ export default function InspSummaryTable(props) {
 
                       {columns.map((column) => (
                         <Tooltip
-                          title={
-                            column.id === "RejectRemarks" ? row[column.id] : null
-                          }
+                        title={["Technician", "ProductName","Client","Remarks"]?.includes(column.id) ? row[column.id] : null}
                         >
                           <TableCell
                             sx={{

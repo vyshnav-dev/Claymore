@@ -28,8 +28,6 @@ const UserPhotoUpload = ({
   const handleDialogClose = () => {
     setOpenDialog(false);
   };
-
-  console.log('field',field,formData);
   
 
     const imageField = field + "_preview";

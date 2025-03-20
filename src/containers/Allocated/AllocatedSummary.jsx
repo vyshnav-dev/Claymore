@@ -175,7 +175,6 @@ export default function AllocatedSummary({
         currentSearchKey === latestSearchKeyRef.current
       ) {
         const myObject = JSON.parse(response?.result);
-        console.log('mu',myObject);
         setRows(myObject?.Data );
 
         const totalRows = myObject?.Metadata.TotalRows;

@@ -34,7 +34,7 @@ export default function UserAutoComplete({
   const focusedRef = useRef(false); // Use ref to track focus state
   const highlightRef = useRef(false); // Separate ref to track component focus state
   const { showAlert } = useAlert();
-  
+
   const handleAutocompleteChange = (event, newValue) => {
     if (newValue) {
       const updatedFormData = {
@@ -60,7 +60,7 @@ export default function UserAutoComplete({
     }
     try {
       const response = await apiKey({
-        Search:searchKey,
+        Search: searchKey,
         Type: iTypeF2,
         criteria,
         Product
@@ -111,9 +111,9 @@ export default function UserAutoComplete({
       <ul style={{ paddingTop: 0, scrollbarWidth: "thin", }} ref={ref} {...other}>
         <ListSubheader
           style={{
-            backgroundColor:secondaryColor,
+            backgroundColor: secondaryColor,
             padding: "5px",
-            color:thirdColor
+            color: thirdColor
           }}
         >
           <div
@@ -123,8 +123,8 @@ export default function UserAutoComplete({
               width: "100%",
             }}
           >
-            <Typography style={{ marginRight: "auto",fontSize:"0.8rem" }}>Name</Typography>
-            <Typography style={{ marginLeft: "auto", fontSize:"0.8rem"  }}>Code</Typography>
+            <Typography style={{ marginRight: "auto", fontSize: "0.8rem" }}>Name</Typography>
+            <Typography style={{ marginLeft: "auto", fontSize: "0.8rem" }}>Code</Typography>
           </div>
         </ListSubheader>
         {children}
@@ -134,7 +134,7 @@ export default function UserAutoComplete({
 
   return (
     <Autocomplete
-    key={`${label}_${autoCompleteKey}`}
+      key={`${label}_${autoCompleteKey}`}
       size="small"
       PaperComponent={({ children }) => (
         <Paper style={{ minWidth: "150px", maxWidth: "300px" }}>
@@ -259,12 +259,12 @@ export default function UserAutoComplete({
             "& .MuiInputLabel-outlined.MuiInputLabel-shrink": {
               transform: "translate(14px, 7px) scale(0.75)",
               padding: "0px 2px",
-              color: "inherit",
+              color: "currentColor",
             },
             "& .MuiOutlinedInput-root": {
               height: 30, // Adjust the height of the input area
               "& fieldset": {
-                borderColor: "currentColor",
+                borderColor: "#ddd",
               },
               "&:hover fieldset": {
                 borderColor: "currentColor", // Keeps the border color on hover
@@ -274,8 +274,9 @@ export default function UserAutoComplete({
               },
             },
             "& .MuiInputLabel-root": {
-              color: "inherit",
+              color: "currentColor",
             },
+            
           }}
         />
       )}
@@ -284,3 +285,5 @@ export default function UserAutoComplete({
     />
   );
 }
+
+

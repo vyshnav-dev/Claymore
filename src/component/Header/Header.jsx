@@ -103,7 +103,7 @@ function Header() {
     setAnchorElUser(null);
   };
 
-  console.log('menu', menu);
+  // console.log('menu', menu);
 
 
   const handleClickEvent = async (menu) => {

@@ -316,11 +316,12 @@ export default function RiskAssesmentSummary({
   const handleExcelExport = async () => {
     try {
       const response = await GetRisAssesmentSummary({
-        pageNumber: 0,
+        allocation:Id,
+        pageNo: 0,
         pageSize: 0,
-        search: "",
+        search: '',
       });
-      const excludedFields = ["Id"];
+      const excludedFields = ["Id","Time"];
       const filteredRows = JSON.parse(response?.result)?.Data;
 
       await ExcelExport({

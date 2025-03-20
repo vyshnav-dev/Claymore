@@ -27,6 +27,7 @@ const createCustomIcon = (color) =>
 
 export default function RouteMap({ open, handleClose, mapId }) {
 
+
   // const { GetGeoLocation } = routeApis();
   const [locations, setLocations] = React.useState([]); // Default to empty array
   const [centerLocation, setCenterLocation] = useState([]);
@@ -42,11 +43,15 @@ export default function RouteMap({ open, handleClose, mapId }) {
     setLoading(true);
     try {
       
-        // Filter out items where Location is empty
-        const [lat, lng] = mapId.split(",").map(Number); // Convert lat/lng to numbers
+      let filteredLocations = [];
+      if(mapId)
+      {
+          // Filter out items where Location is empty
+        const [lat, lng] = mapId?.split(",").map(Number); // Convert lat/lng to numbers
 
-        const filteredLocations = [{ lat, lng }];
-
+        filteredLocations = [{ lat, lng }];
+      }
+        
         if (filteredLocations.length === 0) {
           // If no valid locations are found, set a default location (e.g., a known place)
           setCenterLocation([25.276987, 55.296249]); // Default: Dubai coordinates (Change as needed)
