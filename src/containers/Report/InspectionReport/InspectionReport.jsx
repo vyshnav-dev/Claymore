@@ -301,7 +301,7 @@ export default function InspectionReport({ userAction, disabledDetailed }) {
         const formatedTo = new Date(mainDetails?.toDate).toLocaleDateString("en-GB").split("/").join("-");
         const filteredRows = JSON.parse(response?.result)?.Data;
         await ExcelExport({
-            reportName: `Inspection Report(${formatedFrom} - ${formatedTo})`,
+            reportName: formatedFrom == formatedTo?`Inspection Report(${formatedFrom})`:`Inspection Report(${formatedFrom} - ${formatedTo})`,
             filteredRows,
             excludedFields,
         });
@@ -436,7 +436,7 @@ export default function InspectionReport({ userAction, disabledDetailed }) {
                 </Slide>
             )}
 
-            {rows?.length || latestSearchKeyRef?.current ? (
+           
                 <ReportSummary
                     rows={rows}
                     //onExportData={handleExportData}
@@ -455,7 +455,7 @@ export default function InspectionReport({ userAction, disabledDetailed }) {
                     IdName={"Id"}
                     length={checked}
                 />
-            ) : null}
+           
 
             <ConfirmationAlert
                 handleClose={handleConfrimClose}

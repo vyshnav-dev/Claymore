@@ -27,13 +27,10 @@ import { Button } from "@mui/material";
 import { primaryColor, secondaryColor } from "../../config/config";
 
 export default function NormalButton({ label, action }) {
-  const [isDisabled, setIsDisabled] = React.useState(false);
+  // const [isDisabled, setIsDisabled] = React.useState(false);
 
   const handleClick = async () => {
-    if (isDisabled) return; // Prevent multiple clicks
-    setIsDisabled(true); // Disable button
     await action(); // Execute the provided action
-    setIsDisabled(false); // Re-enable button after completion
   };
 
   const buttonStyle = {
@@ -53,7 +50,7 @@ export default function NormalButton({ label, action }) {
       onClick={handleClick}
       sx={buttonStyle}
       variant="contained"
-      disabled={isDisabled} // Disable button when action is in progress
+      // disabled={isDisabled} // Disable button when action is in progress
     >
       {label}
     </Button>

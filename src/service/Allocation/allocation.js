@@ -140,6 +140,22 @@ const allocationApis = () => {
     }
   };
   
+   //# Suspend
+
+   const updateproductsuspend = async (payload) => {
+    try {
+      const response = await makeAuthorizedRequestBase(
+        "post",
+        "allocation/updateproductsuspend",
+        payload,
+        true
+      );
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  };
+
 
 
   
@@ -154,7 +170,8 @@ const allocationApis = () => {
     GetAllocatedJobOrderSummary,
     GetAllocatedJobOrderDetails,
     getclientlist,
-    getrecordprevnext
+    getrecordprevnext,
+    updateproductsuspend
   }
 }
 

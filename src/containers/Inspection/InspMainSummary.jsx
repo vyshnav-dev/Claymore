@@ -58,7 +58,7 @@ function BasicBreadcrumbs({mId}) {
 }
 
 const DefaultIcons = ({ iconsClick, userAction }) => {
-  const hasEditAction = userAction?.some((action) => action.Name === "Edit");
+  const hasEditAction = userAction?.some((action) => action.Action === "Edit");
   return (
     <Box
       sx={{
@@ -70,14 +70,7 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
         scrollbarWidth: "thin",
       }}
     >
-      {userAction.some((action) => action.Action === "New") && (
-        <ActionButton
-          iconsClick={iconsClick}
-          icon={"fa-solid fa-plus"}
-          caption={"New"}
-          iconName={"new"}
-        />
-      )}
+     
       {userAction?.some((action) => action.Action === "Edit") && (
         <ActionButton
           iconsClick={iconsClick}
@@ -94,16 +87,8 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
           iconName={"excel"}
         />
       )}
-      {userAction?.some((action) => action.Action === "Delete") && (
-        <ActionButton
-          iconsClick={iconsClick}
-          icon={"trash"}
-          caption={"Delete"}
-          iconName={"delete"}
-        />
-      )}
       {!hasEditAction &&
-        userAction?.some((action) => action.Name === "View") && (
+        userAction?.some((action) => action.Action === "View") && (
           <ActionButton
             iconsClick={iconsClick}
             icon={"fa-solid fa-eye"}
@@ -140,8 +125,6 @@ export default function InspMainSummary({
   const [searchKey, setsearchKey] = useState(""); //Table Searching
   const [totalPages, setTotalPages] = useState(null);
   const { showAlert } = useAlert();
-  const [confirmAlert, setConfirmAlert] = useState(false); //To handle alert open
-  const [confirmData, setConfirmData] = useState({}); //To pass alert data
   const latestSearchKeyRef = useRef(searchKey);
   const { GetAllocatedJobOrderSummary,deleteAllocatedJobOrder} =
     allocationApis();
@@ -158,7 +141,7 @@ export default function InspMainSummary({
     {
       Type = 3;
     }
-    else if(menuIdLocal == 29){
+    else if(menuIdLocal == 28){
       Type = 2;
     }
     else{
@@ -211,7 +194,7 @@ export default function InspMainSummary({
   
 
   const handleRowDoubleClick = (rowiId) => {
-    if (rowiId > 0) {
+    if (rowiId > 0 && userAction.some((action) => action.Action === "View" || action.Action === "Edit") ) {
       setId(rowiId);
       setPageRender(2);
     }
@@ -252,9 +235,6 @@ export default function InspMainSummary({
       case "edit":
         handleAdd("edit");
         break;
-      case "delete":
-        deleteClick();
-        break;
       case "view":
         handleAdd("edit");
         break;
@@ -281,8 +261,8 @@ export default function InspMainSummary({
         showAlert(
           "info",
           selectedDatas.length === 0
-            ? "Select row to Edit "
-            : "Can't Edit Multiple Role"
+            ? "Please Select row "
+            : "Can't Select Multiple Row"
         );
         return;
       }
@@ -293,48 +273,6 @@ export default function InspMainSummary({
     setPageRender(2);
   };
 
-  //Delete alert open
-  const deleteClick = async () => {
-    if (selectedDatas.length === 0) {
-      showAlert("info", "Select row to Delete");
-      return;
-    }
-    setConfirmData({ message: "Delete", type: "danger" });
-    handleConfrimOpen();
-  };
-
-  
-
- 
-
-  //To delete
-  const handledeleteRole = async () => {
-    const deletePayload = selectedDatas.map((item) => ({
-      id: item,
-    }));
-
-    try {
-      let response = await deleteAllocatedJobOrder(deletePayload);
-
-      if (response?.status === "Success") {
-        showAlert("success", response?.message);
-      }
-    } catch (error) {
-    } finally {
-      setrefreshFlag(true);
-      setselectedDatas([]);
-      setchangesTriggered(true);
-      handleConfrimClose();
-    }
-  };
-
-  //confirmation
-  const handleConfrimOpen = () => {
-    setConfirmAlert(true);
-  };
-  const handleConfrimClose = () => {
-    setConfirmAlert(false);
-  };
 
   const handleExcelExport = async () => {
     let Type;
@@ -342,7 +280,7 @@ export default function InspMainSummary({
     {
       Type = 3;
     }
-    else if(menuIdLocal == 29){
+    else if(menuIdLocal == 28){
       Type = 2;
     }
     else{
@@ -407,12 +345,7 @@ export default function InspMainSummary({
             statusName={menuIdLocal !== 31 ?"Status":''}
           />
         </Box>
-        <ConfirmationAlert
-          handleClose={handleConfrimClose}
-          open={confirmAlert}
-          data={confirmData}
-          submite={handledeleteRole}
-        />
+        
       </Box>
     </>
   );

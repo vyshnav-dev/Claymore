@@ -140,7 +140,7 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction }) => {
                         iconName={"save"}
                     />
                 )}
-            {userAction.some((action) => action.Action === "Delete") && (
+            {/* {userAction.some((action) => action.Action === "Delete") && (
                 <>
                     {detailPageId != 0 ? (
                         <ActionButton
@@ -151,19 +151,31 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction }) => {
                         />
                     ) : null}
                 </>
+            )} */}
+            {userAction.some((action) => action.Action === "View" || action.Action === "Edit") && (
+                <>
+                    {detailPageId != 0 ? (
+                        <ActionButton
+                            iconsClick={iconsClick}
+                            icon={"fa-solid fa-circle-arrow-left"}
+                            caption={"Prev"}
+                            iconName={"prev"}
+                        />
+                    ) : null}
+                </>
             )}
-            <ActionButton
-                iconsClick={iconsClick}
-                icon={"fa-solid fa-circle-arrow-left"}
-                caption={"Prev"}
-                iconName={"prev"}
-            />
-            <ActionButton
-                iconsClick={iconsClick}
-                icon={"fa-solid fa-circle-arrow-right"}
-                caption={"Next"}
-                iconName={"next"}
-            />
+            {userAction.some((action) => action.Action === "View" || action.Action === "Edit") && (
+                <>
+                    {detailPageId != 0 ? (
+                        <ActionButton
+                            iconsClick={iconsClick}
+                            icon={"fa-solid fa-circle-arrow-right"}
+                            caption={"Next"}
+                            iconName={"next"}
+                        />
+                    ) : null}
+                </>
+            )}
 
 
             <ActionButton
@@ -370,69 +382,91 @@ export default function TimeRecordDetails({
     };
 
     const handlePrevNext = async (value) => {
-        const response = await getrecordprevnext({
-            allocation: mainDetails?.Allocation,
-            category: 2,
-            id: detailPageId,
-            type: value
-        })
-        if (response.status == "Success") {
-            const detailId = Number(response.result)
-            setDetailPageId(detailId)
-
+        try {
+            const response = await getrecordprevnext({
+                allocation: mainDetails?.Allocation,
+                category: 2,
+                id: detailPageId,
+                type: value
+            })
+            if (response.status == "Success") {
+                const detailId = Number(response.result)
+                setDetailPageId(detailId)
+            } else {
+                showAlert("info", "No more records available.");
+            }
+        } catch (error) {
+            throw error
         }
+
     }
 
+   
+    
+
     const handleSave = async () => {
-        const isAnyScopeOfWorkSelected = scopeOfWork.some((field) => mainDetails[field] === true);
+        try {
+            const isAnyScopeOfWorkSelected = scopeOfWork.some((field) => mainDetails[field] === true);
 
-        if (!isAnyScopeOfWorkSelected) {
-            showAlert("info", "Please select at least one field in Scope of Work .");
-            return; // Stop further execution if no field is selected
-        }
-
-        const isDoumentRequiredSelected = tableBody.some((item) => item.Checked === 1);
-        if (!isDoumentRequiredSelected) {
-            showAlert("info", "Please fill at least one field in Doument Required .");
-            return; // Stop further execution if no field is selected
-        }
-
-        const saveData = {
-            Id: detailPageId || 0,
-            allocation: mainDetails?.Allocation,
-            dateOfInspection: mainDetails?.DateOfInspection,
-            timeArrived: mainDetails?.TimeArrived,
-            timeLeft: mainDetails?.TimeLeft,
-            siteHour: mainDetails?.SiteHour,
-            travelHour: mainDetails?.TravelHour,
-            totalTime: mainDetails?.TotalTime,
-            comments: mainDetails?.Comments,
-            eqpDescription: mainDetails?.EqpDescription,
-            virtualTest: mainDetails?.VirtualTest,
-            loadTest: mainDetails?.LoadTest,
-            witness: mainDetails?.Witness,
-            verification: mainDetails?.Verification,
-            functionalTest: mainDetails?.FunctionalTest,
-            // inspector: mainDetails?.Inspector,
-            customerAcceptanceCertificate: mainDetails?.CustomerAcceptanceCertificate,
-        };
-
-        tableBody?.forEach((item) => {
-            if (saveData) {
-                saveData[item.key] = item.Checked; // Assign Checked value to the corresponding key in saveData
+            if (!isAnyScopeOfWorkSelected) {
+                showAlert("info", "Please select at least one field in Scope of Work .");
+                return; // Stop further execution if no field is selected
             }
-        });
 
-        const response = await UpsertTimeSheet(saveData);
-        if (response.status === "Success") {
-
-            showAlert("success", response?.message);
-            handleNew();
-            const actionExists = userAction.some((action) => action.Action === "New");
-            if (!actionExists) {
-                handleclose();
+            const isDoumentRequiredSelected = tableBody.some((item) => item.Checked === 1);
+            if (!isDoumentRequiredSelected) {
+                showAlert("info", "Please fill at least one field in Doument Required .");
+                return; // Stop further execution if no field is selected
             }
+
+            const equipmentDescription = rows?.map(item => ({
+                equipment: item.Product,
+                description: item.Description
+              }));
+
+            const saveData = {
+                Id: detailPageId || 0,
+                allocation: mainDetails?.Allocation,
+                dateOfInspection: mainDetails?.DateOfInspection,
+                timeArrived: mainDetails?.TimeArrived,
+                timeLeft: mainDetails?.TimeLeft,
+                siteHour: mainDetails?.SiteHour,
+                travelHour: mainDetails?.TravelHour,
+                totalTime: mainDetails?.TotalTime,
+                comments: mainDetails?.Comments,
+                eqpDescription: mainDetails?.EqpDescription,
+                virtualTest: mainDetails?.VirtualTest,
+                loadTest: mainDetails?.LoadTest,
+                witness: mainDetails?.Witness,
+                verification: mainDetails?.Verification,
+                functionalTest: mainDetails?.FunctionalTest,
+                // inspector: mainDetails?.Inspector,
+                customerAcceptanceCertificate: mainDetails?.CustomerAcceptanceCertificate,
+                equipmentDescription:equipmentDescription,
+                remarks:mainDetails?.Remarks,
+                clientSign:mainDetails?.ClientSign
+            };
+
+            tableBody?.forEach((item) => {
+                if (saveData) {
+                    saveData[item.key] = item.Checked; // Assign Checked value to the corresponding key in saveData
+                }
+            });
+
+            const response = await UpsertTimeSheet(saveData);
+            if (response.status === "Success") {
+
+                showAlert("success", response?.message);
+                handleNew();
+                const actionExists = userAction.some((action) => action.Action === "New");
+                if (!actionExists) {
+                    handleclose();
+                }
+            }
+        } catch (error) {
+            throw error
         }
+
     };
 
 
@@ -481,16 +515,21 @@ export default function TimeRecordDetails({
 
     //Delete alert open
     const deleteClick = async () => {
-        let response;
-        response = await deleteTimeSheet([{ id: detailPageId }]);
-        if (response?.status === "Success") {
-            showAlert("success", response?.message);
-            handleNew();
-            const actionExists = userAction.some((action) => action.Action === "New");
-            if (!actionExists) {
-                setPageRender(3);
-            }
+        try {
+            let response;
+            response = await deleteTimeSheet([{ id: detailPageId }]);
+            if (response?.status === "Success") {
+                showAlert("success", response?.message);
+                handleNew();
+                const actionExists = userAction.some((action) => action.Action === "New");
+                if (!actionExists) {
+                    setPageRender(3);
+                }
+            } 
+        } catch (error) {
+            throw error
         }
+        
     };
 
 
@@ -963,7 +1002,7 @@ export default function TimeRecordDetails({
                             ) : (
                                 <ImageNotSupportedIcon sx={{ color: secondaryColor }} />
                             )}
-                            <Typography variant="body2" sx={{ mt: 1, color: "black",fontWeight:'bold' }}> {/* Adjust color as needed */}
+                            <Typography variant="body2" sx={{ mt: 1, color: "black", fontWeight: 'bold' }}> {/* Adjust color as needed */}
                                 Client Sign
                             </Typography>
                         </Box>

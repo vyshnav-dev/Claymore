@@ -97,7 +97,7 @@ function BasicBreadcrumbs() {
         </div>
     );
 }
-const DefaultIcons = ({ iconsClick, detailPageId, userAction, certify }) => {
+const DefaultIcons = ({ iconsClick, detailPageId, userAction, certify, isSave, menuId }) => {
 
 
     const hasAproove = userAction.some((action) => action.Action == "Authorise");
@@ -125,17 +125,16 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction, certify }) => {
                 )} */}
             {userAction.some(
                 (action) =>
-                    (action.Action == "New" && detailPageId == 0) ||
-                    (action.Action == "Edit" && detailPageId !== 0 && !hasAproove)
-            ) && (
+                    action.Action === "Edit" && detailPageId !== 0 && !hasAproove
+            ) && !isSave && menuId === 28 && (
                     <ActionButton
                         iconsClick={iconsClick}
-                        icon={"save"}
-                        caption={"Save"}
-                        iconName={"save"}
+                        icon="save"
+                        caption="Save"
+                        iconName="save"
                     />
                 )}
-            {userAction.some((action) => action.Action == "Delete") || !hasAproove && (
+            {/* {userAction.some((action) => action.Action == "Delete") || !hasAproove && (
                 <>
                     {detailPageId != 0 ? (
                         <ActionButton
@@ -146,19 +145,8 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction, certify }) => {
                         />
                     ) : null}
                 </>
-            )}
-            <ActionButton
-                iconsClick={iconsClick}
-                icon={"fa-solid fa-circle-arrow-left"}
-                caption={"Prev"}
-                iconName={"prev"}
-            />
-            <ActionButton
-                iconsClick={iconsClick}
-                icon={"fa-solid fa-circle-arrow-right"}
-                caption={"Next"}
-                iconName={"next"}
-            />
+            )} */}
+
 
             {hasAproove && detailPageId != 0 ? (
                 <>
@@ -175,14 +163,14 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction, certify }) => {
                                 icon={"fa-solid fa-ban"}
                                 caption={"Reject"}
                                 iconName={"reject"}
-                            /> 
-                                <ActionButton
+                            />
+                            <ActionButton
                                 iconsClick={iconsClick}
                                 icon={"fa-solid fa-file-pen"}
                                 caption={"Correction"}
                                 iconName={"correction"}
                             />
-                            
+
                             <ActionButton
                                 iconsClick={iconsClick}
                                 icon={"fa-regular fa-rectangle-xmark"}
@@ -201,6 +189,31 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction, certify }) => {
                 </>
             ) : null}
 
+
+            {userAction.some((action) => action.Action === "View" || action.Action === "Edit") && (
+                <>
+                    {detailPageId != 0 ? (
+                        <ActionButton
+                            iconsClick={iconsClick}
+                            icon={"fa-solid fa-circle-arrow-left"}
+                            caption={"Prev"}
+                            iconName={"prev"}
+                        />
+                    ) : null}
+                </>
+            )}
+            {userAction.some((action) => action.Action === "View" || action.Action === "Edit") && (
+                <>
+                    {detailPageId != 0 ? (
+                        <ActionButton
+                            iconsClick={iconsClick}
+                            icon={"fa-solid fa-circle-arrow-right"}
+                            caption={"Next"}
+                            iconName={"next"}
+                        />
+                    ) : null}
+                </>
+            )}
 
 
 
@@ -404,6 +417,7 @@ export default function InspDetails({
     mainDetails,
     setMainDetails,
     newId,
+    menuId,
 }) {
 
 
@@ -441,9 +455,7 @@ export default function InspDetails({
     const [expanded, setExpanded] = useState("InspectionDetails");//Accordion open
     const [tableBody, setTableBody] = useState();
     const [loading, setLoading] = useState(true);
-    const [docNo, setDocNo] = useState({
-        DocNo: null,
-    });
+    const [isSave, setIsSave] = useState(false);
 
     const [exam, setExam] = useState();
 
@@ -677,7 +689,7 @@ export default function InspDetails({
 
 
                 const result = JSON.parse(response?.result)
-
+                
 
                 let updatedData = {
                     ...formData,
@@ -686,8 +698,12 @@ export default function InspDetails({
                 }
                 if (result?.Status == 2 || result?.Status == 4) {
                     setCertify(2)
+                    setIsSave(true);
                 }
                 else if (result?.Status == 7 || result?.Status == 6) {
+                    if (result?.Status == 7) {
+                        setIsSave(true);
+                    }
                     setCertify(0)
                 }
                 else {
@@ -786,11 +802,6 @@ export default function InspDetails({
             case "certificate":
                 handleCertificate();
                 break;
-            case "delete":
-                setConfirmData({ message: "Delete", type: "danger" });
-                setConfirmType("delete");
-                setConfirmAlert(true);
-                break;
             default:
                 break;
         }
@@ -806,23 +817,30 @@ export default function InspDetails({
             setPageRender(2);
         }
         setCertify(0)
+        setIsSave(false)
     };
 
 
 
 
     const handlePrevNext = async (value) => {
-        const response = await getrecordprevnext({
-            allocation: formData?.Allocation,
-            category: 3,
-            id: detailPageId,
-            type: value
-        })
-        if (response.status == "Success") {
-            const detailId = Number(response.result)
-            setDetailPageId(detailId)
-
+        try {
+            const response = await getrecordprevnext({
+                allocation: formData?.Allocation,
+                category: 3,
+                id: detailPageId,
+                type: value
+            })
+            if (response.status == "Success") {
+                const detailId = Number(response.result)
+                setDetailPageId(detailId)
+            } else {
+                showAlert("info", "No more records available.");
+            }
+        } catch (error) {
+            throw error
         }
+
     }
 
     const validateFormData = async () => {
@@ -888,98 +906,103 @@ export default function InspDetails({
 
     const handleSave = async () => {
 
+        try {
+            const validFieldNames = new Set(viewFields.map(field => field.FieldName));
 
+            // Filter formData.InspectionInformation to keep only valid fields
+            const filteredInspectionInformation = Object.keys(formData?.InspectionInformation || {})
+                .filter(key => validFieldNames.has(key)) // Keep only keys that exist in viewFields
+                .reduce((obj, key) => {
+                    obj[key] = formData?.InspectionInformation[key];
+                    return obj;
+                }, {});
+            const inspectionInformationArray = [filteredInspectionInformation]
+
+            const saveData = {
+                id: formData?.Id,
+                docNo: formData?.DocNo,
+                product: formData?.Product,
+                list: formData?.List,
+                dateOfInspection: formData?.DateOfInspection,
+                expiryDate: formData?.ExpiryDate,
+                inspectionType: formData?.InspectionType,
+                previousInspectionReport: formData?.PreviousInspectionReport,
+                testMethod: formData?.TestMethod,
+                calibratedTestEquipment: formData?.CalibratedTestEquipment,
+                clientTestEquipment: formData?.ClientTestEquipment,
+                testDate: formData?.TestDate,
+                location:formData?.Location,
+                inspectionInformation: inspectionInformationArray,
+                examination: exam,
+                attachments: formData?.Attachment || []
+            };
+
+
+            const response = await upsertInspection(saveData);
+            if (response.status == "Success") {
+
+                showAlert("success", response?.message);
+
+                const detailId = Number(response.result)
+
+                const formDataFiles = new FormData();
+
+                let fileIndex = 0;
+                // Filter attachments that have a file and add them to the FormData
+                const attachmentsWithFiles = formData?.Attachment?.filter(attachment => attachment?.file);
+
+
+
+                if (attachmentsWithFiles.length > 0) {
+
+                    attachmentsWithFiles.forEach((attachment) => {
+                        if (attachment.file) {
+                            formDataFiles.append(
+                                `Attachments[${fileIndex}].SlNo`,
+                                attachment.SLNo
+                            );
+                            formDataFiles.append(
+                                `Attachments[${fileIndex}].previousFileName`,
+                                attachment.FileName
+                            );
+                            formDataFiles.append(
+                                `Attachments[${fileIndex}].FileContent`,
+                                attachment.file
+                            );
+                            fileIndex++;
+                        }
+                    });
+                    try {
+
+
+
+                        const uploadResponse = await uploadAttachfiles(detailId, formDataFiles);
+                        if (uploadResponse.status === 'Success') {
+                            showAlert('success', uploadResponse?.message);
+                        }
+                    } catch (error) {
+                        throw error
+                    }
+
+                }
+                // handleNew();
+                // const actionExists = userAction.some((action) => action.Action == "New");
+                // if (!actionExists) {
+                handleclose();
+                // }
+
+                // }
+
+            }
+        } catch (error) {
+            throw error
+        }
 
 
 
         // if (!filteredData?.length) {
 
-        const validFieldNames = new Set(viewFields.map(field => field.FieldName));
 
-        // Filter formData.InspectionInformation to keep only valid fields
-        const filteredInspectionInformation = Object.keys(formData?.InspectionInformation || {})
-            .filter(key => validFieldNames.has(key)) // Keep only keys that exist in viewFields
-            .reduce((obj, key) => {
-                obj[key] = formData?.InspectionInformation[key];
-                return obj;
-            }, {});
-        const inspectionInformationArray = [filteredInspectionInformation]
-
-        const saveData = {
-            id: formData?.Id,
-            docNo: formData?.DocNo,
-            product: formData?.Product,
-            list: formData?.List,
-            dateOfInspection: formData?.DateOfInspection,
-            expiryDate: formData?.ExpiryDate,
-            inspectionType: formData?.InspectionType,
-            previousInspectionReport: formData?.PreviousInspectionReport,
-            testMethod: formData?.TestMethod,
-            calibratedTestEquipment: formData?.CalibratedTestEquipment,
-            clientTestEquipment: formData?.ClientTestEquipment,
-            testDate: formData?.TestDate,
-            inspectionInformation: inspectionInformationArray,
-            examination: exam,
-            attachments: formData?.Attachment || []
-        };
-
-
-        const response = await upsertInspection(saveData);
-        if (response.status == "Success") {
-
-            showAlert("success", response?.message);
-
-            const detailId = Number(response.result)
-
-            const formDataFiles = new FormData();
-
-            let fileIndex = 0;
-            // Filter attachments that have a file and add them to the FormData
-            const attachmentsWithFiles = formData?.Attachment?.filter(attachment => attachment?.file);
-
-
-
-            if (attachmentsWithFiles.length > 0) {
-
-                attachmentsWithFiles.forEach((attachment) => {
-                    if (attachment.file) {
-                        formDataFiles.append(
-                            `Attachments[${fileIndex}].SlNo`,
-                            attachment.SLNo
-                        );
-                        formDataFiles.append(
-                            `Attachments[${fileIndex}].previousFileName`,
-                            attachment.FileName
-                        );
-                        formDataFiles.append(
-                            `Attachments[${fileIndex}].FileContent`,
-                            attachment.file
-                        );
-                        fileIndex++;
-                    }
-                });
-                try {
-
-
-
-                    const uploadResponse = await uploadAttachfiles(detailId, formDataFiles);
-                    if (uploadResponse.status === 'Success') {
-                        showAlert('success', uploadResponse?.message);
-                    }
-                } catch (error) {
-
-                }
-
-            }
-            // handleNew();
-            // const actionExists = userAction.some((action) => action.Action == "New");
-            // if (!actionExists) {
-            handleclose();
-            // }
-
-            // }
-
-        }
     };
 
     //confirmation
@@ -987,14 +1010,6 @@ export default function InspDetails({
     const handleConfirmSubmit = () => {
         if (confirmType == "save") {
             handleSave();
-        } else if (confirmType == "delete") {
-            if (detailPageId == 0) {
-                setConfirmAlert(false);
-                setConfirmData({});
-                setConfirmType(null);
-                return;
-            }
-            deleteClick();
         }
         setConfirmAlert(false);
         setConfirmData({});
@@ -1006,19 +1021,6 @@ export default function InspDetails({
         setConfirmType(null);
     };
 
-    //Delete alert open
-    const deleteClick = async () => {
-        let response;
-        response = await deleteInspection([{ id: detailPageId }]);
-        if (response?.status == "Success") {
-            showAlert("success", response?.message);
-            handleNew();
-            const actionExists = userAction.some((action) => action.Action == "New");
-            if (!actionExists) {
-                handleclose();
-            }
-        }
-    };
 
     const handleApproveClose = () => {
         setProperty(false);
@@ -1043,7 +1045,6 @@ export default function InspDetails({
         try {
             const response = await upsertApprove(saveData);
             if (response?.status === "Success") {
-                // setCertify(true)
                 showAlert("success", response?.message);
                 handleclose();
                 setMainDetails1({})
@@ -1069,13 +1070,16 @@ export default function InspDetails({
                 if (!popupWindow) {
                     alert("Popup blocked! Please allow popups for this site.");
                 }
-            } else {
-
-            }
+            } 
 
         } catch (error) {
+            throw error;
 
-
+        }
+        finally{
+            const popupWindow = window.open(
+                myObject,
+            );
         }
     };
 
@@ -1103,6 +1107,8 @@ export default function InspDetails({
                     userAction={userAction}
                     disabledDetailed={disabledDetailed}
                     certify={certify}
+                    isSave={isSave}
+                    menuId={menuId}
                 />
             </Box>
             <Box
@@ -1282,7 +1288,7 @@ export default function InspDetails({
                         setFormData={setFormData}
                         // currentLanguageName={currentLanguageName}
                         // menuObj={menuObj}
-                        // disabledDetailed={disabledDetailed}
+                        disabledDetailed={menuId == 31 ? true : false}
                         detailPageId={formData.Id}
                         // handleTagSwitch={!preview ? handleTagSwitch : false}
                         dbTagAttachmentDetails={dbTagAttachmentDetails}

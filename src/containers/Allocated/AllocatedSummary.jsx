@@ -201,12 +201,12 @@ export default function AllocatedSummary({
 
   React.useEffect(() => {
     fetchRoleSummary(); // Initial data fetch
-  }, [pageNumber, displayLength, searchKey, changesTriggered]);
+  }, [pageNumber, displayLength, searchKey, changesTriggered,refreshFlag]);
 
 
 
   const handleRowDoubleClick = (rowiId) => {
-    if (rowiId > 0) {
+    if (rowiId > 0 && userAction.some((action) => action.Action === "Allocate")) {
       setId(rowiId);
       setAddMenu(true);
     }

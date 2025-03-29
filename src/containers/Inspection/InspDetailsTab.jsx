@@ -59,6 +59,7 @@ export default function InspDetailsTab({formData,setFormData}) {
             setValue={setFormData}
             maxLength={100}
             DonotAllowSpecialChar={true}
+            
         />
         
         <UserInputField

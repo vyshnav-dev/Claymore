@@ -16,19 +16,9 @@ import ActionButton from "../../../component/Buttons/ActionButton";
 import { useAlert } from "../../../component/Alerts/AlertContext";
 import { primaryColor } from "../../../config/config";
 import UserInputField from "../../../component/InputFields/UserInputField";
-import { stockCountApis } from "../../../service/Transaction/stockcount";
-// import ChecKBoxLabel from "../../../component/CheckBox/CheckBoxLabel";
-// import WarehouseAutoComplete from "../../../component/AutoComplete/WarehouseAutoComplete";
-// import { reconciliationApis } from "../../../service/Transaction/reconciliation";
-// import ReconEntityAutoComplete from "../../../component/AutoComplete/ReconciliationAutoComplete/ReconEntityAutoComplete";
-// import ReconciliationTable from "../../Transaction/Reconciliation/ReconciliationTable";
 import { reportApis } from "../../../service/Report/report";
-// import UserAutoCompleteManual from "../../../component/AutoComplete/UserAutoCompleteManual";
-// import ReportTable from "../../../component/Table/ReportTable";
 import ExcelExport from "../../../component/Excel/Excel";
 import ReportSummary from "../../../component/Table/ReportSummary";
-// import ReportBinAutoComplete from "../../../component/AutoComplete/ReportAutoComplete/ReportBinAutoComplete";
-// import UserAutoComplete from "../../../component/AutoComplete/UserAutoComplete";
 import NormalButton from "../../../component/Buttons/NormalButton";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import UserAutoComplete from "../../../component/AutoComplete/UserAutoComplete";
@@ -307,11 +297,14 @@ export default function TimeSheetReport({ userAction, disabledDetailed }) {
     const filteredRows = JSON.parse(response?.result)?.Data;
     const formatedFrom = new Date(mainDetails?.fromDate).toLocaleDateString("en-GB").split("/").join("-");
     const formatedTo = new Date(mainDetails?.toDate).toLocaleDateString("en-GB").split("/").join("-");
-    await ExcelExport({
-      reportName: `Time sheet Report(${formatedFrom} - ${formatedTo})`,
-      filteredRows,
-      excludedFields,
-    });
+    
+      await ExcelExport({
+        reportName: formatedFrom == formatedTo?`Time sheet Report(${formatedFrom})`:`Time sheet Report(${formatedFrom} - ${formatedTo})`,
+        filteredRows,
+        excludedFields,
+      });
+    
+    
   };
 
   //confirmation
@@ -439,7 +432,7 @@ export default function TimeSheetReport({ userAction, disabledDetailed }) {
         </Slide>
       )}
 
-      {rows?.length || latestSearchKeyRef?.current ? (
+    
         <ReportSummary
           rows={rows}
           //onExportData={handleExportData}
@@ -458,7 +451,7 @@ export default function TimeSheetReport({ userAction, disabledDetailed }) {
           IdName={"Id"}
           length={checked}
         />
-      ) : null}
+      
 
       <ConfirmationAlert
         handleClose={handleConfrimClose}

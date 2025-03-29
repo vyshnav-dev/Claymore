@@ -21,7 +21,6 @@ import {
 } from "../../../config/config";
 import TableInputes from "../../../component/InputFields/TableInputes";
 import TableProductAutoComplete from "../../../component/AutoComplete/TableProductAutoComplete";
-import { stockCountApis } from "../../../service/Transaction/stockcount";
 import TableBinAutoComplete from "../../../component/AutoComplete/TableBinAutoComplete";
 import TableUnitAutoComplete from "../../../component/AutoComplete/TableUnitAutoComplete";
 import NormalModal from "../../../component/Modal/NormalModal";
@@ -44,7 +43,6 @@ const iconsExtraSx = {
 export default function PDInfoTable({ tableBody, setTableBody, baseUnit }) {
   const [selected, setSelected] = useState(0);
   const { showAlert } = useAlert();
-  const { gettaglist } = stockCountApis();
 
   // Define all headers and filter them based on mainDetails properties
   const allHeaders = [

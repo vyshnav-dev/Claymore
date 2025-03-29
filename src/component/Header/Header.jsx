@@ -23,6 +23,7 @@ import {
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { logoImage, primaryColor } from "../../config/config";
+import sangsolution from "/Images/CSSC_logo-new.png";
 import Loader from "../Loader/Loader";
 import { securityApis } from "../../service/Security/security";
 import ConfirmationAlert from "../Alerts/ConfirmationAlert";
@@ -122,10 +123,10 @@ function Header() {
         navigate("/risk", { state: menu });
       }
       else if (menu?.ScreenId === 28) {
-        navigate("/timesheet", { state: menu });
+        navigate("/inspection", { state: menu });
       }
       else if (menu?.ScreenId === 29) {
-        navigate("/inspection", { state: menu });
+        navigate("/timesheet", { state: menu });
       }
       else if (menu?.ScreenId === 30) {
         navigate("/acknowledgement", { state: menu });
@@ -459,6 +460,10 @@ function Header() {
                 </IconButton>
               </Tooltip>
             </Box>
+            
+            <img alt="Logo" src={sangsolution} style={{ width: 80, height: 40 }} />
+            
+            
           </Box>
           {/* <Popover
             open={Boolean(anchorElLogout)}

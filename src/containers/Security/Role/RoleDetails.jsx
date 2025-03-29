@@ -287,21 +287,7 @@ export default function RoleDetails({
     setChild(data);
   };
 
-  // const handleRoleExist = async () => {
-  //   try {
-  //     const response = await checkrolenameexistence({
-  //       roleId: mainDetails?.RoleId,
-  //       roleName: mainDetails?.RoleName,
-  //     });
-  //     if (response.status === "Success") {
-  //       return true;
-  //     } else {
-  //       return false;
-  //     }
-  //   } catch (error) {
-  //     return false;
-  //   }
-  // };
+  
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>

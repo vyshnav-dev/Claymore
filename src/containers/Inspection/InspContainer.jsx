@@ -83,6 +83,7 @@ export default function InspContainer() {
           mainDetails={mainDetails}
           setMainDetails={setMainDetails}
           newId={newId}
+          menuId={menuId?.ScreenId}
         />
       ) : null}
     </>

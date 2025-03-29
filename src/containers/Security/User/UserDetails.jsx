@@ -408,10 +408,10 @@ export default function UserDetails({
       }
       showAlert("success", response?.message);
       handleNew();
-      const actionExists = userAction.some((action) => action.Action === "New");
-      if (!actionExists) {
+      // const actionExists = userAction.some((action) => action.Action === "New");
+      // if (!actionExists) {
         setPageRender(1);
-      }
+      // }
     }
     else {
       showAlert("info", response?.message);

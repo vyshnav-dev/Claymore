@@ -27,6 +27,8 @@ const createCustomIcon = (color) =>
 
 export default function RouteMap({ open, handleClose, mapId }) {
 
+  
+  
 
   // const { GetGeoLocation } = routeApis();
   const [locations, setLocations] = React.useState([]); // Default to empty array
@@ -41,33 +43,38 @@ export default function RouteMap({ open, handleClose, mapId }) {
 
   const fetchData = async () => {
     setLoading(true);
-    try {
-      
-      let filteredLocations = [];
-      if(mapId)
-      {
-          // Filter out items where Location is empty
-        const [lat, lng] = mapId?.split(",").map(Number); // Convert lat/lng to numbers
 
-        filteredLocations = [{ lat, lng }];
-      }
-        
-        if (filteredLocations.length === 0) {
-          // If no valid locations are found, set a default location (e.g., a known place)
-          setCenterLocation([25.276987, 55.296249]); // Default: Dubai coordinates (Change as needed)
-          setLocations([]);
-        } else {
-          setCenterLocation(findCenter(filteredLocations));
-          setLocations(filteredLocations);
+    try {
+        let filteredLocations = [];
+
+        if (mapId && typeof mapId === "string") {
+            // Extract numbers from the string
+            const match = mapId.match(/[-+]?\d*\.\d+/g); // Find decimal numbers
+
+            if (match && match.length === 2) {
+                const [lat, lng] = match.map(Number);
+                filteredLocations = [{ lat, lng }];
+            }
         }
 
-      } catch (error) {
+        if (filteredLocations.length === 0) {
+            // If no valid locations, set a default (Dubai coordinates)
+            setCenterLocation([25.276987, 55.296249]);
+            setLocations([]);
+        } else {
+            setCenterLocation(findCenter(filteredLocations));
+            setLocations(filteredLocations);
+        }
+    } catch (error) {
+        console.error("Error processing mapId:", error);
         setLocations([]);
         setCenterLocation([25.276987, 55.296249]); // Default fallback location
-      } finally {
+    } finally {
         setLoading(false);
-      }
-    };
+    }
+};
+
+
 
     const findCenter = (locations) => {
       const totalPoints = locations.length;

@@ -28,15 +28,8 @@ import {
     thirdColor,
 } from "../../config/config";
 import UserInputField from "../../component/InputFields/UserInputField";
-import { stockCountApis } from "../../service/Transaction/stockcount";
-import { masterApis } from "../../service/Master/master";
-
-
-import { Info } from "@mui/icons-material";
 import CustomizedAccordions from "../../component/Accordion/Accordion";
 import RiskBodyTable from "./RiskBodyTable";
-import { assessmentData, locationType } from "../../config";
-import InputCommon from "../../component/InputFields/InputCommon";
 import { allocationApis } from "../../service/Allocation/allocation";
 import UserAutoComplete from "../../component/AutoComplete/UserAutoComplete";
 import { inspectionApis } from "../../service/Inspection/inspection";
@@ -163,7 +156,7 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction }) => {
                         iconName={"save"}
                     />
                 )}
-            {userAction.some((action) => action.Action === "Delete") && (
+            {/* {userAction.some((action) => action.Action === "Delete") && (
                 <>
                     {detailPageId != 0 ? (
                         <ActionButton
@@ -174,28 +167,49 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction }) => {
                         />
                     ) : null}
                 </>
+            )} */}
+
+
+            {userAction.some((action) => action.Action === "View" || action.Action === "Edit") && (
+                <>
+                    {detailPageId !== 0 && (
+                        <ActionButton
+                            iconsClick={iconsClick}
+                            icon={"fa-solid fa-circle-arrow-left"}
+                            caption={"Prev"}
+                            iconName={"prev"}
+                        />
+                    )}
+                </>
+            )}
+            {userAction.some((action) => action.Action === "View" || action.Action === "Edit") && (
+                <>
+                    {detailPageId != 0 ? (
+                        <ActionButton
+                            iconsClick={iconsClick}
+                            icon={"fa-solid fa-circle-arrow-right"}
+                            caption={"Next"}
+                            iconName={"next"}
+                        />
+                    ) : null}
+                </>
+            )}
+            {userAction.some((action) => action.Action === "Print") && (
+                <>
+                    {detailPageId != 0 ? (
+                        <ActionButton
+                            iconsClick={iconsClick}
+                            icon={"fa-solid fa-print"}
+                            caption={"Print"}
+                            iconName={"print"}
+                        />
+                    ) : null}
+                </>
             )}
 
 
 
-            <ActionButton
-                iconsClick={iconsClick}
-                icon={"fa-solid fa-circle-arrow-left"}
-                caption={"Prev"}
-                iconName={"prev"}
-            />
-            <ActionButton
-                iconsClick={iconsClick}
-                icon={"fa-solid fa-circle-arrow-right"}
-                caption={"Next"}
-                iconName={"next"}
-            />
-            <ActionButton
-                iconsClick={iconsClick}
-                icon={"fa-solid fa-print"}
-                caption={"Print"}
-                iconName={"print"}
-            />
+
             <ActionButton
                 iconsClick={iconsClick}
                 icon={"fa-solid fa-xmark"}
@@ -499,7 +513,7 @@ export default function RiskAssesmentDetails({
             throw error;
         }
     };
-    
+
     //Accordion 
     const handleChange = (panel) => (event, isExpanded) => {
         setExpanded(isExpanded ? panel : null);
@@ -529,25 +543,28 @@ export default function RiskAssesmentDetails({
 
     useEffect(() => {
 
-        const fetchHeadData = async () => {
-            const response = await getriskjoborderdetails({
-                allocation: mainDetails?.Allocation
-            });
-            if (response?.status === "Success") {
-                const myObject = JSON.parse(response?.result);
-                // delete myObject[0].Id;
-                setMainDetails(prevState => ({
-                    ...prevState, // Retain previous values
-                    ...myObject[0],
-                    Date: currentDate,
-                }));
+        try {
+            const fetchHeadData = async () => {
+                const response = await getriskjoborderdetails({
+                    allocation: mainDetails?.Allocation
+                });
+                if (response?.status === "Success") {
+                    const myObject = JSON.parse(response?.result);
+                    // delete myObject[0].Id;
+                    setMainDetails(prevState => ({
+                        ...prevState, // Retain previous values
+                        ...myObject[0],
+                        Date: currentDate,
+                    }));
+                }
             }
+            if (mainDetails?.Allocation && detailPageId == 0) {
+                fetchHeadData();
+            }
+
+        } catch (error) {
+            throw error
         }
-        if(mainDetails?.Allocation && detailPageId == 0)
-        {
-            fetchHeadData();
-        }
-        
 
     }, [mainDetails?.Allocation])
 
@@ -567,10 +584,10 @@ export default function RiskAssesmentDetails({
                 const emptyFields = [];
                 if (!mainDetails?.JobOrderNo) emptyFields.push("Job OrderNo");
                 if (!mainDetails.FileNo) emptyFields.push("File No Name");
-                if(namePattern.test(mainDetails.FileNo)) {
+                if (namePattern.test(mainDetails.FileNo)) {
                     showAlert("info", "File No Only special characters are not allowed.");
                     return;
-                  } 
+                }
                 if (emptyFields.length > 0) {
                     showAlert("info", `Please Provide ${emptyFields[0]}`);
                     return;
@@ -582,7 +599,7 @@ export default function RiskAssesmentDetails({
                     setConfirmAlert(true);
                 }
                 break;
-                case "prev":
+            case "prev":
                 handlePrevNext(1);
                 break;
             case "next":
@@ -606,19 +623,26 @@ export default function RiskAssesmentDetails({
     };
 
 
-    const handlePrevNext = async (value) =>{
-        const response = await getrecordprevnext({
-            allocation:mainDetails?.Allocation,
-            category:1,
-            id: detailPageId,
-            type:value
-        })
-        if (response.status == "Success") {
-            const detailId = Number(response.result)
-            setDetailPageId(detailId)
-            
+    const handlePrevNext = async (value) => {
+        try {
+            const response = await getrecordprevnext({
+                allocation: mainDetails?.Allocation,
+                category: 1,
+                id: detailPageId,
+                type: value
+            });
+
+            if (response.status === "Success") {
+                const detailId = Number(response?.result);
+                setDetailPageId(detailId);
+            } else {
+                showAlert("info", "No more records available.");
+            }
+        } catch (error) {
+            throw error;
         }
-    }
+    };
+
 
     const detailsValidation = async () => {
         const updatedChildData = tableBody.flatMap(obj =>
@@ -667,28 +691,34 @@ export default function RiskAssesmentDetails({
 
     const handleSave = async () => {
 
+        try {
+            // If both validations pass, proceed with saving
+            const saveData = {
+                Id: mainDetails?.Id,
+                allocation: mainDetails?.Allocation,
+                date: mainDetails?.Date,
+                inspector: mainDetails?.Inspector,
+                fileNo: mainDetails?.FileNo,
+                details: updateDetails
+            };
 
-        // If both validations pass, proceed with saving
-        const saveData = {
-            Id: mainDetails?.Id,
-            allocation: mainDetails?.Allocation,
-            date: mainDetails?.Date,
-            inspector: mainDetails?.Inspector,
-            fileNo: mainDetails?.FileNo,
-            details: updateDetails
-        };
-
-        const response = await UpsertRiskAssesment(saveData);
-        if (response.status === "Success") {
-            showAlert("success", response?.message);
-            handleNew();
-            setPageRender(2);
-            // Check if "New" action exists, otherwise setPageRender
-            // const actionExists = userAction.some(action => action.Action === "New");
-            // if (!actionExists) {
-            //     setPageRender(1);
-            // }
+            const response = await UpsertRiskAssesment(saveData);
+            if (response.status === "Success") {
+                showAlert("success", response?.message);
+                handleclose();
+                setPageRender(2);
+                // Check if "New" action exists, otherwise setPageRender
+                // const actionExists = userAction.some(action => action.Action === "New");
+                // if (!actionExists) {
+                //     setPageRender(1);
+                // }
+            }
+        } catch (error) {
+            throw error
         }
+
+
+
     };
 
 
@@ -732,7 +762,7 @@ export default function RiskAssesmentDetails({
 
 
     return (
-        <Box sx={{ display: "flex", flexDirection: "column", width: "100%",position: 'relative' }}>
+        <Box sx={{ display: "flex", flexDirection: "column", width: "100%", position: 'relative' }}>
             <Box
                 sx={{
                     position: 'fixed',
@@ -743,8 +773,8 @@ export default function RiskAssesmentDetails({
                     paddingLeft: 1.5,
                     paddingRight: 1.5,
                     flexWrap: "wrap",
-                    zIndex:5,
-                    backgroundColor:'white'
+                    zIndex: 5,
+                    backgroundColor: 'white'
                 }}
             >
                 <BasicBreadcrumbs />

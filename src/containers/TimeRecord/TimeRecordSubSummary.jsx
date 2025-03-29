@@ -57,7 +57,7 @@ function BasicBreadcrumbs() {
 }
 
 const DefaultIcons = ({ iconsClick, userAction }) => {
-  const hasEditAction = userAction.some((action) => action.Name === "Edit");
+  const hasEditAction = userAction.some((action) => action.Action === "Edit");
   return (
     <Box
       sx={{
@@ -93,14 +93,14 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
           iconName={"excel"}
         />
       )}
-      {userAction.some((action) => action.Action === "Delete") && (
+      {/* {userAction.some((action) => action.Action === "Delete") && (
         <ActionButton
           iconsClick={iconsClick}
           icon={"trash"}
           caption={"Delete"}
           iconName={"delete"}
         />
-      )}
+      )} */}
       {!hasEditAction &&
         userAction.some((action) => action.Name === "View") && (
           <ActionButton
@@ -196,7 +196,7 @@ export default function TimeRecordSubSummary({
  
 
   const handleRowDoubleClick = (rowiId) => {
-    if (rowiId > 0) {
+    if (rowiId > 0 && userAction.some((action) => action.Action === "View" || action.Action === "Edit")) {
       setId(rowiId);
       setPageRender(2);
     }
@@ -266,8 +266,8 @@ export default function TimeRecordSubSummary({
         showAlert(
           "info",
           selectedDatas.length === 0
-            ? "Select row to Edit "
-            : "Can't Edit Multiple Role"
+            ? "Please Select row "
+            : "Can't Select Multiple Row"
         );
         return;
       }

@@ -28,7 +28,6 @@ import {
     thirdColor,
 } from "../../../config/config";
 import UserInputField from "../../../component/InputFields/UserInputField";
-import { stockCountApis } from "../../../service/Transaction/stockcount";
 import { masterApis } from "../../../service/Master/master";
 
 // import MasterProductConfirmation from "./MasterProductConfirmation";

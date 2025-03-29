@@ -298,7 +298,7 @@ export default function ApproveReport({ userAction, disabledDetailed }) {
         const formatedTo = new Date(mainDetails?.toDate).toLocaleDateString("en-GB").split("/").join("-");
         const filteredRows = JSON.parse(response?.result)?.Data;
         await ExcelExport({
-            reportName: `Authorize Report(${formatedFrom} - ${formatedTo})`,
+            reportName: formatedFrom == formatedTo?`Authorize Report(${formatedFrom})`:`Authorize Report(${formatedFrom} - ${formatedTo})`,
             filteredRows,
             excludedFields,
         });
@@ -436,7 +436,7 @@ export default function ApproveReport({ userAction, disabledDetailed }) {
                 </Slide>
             )}
 
-            {rows?.length || latestSearchKeyRef?.current ? (
+            
                 <ReportSummary
                     rows={rows}
                     //onExportData={handleExportData}
@@ -455,7 +455,7 @@ export default function ApproveReport({ userAction, disabledDetailed }) {
                     IdName={"Id"}
                     length={checked}
                 />
-            ) : null}
+            
 
             <ConfirmationAlert
                 handleClose={handleConfrimClose}

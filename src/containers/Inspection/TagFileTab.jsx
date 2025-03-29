@@ -30,14 +30,11 @@ import BrokenImageIcon from '@mui/icons-material/BrokenImage';
 export default function TagFileTab({
   expanded,
   onChange,
-  fieldsWithStructure6,
   formData,
   setFormData,
-  currentLanguageName,
   disabledDetailed,
   menuObj,
   detailPageId,
-  handleTagSwitch,
   dbTagAttachmentDetails,
   setdbTagAttachmentDetails
 
@@ -452,9 +449,9 @@ export default function TagFileTab({
                     {/* <TableCell sx={headerCellStyle}>{languageDatasJson.DocumentType}</TableCell>
                     <TableCell sx={headerCellStyle}>{languageDatasJson.ReferenceNumber}</TableCell> */}
                     <TableCell sx={headerCellStyle}>File</TableCell>
-                    {!disabledDetailed &&
+                    {/* {disabledDetailed && */}
                     <TableCell sx={headerCellStyle}>Image</TableCell>
-                    }
+                    {/* } */}
                     {!disabledDetailed &&
                     <TableCell sx={headerCellStyle}>Delete</TableCell>
                     }
@@ -499,7 +496,7 @@ export default function TagFileTab({
                             </IconButton>
                             }
                           </TableCell>
-                          {!disabledDetailed &&
+                          {/* {disabledDetailed && */}
                           <TableCell
                             sx={{
                               ...bodyCell,
@@ -515,7 +512,7 @@ export default function TagFileTab({
                             />):(<><BrokenImageIcon sx={{ color: secondaryColor }} /><span>No image</span></>)}
                             
                           </TableCell>
-                          }
+                          {/* } */}
                           {!disabledDetailed &&
                           <TableCell
                             sx={{

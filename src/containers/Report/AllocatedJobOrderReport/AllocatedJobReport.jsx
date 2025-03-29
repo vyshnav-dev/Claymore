@@ -214,7 +214,6 @@ export default function AllocatedJobReport({ userAction, disabledDetailed }) {
                     currentSearchKey === latestSearchKeyRef.current
                 ) {
                     const myObject = JSON.parse(response?.result);
-
                     setRows(myObject?.Data);
 
                     const totalRows = myObject?.Metadata.TotalRows;
@@ -301,8 +300,9 @@ export default function AllocatedJobReport({ userAction, disabledDetailed }) {
         const formatedFrom = new Date(mainDetails?.fromDate).toLocaleDateString("en-GB").split("/").join("-");
         const formatedTo = new Date(mainDetails?.toDate).toLocaleDateString("en-GB").split("/").join("-");
         const filteredRows = JSON.parse(response?.result)?.Data;
+        
         await ExcelExport({
-            reportName: `Allocated job orders Report(${formatedFrom} - ${formatedTo})`,
+            reportName: formatedFrom == formatedTo?`Allocated job orders Report(${formatedFrom})`:`Allocated job orders Report(${formatedFrom} - ${formatedTo})`,
             filteredRows,
             excludedFields,
         });
@@ -450,7 +450,7 @@ export default function AllocatedJobReport({ userAction, disabledDetailed }) {
                 </Slide>
             )}
 
-            {rows?.length || latestSearchKeyRef?.current ? (
+            
                 <ReportSummary
                     rows={rows}
                     //onExportData={handleExportData}
@@ -469,7 +469,7 @@ export default function AllocatedJobReport({ userAction, disabledDetailed }) {
                     IdName={"Id"}
                     length={checked}
                 />
-            ) : null}
+           
 
             <ConfirmationAlert
                 handleClose={handleConfrimClose}

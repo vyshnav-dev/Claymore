@@ -28,9 +28,7 @@ import {
   thirdColor,
 } from "../../../config/config";
 import UserInputField from "../../../component/InputFields/UserInputField";
-import { stockCountApis } from "../../../service/Transaction/stockcount";
 import { masterApis } from "../../../service/Master/master";
-import { Info } from "@mui/icons-material";
 import AutoSelect from "../../../component/AutoComplete/AutoSelect";
 const currentDate = new Date().toISOString().split("T")[0];
 function CustomTabPanel(props) {

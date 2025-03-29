@@ -137,9 +137,12 @@ export default function Dashboard() {
           setRows(data);
         }
       } catch (error) {
+        throw error
         console.error("Error fetching notifications:", error);
       }
     };
+
+    
   
     if (
       !loading &&
@@ -147,7 +150,7 @@ export default function Dashboard() {
       userAction.some((action) => action.ActionId == 13)
     ) {
       fetchNotification(); // Initial call
-      const interval = setInterval(fetchNotification, 60000); // Call every 5 seconds
+      const interval = setInterval(fetchNotification, 60000); 
   
       return () => clearInterval(interval); // Cleanup on unmount
     }
@@ -227,7 +230,7 @@ export default function Dashboard() {
       fromDate = firstDayOfYear.toISOString().split("T")[0];
     }
 
-    setDateForm({ fromDate, toDate,});
+    setDateForm({ fromDate,toDate});
 };
 
 const handleDate = (data) =>{

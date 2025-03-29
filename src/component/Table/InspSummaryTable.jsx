@@ -88,7 +88,7 @@ export default function InspSummaryTable(props) {
   const profileDateFieldsArray = profileDateFields
     .split(",")
     .map((field) => field.trim());
-  const excludedFields = ["Group", "GroupId", "TotalRows", "UserName", "Id", statusName];
+  const excludedFields = ["Group", "GroupId", "TotalRows", "UserName","Id",statusName[0],statusName[1]];
 
   //To apply some filters on table rows
   const initialColumns =
@@ -569,7 +569,7 @@ export default function InspSummaryTable(props) {
                               paddingLeft: "4px",
                               border: `1px solid ${thirdColor}`,
                               minWidth: "100px",
-                              maxWidth: column.maxWidth,
+                              maxWidth: column.maxWidth || "200px",
                               whiteSpace: "nowrap",
                               overflow: "hidden",
                               textOverflow: "ellipsis",

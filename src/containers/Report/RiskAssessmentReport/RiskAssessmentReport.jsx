@@ -297,7 +297,7 @@ export default function RiskAssessmentReport({ userAction, disabledDetailed }) {
     const formatedTo = new Date(mainDetails?.toDate).toLocaleDateString("en-GB").split("/").join("-");
     const filteredRows = JSON.parse(response?.result)?.Data;
     await ExcelExport({
-      reportName: `Risk Assessment Report(${formatedFrom} - ${formatedTo})`,
+      reportName: formatedFrom == formatedTo?`Risk Assessment Report(${formatedFrom})`:`Risk Assessment Report(${formatedFrom} - ${formatedTo})`,
       filteredRows,
       excludedFields,
     });
@@ -428,7 +428,7 @@ export default function RiskAssessmentReport({ userAction, disabledDetailed }) {
         </Slide>
       )}
 
-      {rows?.length || latestSearchKeyRef?.current ? (
+     
         <ReportSummary
           rows={rows}
           //onExportData={handleExportData}
@@ -447,7 +447,7 @@ export default function RiskAssessmentReport({ userAction, disabledDetailed }) {
           IdName={"Id"}
           length={checked}
         />
-      ) : null}
+    
 
       <ConfirmationAlert
         handleClose={handleConfrimClose}

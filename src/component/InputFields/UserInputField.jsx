@@ -1,4 +1,4 @@
-import { TextField, useTheme } from "@mui/material";
+import { TextField, Tooltip, useTheme } from "@mui/material";
 import React, { useState } from "react";
 import { styled } from "@mui/system";
 import { validateInput } from "./ValidateInput";
@@ -119,7 +119,27 @@ export default function UserInputField({
     }
   };
 
+  // Calculate effective width
+  const effectiveWidth = 250;
+
+  // Estimate the average width per character in pixels (adjust this value as needed)
+  const averageCharWidth = 6;
+
+  // Calculate the character threshold based on the effective width
+  const tooltipThreshold = Math.floor(effectiveWidth / averageCharWidth);
+
+  
+  
+
   return (
+    <Tooltip
+      title={value[name] || ""}
+      disableHoverListener={value[name]?.length <= tooltipThreshold}
+      disableFocusListener={value[name]?.length <= tooltipThreshold}
+      // optionally, you can add enterDelay/leaveDelay if you want
+      // e.g. enterDelay={800} leaveDelay={0}
+      placement="top"
+    >
     <CustomTextField
       margin="normal"
       size="small"
@@ -241,5 +261,6 @@ export default function UserInputField({
         },
       }}
     />
+    </Tooltip>
   );
 }

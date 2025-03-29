@@ -261,12 +261,8 @@ export default function TechnicianReport({ userAction, disabledDetailed }) {
             search: "",
         });
         const excludedFields = [
-            "BE",
-            "Product",
-            "Unit",
-            "Warehouse",
-            "Bin",
-            "TransId",
+            
+            "Id",
         ];
         const filteredRows = JSON.parse(response?.result)?.Data;
         await ExcelExport({
@@ -311,7 +307,7 @@ export default function TechnicianReport({ userAction, disabledDetailed }) {
             </Box>
 
 
-            {rows?.length || latestSearchKeyRef?.current ? (
+            
                 <ReportSummary
                     rows={rows}
                     //onExportData={handleExportData}
@@ -330,7 +326,7 @@ export default function TechnicianReport({ userAction, disabledDetailed }) {
                     IdName={"Id"}
                     length={checked}
                 />
-            ) : null}
+           
 
             <ConfirmationAlert
                 handleClose={handleConfrimClose}

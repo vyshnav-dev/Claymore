@@ -78,7 +78,7 @@ export default function SummaryTable(props) {
   const profileDateFieldsArray = profileDateFields
     .split(",")
     .map((field) => field.trim());
-  const excludedFields = [statusName, "Group", "GroupId", "TotalRows", "UserName", "Time", "Id","Allocation"];
+  const excludedFields = [statusName, "Group", "GroupId", "TotalRows", "UserName", "Time","Allocation","Id"];
 
   //To apply some filters on table rows
   const initialColumns =
@@ -101,7 +101,7 @@ export default function SummaryTable(props) {
     setColumns(initialColumns);
   }, [rows]);
 
-
+  
 
   //To expand column on mouse dragging
   const handleResize = (index, event) => {

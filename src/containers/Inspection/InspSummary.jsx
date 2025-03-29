@@ -50,7 +50,7 @@ function BasicBreadcrumbs({mId}) {
           aria-label="breadcrumb"
         >
           <Typography underline="hover" sx={style} key="1">
-            { mId !== 31 ? 'Inspection Product list ' :'Authorise Product list'}
+            { mId !== 31 ? 'Inspection Product list ' :'Authorize Product list'}
           </Typography>
         </Breadcrumbs>
       </Stack>
@@ -59,7 +59,8 @@ function BasicBreadcrumbs({mId}) {
 }
 
 const DefaultIcons = ({ iconsClick, userAction }) => {
-  const hasEditAction = userAction?.some((action) => action.Name === "Edit");
+  
+  const hasEditAction = userAction?.some((action) => action.Action === "Edit");
   return (
     <Box
       sx={{
@@ -104,7 +105,7 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
         />
       )} */}
       {!hasEditAction &&
-        userAction?.some((action) => action.Name === "View") && (
+        userAction?.some((action) => action.Action === "View") && (
           <ActionButton
             iconsClick={iconsClick}
             icon={"fa-solid fa-eye"}
@@ -135,6 +136,8 @@ export default function InspSummary({
   setNewId
 }) {
 
+  const inspection =["AuthorizedOn","AuthorizedBy"]
+  const authorize =["ModifiedOn","ModifiedBy"]
   
   const [rows, setRows] = React.useState([]); //To Pass in Table
   const [displayLength, setdisplayLength] = React.useState(25); // Show Entries
@@ -167,7 +170,7 @@ export default function InspSummary({
     {
       Type = 2;
     }
-    else if(menuIdLocal == 29){
+    else if(menuIdLocal == 28){
       Type = 1;
     }
     else{
@@ -242,16 +245,16 @@ export default function InspSummary({
  
 
   const handleRowDoubleClick = (rowiId,row) => {
-    if (rowiId > 0) {
+    if (rowiId > 0 && userAction.some((action) => action.Action === "View" || action.Action === "Edit") ) {
       // if(menuIdLocal == 29 && row.CreatedBy !== loginName){
       //   showAlert('info',"You can't edit")
       //     return;
       // }
-      if(menuIdLocal === 29 && (row?.Status === 'Approved' || row?.Status === 'Rejected'))
-        {
-          showAlert('info',"This product is Authorized can't edit")
-          return;
-        }
+      // if(menuIdLocal === 29 && (row?.Status === 'Approved' || row?.Status === 'Rejected' || row?.Status === 'Suspended' ))
+      //   {
+      //     showAlert('info',"This product is Authorized can't edit")
+      //     return;
+      //   }
       setId(rowiId);
       setProductId(row?.Product)
       setPageRender(3);
@@ -299,9 +302,6 @@ export default function InspSummary({
       case "edit":
         handleAdd("edit");
         break;
-      case "delete":
-        deleteClick();
-        break;
       case "view":
         handleAdd("edit");
         break;
@@ -331,16 +331,16 @@ export default function InspSummary({
         showAlert(
           "info",
           selectedDatas.length === 0
-            ? "Select row to Edit "
-            : "Can't Edit Multiple Role"
+            ? "Please Select row  "
+            : "Can't Select Multiple Row"
         );
         return;
       }
-      if(menuIdLocal == 29 && (selectedStatus[0]?.Status === 'Approved' || selectedStatus[0]?.Status === 'Rejected'))
-      {
-        showAlert('info',"This product is Authorized can't edit")
-        return;
-      }
+      // if(menuIdLocal == 29 && (selectedStatus[0]?.Status === 'Approved' || selectedStatus[0]?.Status === 'Rejected' || selectedStatus[0]?.Status === 'Suspended'))
+      // {
+      //   showAlert('info',"This product is Authorized can't edit")
+      //   return;
+      // }
       setId(selectedDatas[0]);
       setProductId(selectedProduct[0]);
     } else {
@@ -349,56 +349,14 @@ export default function InspSummary({
     setPageRender(3);
   };
 
-  //Delete alert open
-  const deleteClick = async () => {
-    if (selectedDatas.length === 0) {
-      showAlert("info", "Select row to Delete");
-      return;
-    }
-    setConfirmData({ message: "Delete", type: "danger" });
-    handleConfrimOpen();
-  };
-
-  
-
-  
-
-  //To delete
-  const handledeleteRole = async () => {
-    const deletePayload = selectedDatas.map((item) => ({
-      id: item,
-    }));
-
-    try {
-      let response = await deleteInspection(deletePayload);
-
-      if (response?.status === "Success") {
-        showAlert("success", response?.message);
-      }
-    } catch (error) {
-    } finally {
-      setrefreshFlag(true);
-      setselectedDatas([]);
-      setchangesTriggered(true);
-      handleConfrimClose();
-    }
-  };
-
-  //confirmation
-  const handleConfrimOpen = () => {
-    setConfirmAlert(true);
-  };
-  const handleConfrimClose = () => {
-    setConfirmAlert(false);
-  };
-
+ 
   const handleExcelExport = async () => {
     let Type;
     if(menuIdLocal == 31)
     {
       Type = 2;
     }
-    else if(menuIdLocal == 29){
+    else if(menuIdLocal == 28){
       Type = 1;
     }
     else{
@@ -416,7 +374,7 @@ export default function InspSummary({
       const filteredRows = JSON.parse(response?.result)?.Data;
 
       await ExcelExport({
-        reportName:  menuIdLocal !== 31 ? 'Inspection Product list ' :'Approve Product list',
+        reportName:  menuIdLocal !== 31 ? 'Inspection Product list': 'Approve Product list',
         filteredRows,
         excludedFields,
       });
@@ -463,7 +421,7 @@ export default function InspSummary({
             totalPages={totalPages}
             hardRefresh={hardRefresh}
             IdName={"Id"} 
-            // statusName={menuIdLocal !== 31 ?"Status":''}
+            statusName={menuIdLocal == 31 ? authorize: inspection}
             getAssignjoborderlist={getAssignjoborderlist}
             mainDetails={mainDetails}
             setMainDetails={setMainDetails}
@@ -471,12 +429,7 @@ export default function InspSummary({
             menuIdLocal={menuIdLocal}
           />
         </Box>
-        <ConfirmationAlert
-          handleClose={handleConfrimClose}
-          open={confirmAlert}
-          data={confirmData}
-          submite={handledeleteRole}
-        />
+        
        
       </Box>
     </>

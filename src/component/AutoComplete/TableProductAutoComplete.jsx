@@ -9,7 +9,6 @@ import {
 import { debounce } from "lodash";
 import { secondaryColor, thirdColor } from "../../config/config";
 import { useAlert } from "../Alerts/AlertContext";
-import { stockCountApis } from "../../service/Transaction/stockcount";
 
 export default function TableProductAutoComplete({
   apiKey,
@@ -31,7 +30,6 @@ export default function TableProductAutoComplete({
   const [inputValue, setInputValue] = useState(""); // Track displayed input text
   const [Menu, setMenu] = useState([]);
   const [autoCompleteKey, setAutoCompleteKey] = useState(0);
-  const { getproductproperties } = stockCountApis();
   const focusedRef = useRef(false);
   const highlightRef = useRef(false);
   const { showAlert } = useAlert();

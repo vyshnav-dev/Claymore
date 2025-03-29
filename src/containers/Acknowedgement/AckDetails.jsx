@@ -29,22 +29,11 @@ import {
     thirdColor,
 } from "../../config/config";
 import UserInputField from "../../component/InputFields/UserInputField";
-import { stockCountApis } from "../../service/Transaction/stockcount";
-import { masterApis } from "../../service/Master/master";
-
-import { MDBIcon } from "mdb-react-ui-kit";
-// import MasterSelectionAutoComplete from "../MasterWarehouse/MasterSelectionAutoComplete";
-import UserAutoComplete from "../../component/AutoComplete/UserAutoComplete";
-// import UserAutoCompleteManual from "../../../component/AutoComplete/UserAutoCompleteManual";
-// import ChecKBoxLabel from "../../../component/CheckBox/CheckBoxLabel";
-// import MasterParentAutoComplete from "../../../component/AutoComplete/MasterAutoComplete/MasterParentAutoComplete";
-// import MasterProductUnitInfo from "./MasterProductUnitInfo";
-// import MasterProductConfirmation from "./MasterProductConfirmation";
-import { Info } from "@mui/icons-material";
-import MultiCheckBox from "../../component/MultiCheckBox.jsx/MultiCheckBox";
 import { inspectionApis } from "../../service/Inspection/inspection";
 import { allocationApis } from "../../service/Allocation/allocation";
-const currentDate = new Date().toISOString().split("T")[0];
+import ImageNotSupportedIcon from '@mui/icons-material/ImageNotSupported';
+import ImageModal from "../../component/Modal/ImageModal";
+
 function CustomTabPanel(props) {
     const { children, value, index, ...other } = props;
 
@@ -60,31 +49,7 @@ function CustomTabPanel(props) {
         </div>
     );
 }
-const headerCellStyle = {
-    padding: "0px 4px",
-    border: `1px solid #ddd`,
-    fontWeight: "600",
-    fontSize: "14px",
-    color: "white",
-};
 
-const bodyCellStyle = {
-    border: `1px solid #ddd`,
-    whiteSpace: "nowrap",
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-    fontSize: "12px",
-};
-
-const iconsExtraSx = {
-    fontSize: "0.8rem",
-    padding: "0.4rem",
-    "&:hover": {
-        backgroundColor: thirdColor,
-    },
-};
-
-const visibleHeaders = ["Name"];
 
 CustomTabPanel.propTypes = {
     children: PropTypes.node,
@@ -167,19 +132,31 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction }) => {
                         iconName={"save"}
                     />
                 )}
-            <ActionButton
-                iconsClick={iconsClick}
-                icon={"fa-solid fa-circle-arrow-left"}
-                caption={"Prev"}
-                iconName={"prev"}
-            />
-            <ActionButton
-                iconsClick={iconsClick}
-                icon={"fa-solid fa-circle-arrow-right"}
-                caption={"Next"}
-                iconName={"next"}
-            />
-            {userAction.some((action) => action.Action === "Delete") && (
+            {userAction.some((action) => action.Action === "View" || action.Action === "Edit") && (
+                <>
+                    {detailPageId != 0 ? (
+                        <ActionButton
+                            iconsClick={iconsClick}
+                            icon={"fa-solid fa-circle-arrow-left"}
+                            caption={"Prev"}
+                            iconName={"prev"}
+                        />
+                    ) : null}
+                </>
+            )}
+            {userAction.some((action) => action.Action === "View" || action.Action === "Edit") && (
+                <>
+                    {detailPageId != 0 ? (
+                        <ActionButton
+                            iconsClick={iconsClick}
+                            icon={"fa-solid fa-circle-arrow-right"}
+                            caption={"Next"}
+                            iconName={"next"}
+                        />
+                    ) : null}
+                </>
+            )}
+            {/* {userAction.some((action) => action.Action === "Delete") && (
                 <>
                     {detailPageId != 0 ? (
                         <ActionButton
@@ -190,7 +167,7 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction }) => {
                         />
                     ) : null}
                 </>
-            )}
+            )} */}
 
 
 
@@ -217,7 +194,7 @@ export default function AckDetails({
     const [confirmAlert, setConfirmAlert] = useState(false);
     const [confirmData, setConfirmData] = useState({});
     const [confirmType, setConfirmType] = useState(null);
-
+    const [isImageModalOpenSign, setIsImageModalOpenSign] = useState(false);
 
 
     const { showAlert } = useAlert();
@@ -332,40 +309,52 @@ export default function AckDetails({
     };
 
     const handlePrevNext = async (value) =>{
-        const response = await getrecordprevnext({
-            allocation:null,
-            category:4,
-            id: detailPageId,
-            type:value
-        })
-        if (response.status == "Success") {
-            const detailId = Number(response.result)
-            setDetailPageId(detailId)
-            
+        try {
+            const response = await getrecordprevnext({
+                allocation:null,
+                category:4,
+                id: detailPageId,
+                type:value
+            })
+            if (response.status == "Success") {
+                const detailId = Number(response.result)
+                setDetailPageId(detailId)
+            }else {
+                showAlert("info", "No more records available.");
+            }
+        } catch (error) {
+            throw error
         }
+        
     }
 
     const handleSave = async () => {
 
-        const saveData = {
-            id: mainDetails?.Id,
-            allocation: mainDetails?.Allocation,
-            finding: mainDetails?.Finding,
-            criticalFinding: mainDetails?.CriticalFinding,
-            targetDateOfClosure: mainDetails?.TargetDateOfClosure,
-            otherRemarks: mainDetails?.OtherRemarks,
-
-        };
-        const response = await upsertAcknowledgement(saveData);
-        if (response.status === "Success") {
-
-            showAlert("success", response?.message);
-            handleNew();
-            const actionExists = userAction.some((action) => action.Action === "New");
-            if (!actionExists) {
-                setPageRender(1);
-            }
+        try {
+            const saveData = {
+                id: mainDetails?.Id,
+                allocation: mainDetails?.Allocation,
+                finding: mainDetails?.Finding,
+                criticalFinding: mainDetails?.CriticalFinding,
+                targetDateOfClosure: mainDetails?.TargetDateOfClosure,
+                otherRemarks: mainDetails?.OtherRemarks,
+                clientSign:mainDetails?.ClientSign
+            };
+            const response = await upsertAcknowledgement(saveData);
+            if (response.status === "Success") {
+    
+                showAlert("success", response?.message);
+                handleNew();
+                const actionExists = userAction.some((action) => action.Action === "New");
+                if (!actionExists) {
+                    setPageRender(1);
+                }
+            } 
+        } catch (error) {
+            throw error
         }
+
+        
     };
 
     //confirmation
@@ -407,6 +396,13 @@ export default function AckDetails({
     };
 
 
+    const handleImageClickSign = (index) => {
+        setIsImageModalOpenSign(true);
+    };
+
+    const handleCloseImagePopupSign = () => {
+        setIsImageModalOpenSign(false);
+    };
 
 
 
@@ -461,7 +457,7 @@ export default function AckDetails({
                             display: "flex",
                             width: "100%",
                             flexDirection: "row",
-                            justifyContent: "flex-start", // Changed from center to flex-start
+                            justifyContent: "space-between", // Changed from center to flex-start
                             padding: 1,
                             gap: "10px",
                             boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)",
@@ -486,6 +482,8 @@ export default function AckDetails({
                             setValue={setMainDetails}
                             maxLength={100}
                         />
+
+                        
 
                         <Box
                             sx={{
@@ -549,20 +547,25 @@ export default function AckDetails({
                                 value={mainDetails}
                                 setValue={setMainDetails}
                             />
-
-
+                        </Box>
+                        <Box sx={{ width:'100%', display: "flex",flexDirection: "column", alignItems: "end", p: 3 }}>
+                            {mainDetails?.ClientSignPath ? (
+                                <img
+                                    src={mainDetails?.ClientSignPath}
+                                    alt="Thumbnail"
+                                    style={{ cursor: "pointer", width: "50px", height: "50px" }}
+                                    onClick={handleImageClickSign}
+                                />
+                            ) : (
+                                <ImageNotSupportedIcon sx={{ color: secondaryColor }} />
+                            )}
+                            <Typography variant="body2" sx={{ mt: 1, color: "black",fontWeight:'bold' }}> {/* Adjust color as needed */}
+                                Client Sign
+                            </Typography>
                         </Box>
 
-
-
-
-
-
-
-
-
                     </Box>
-
+                   
                 </Box>
             </Box>
 
@@ -572,14 +575,13 @@ export default function AckDetails({
                 data={confirmData}
                 submite={handleConfirmSubmit}
             />
+            <ImageModal
+                isOpen={isImageModalOpenSign}
+                imageUrl={mainDetails?.ClientSignPath}
+                handleCloseImagePopup={handleCloseImagePopupSign}
+            />
 
-            {/* <MasterProductConfirmation
-        handleClose={() => setProperty(false)}
-        open={property}
-        data={confirmData}
-        submite={handlePropertyConfirmation}
-        selectedDatas={detailPageId ? detailPageId : null}
-      /> */}
+            
         </Box>
     );
 }

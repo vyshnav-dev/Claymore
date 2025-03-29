@@ -16,19 +16,9 @@ import ActionButton from "../../../component/Buttons/ActionButton";
 import { useAlert } from "../../../component/Alerts/AlertContext";
 import { primaryColor } from "../../../config/config";
 import UserInputField from "../../../component/InputFields/UserInputField";
-import { stockCountApis } from "../../../service/Transaction/stockcount";
-// import ChecKBoxLabel from "../../../component/CheckBox/CheckBoxLabel";
-// import WarehouseAutoComplete from "../../../component/AutoComplete/WarehouseAutoComplete";
-// import { reconciliationApis } from "../../../service/Transaction/reconciliation";
-// import ReconEntityAutoComplete from "../../../component/AutoComplete/ReconciliationAutoComplete/ReconEntityAutoComplete";
-// import ReconciliationTable from "../../Transaction/Reconciliation/ReconciliationTable";
 import { reportApis } from "../../../service/Report/report";
-// import UserAutoCompleteManual from "../../../component/AutoComplete/UserAutoCompleteManual";
-// import ReportTable from "../../../component/Table/ReportTable";
 import ExcelExport from "../../../component/Excel/Excel";
 import ReportSummary from "../../../component/Table/ReportSummary";
-// import ReportBinAutoComplete from "../../../component/AutoComplete/ReportAutoComplete/ReportBinAutoComplete";
-// import UserAutoComplete from "../../../component/AutoComplete/UserAutoComplete";
 import NormalButton from "../../../component/Buttons/NormalButton";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { allocationApis } from "../../../service/Allocation/allocation";
@@ -305,7 +295,7 @@ export default function JobOrderReport({ userAction, disabledDetailed }) {
         const formatedTo = new Date(mainDetails?.toDate).toLocaleDateString("en-GB").split("/").join("-");
     const filteredRows = JSON.parse(response?.result)?.Data;
     await ExcelExport({
-      reportName: `Pending Job Order Report(${formatedFrom} - ${formatedTo})`,
+      reportName: formatedFrom == formatedTo?`Pending Job Order Report(${formatedFrom})`:`Pending Job Order Report(${formatedFrom} - ${formatedTo})`,
       filteredRows,
       excludedFields,
     });
@@ -424,7 +414,7 @@ export default function JobOrderReport({ userAction, disabledDetailed }) {
         </Slide>
       )}
 
-      {rows?.length || latestSearchKeyRef?.current ? (
+      
         <ReportSummary
           rows={rows}
           //onExportData={handleExportData}
@@ -443,7 +433,7 @@ export default function JobOrderReport({ userAction, disabledDetailed }) {
           IdName={"Id"}
           length={checked}
         />
-      ) : null}
+     
 
       <ConfirmationAlert
         handleClose={handleConfrimClose}

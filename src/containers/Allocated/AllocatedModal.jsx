@@ -58,7 +58,7 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
     const [suspend, setSuspend] = useState([]);
     const [products, setProducts] = useState([]);
     const { showAlert } = useAlert();
-    const { UpsertJobOrderAllocation, GetAllocatedJobOrderDetails } = allocationApis()
+    const { UpsertJobOrderAllocation, GetAllocatedJobOrderDetails,updateproductsuspend} = allocationApis()
 
 
     React.useEffect(() => {
@@ -126,7 +126,7 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
         if (response?.status === "Success") {
             handleCloseModal()
             hardRefresh();
-            showAlert('success', `Technician Allocate Successfully`);
+            showAlert('success', response?.message);
             return;
         }
 
@@ -137,14 +137,13 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
         const value = e.target.value;
 
         const data = {
-            jobOrderNo: mainDetails?.JobOrderNo,
-            Product: items?.Product,
-            suspendQty: value
+            product: items?.Product,
+            quantity: value || 0
         };
 
         // Check if the product already exists in suspend array
         setSuspend(prev => {
-            const existingIndex = prev.findIndex(p => p.Product === items?.Product);
+            const existingIndex = prev.findIndex(p => p.product === items?.Product);
             if (existingIndex !== -1) {
                 // Update existing product suspendQty
                 const updatedSuspend = [...prev];
@@ -157,7 +156,31 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
         });
     };
 
-    console.log('sus', suspend);
+    const handleSubmitSuspend = async () =>{
+        try {
+            if(!suspend?.length){
+                showAlert("info", "Please add Suspend Quantity");
+            }
+            else{
+                const saveData = {
+                    allocation:selected,
+                    details:suspend
+                  }
+    
+                  const response = await updateproductsuspend(saveData)
+            if (response?.status === "Success") {
+                showAlert('success', response?.message);
+                handleCloseModal()
+                hardRefresh();
+            }
+            }
+            
+            
+        } catch (error) {
+            throw error;
+        }
+    }
+
 
 
     return (
@@ -244,7 +267,7 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
                                                             const value = e.target.value.replace(/\D/g, ''); // Remove non-numeric characters
                                                             handleSuspend({ target: { value } }, item);
                                                         }}
-                                                        value={suspend.find(p => p.Product === item?.Product)?.suspendQty || ''}
+                                                        value={suspend.find(p => p.product === item?.Product)?.quantity || ''}
                                                         inputMode="numeric"  // Helps on mobile devices
                                                         pattern="[0-9]*"     // Allows only numbers
                                                         inputProps={{ min: 0 }}
@@ -292,7 +315,7 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
                 </DialogContent>
 
                 <DialogActions >
-                    <NormalButton action={handleCloseModal} label="Suspend" />
+                    <NormalButton action={handleSubmitSuspend} label="Suspend" />
                     <NormalButton action={handleSave} label="Ok" />
                     <NormalButton action={handleCloseModal} label="Cancel" />
 

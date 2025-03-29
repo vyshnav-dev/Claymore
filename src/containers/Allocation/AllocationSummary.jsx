@@ -72,14 +72,7 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
         scrollbarWidth: "thin",
       }}
     >
-      {/* {userAction.some((action) => action.Action === "New") && (
-        <ActionButton
-          iconsClick={iconsClick}
-          icon={"fa-solid fa-plus"}
-          caption={"New"}
-          iconName={"new"}
-        />
-      )}  */}
+      
       {userAction.some((action) => action.Action === "Allocate") && (
         <ActionButton
           iconsClick={iconsClick}
@@ -96,15 +89,7 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
           iconName={"excel"}
         />
       )}
-      {/* {userAction.some((action) => action.Action === "Delete") && (
-        <ActionButton
-          iconsClick={iconsClick}
-          icon={"trash"}
-          caption={"Delete"}
-          iconName={"delete"}
-        />
-      )} */}
-      {!hasEditAction &&
+      {/* {!hasEditAction &&
         userAction.some((action) => action.Name === "View") && (
           <ActionButton
             iconsClick={iconsClick}
@@ -112,7 +97,7 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
             caption={"View"}
             iconName={"view"}
           />
-        )}
+        )} */}
       <ActionButton
         iconsClick={iconsClick}
         icon={"fa-solid fa-xmark"}
@@ -197,7 +182,7 @@ export default function AllocationSummary({
 
 
   const handleRowDoubleClick = (rowiId) => {
-    if (rowiId > 0) {
+    if (rowiId > 0 && userAction.some((action) => action.Action === "Allocate")) {
       setId(rowiId);
       setAddMenu(true);
     }
@@ -232,14 +217,8 @@ export default function AllocationSummary({
 
   const handleIconsClick = (value) => {
     switch (value) {
-      case "new":
-        handleAdd("new");
-        break;
       case "allocate":
         handleAdd("allocate");
-        break;
-      case "delete":
-        deleteClick();
         break;
       case "excel":
         handleExcelExport();
@@ -277,48 +256,7 @@ export default function AllocationSummary({
     setAddMenu(true);
   };
 
-  //Delete alert open
-  const deleteClick = async () => {
-    if (selectedDatas.length === 0) {
-      showAlert("info", "Select row to Delete");
-      return;
-    }
-    setConfirmData({ message: "Delete", type: "danger" });
-    handleConfrimOpen();
-  };
-
   
-
-  
-
-  //To delete
-  const handledeleteRole = async () => {
-    const deletePayload = selectedDatas.map((item) => ({
-      id: item,
-    }));
-
-    try {
-      let response = await deletetag(deletePayload, 11);
-
-      if (response?.status === "Success") {
-        showAlert("success", response?.message);
-      }
-    } catch (error) {
-    } finally {
-      setrefreshFlag(true);
-      setselectedDatas([]);
-      setchangesTriggered(!changesTriggered);
-      handleConfrimClose();
-    }
-  };
-
-  //confirmation
-  const handleConfrimOpen = () => {
-    setConfirmAlert(true);
-  };
-  const handleConfrimClose = () => {
-    setConfirmAlert(false);
-  };
 
   const handleExcelExport = async () => {
     try {
@@ -378,12 +316,7 @@ export default function AllocationSummary({
             IdName={"JobOrderNo"}
           />
         </Box>
-        <ConfirmationAlert
-          handleClose={handleConfrimClose}
-          open={confirmAlert}
-          data={confirmData}
-          submite={handledeleteRole}
-        />
+        
 
 <NormalModal
         isOpen={addMenu}
