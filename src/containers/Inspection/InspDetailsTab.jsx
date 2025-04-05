@@ -5,7 +5,7 @@ import AutoSelect from '../../component/AutoComplete/AutoSelect'
 import TagAutoSelect from '../../component/Select/TagAutoSelect'
 
 export default function InspDetailsTab({formData,setFormData}) {
-    
+    const currentDate = new Date().toISOString().split("T")[0];
   return (
     
     <Box sx={{
@@ -66,7 +66,7 @@ export default function InspDetailsTab({formData,setFormData}) {
             label={"Test Method"}
             name={"TestMethod"}
             type={"text"}
-            disabled={false}
+            disabled={true}
             mandatory={true}
             value={formData}
             setValue={setFormData}
@@ -81,6 +81,7 @@ export default function InspDetailsTab({formData,setFormData}) {
             value={formData}
             setValue={setFormData}
             maxLength={100}
+            min={currentDate}
         />
         <UserInputField
             label={"Last Proof Load Test"}

@@ -103,7 +103,7 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
         />
       )} */}
       {!hasEditAction &&
-        userAction.some((action) => action.Name === "View") && (
+        userAction.some((action) => action.Action === "View") && (
           <ActionButton
             iconsClick={iconsClick}
             icon={"fa-solid fa-eye"}
@@ -126,6 +126,8 @@ export default function AckSummary({
   setPageRender,
   setId,
   userAction,
+  Id,
+  setBackId1
 }) {
   const [rows, setRows] = React.useState([]); //To Pass in Table
   const [displayLength, setdisplayLength] = React.useState(25); // Show Entries
@@ -150,7 +152,9 @@ export default function AckSummary({
     const currentSearchKey = latestSearchKeyRef.current;
     
     try {
+      setBackId1(Id)
       const response = await getAcknowledgementSummary({
+        allocation:Id,
         pageNo: pageNumber,
         pageSize: displayLength,
         search: currentSearchKey,
@@ -196,7 +200,7 @@ export default function AckSummary({
   const handleRowDoubleClick = (rowiId) => {
     if (rowiId > 0 && userAction.some((action) => action.Action === "View" || action.Action === "Edit")) {
       setId(rowiId);
-      setPageRender(2);
+      setPageRender(3);
     }
   };
 
@@ -252,7 +256,7 @@ export default function AckSummary({
   };
 
   const handleclose = () => {
-    window.history.back();
+    setPageRender(1)
   };
 
  
@@ -273,7 +277,7 @@ export default function AckSummary({
     } else {
       setId(0);
     }
-    setPageRender(2);
+    setPageRender(3);
   };
 
   //Delete alert open

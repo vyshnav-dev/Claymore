@@ -479,7 +479,8 @@ export default function RiskAssesmentDetails({
         deleteRiskAssesment,
         getFormdata,
         getriskjoborderdetails,
-        getAssignjoborderlist
+        getAssignjoborderlist,
+        generatepdfprint
     } = inspectionApis();
     const {
         getrecordprevnext
@@ -598,6 +599,9 @@ export default function RiskAssesmentDetails({
                     setConfirmType("save");
                     setConfirmAlert(true);
                 }
+                break;
+            case "print":
+                handlePrint();
                 break;
             case "prev":
                 handlePrevNext(1);
@@ -761,6 +765,34 @@ export default function RiskAssesmentDetails({
     };
 
 
+    const handlePrint = async () => {
+        // Open a blank popup immediately on user action
+        const popupWindow = window.open("", "PDFPopup", "width=800,height=600,resizable=yes,scrollbars=yes");
+        if (!popupWindow) {
+            alert("Popup blocked! Please allow popups for this site.");
+            return;
+        }
+    
+        try {
+            const response = await generatepdfprint({ Id: detailPageId,category:1 });
+            // Assuming response.result is a JSON string containing a URL property
+            const resultObj = JSON.parse(response?.result);
+            
+    
+            if (response?.status === "Success" && resultObj) {
+                // Set the popup's location to the PDF URL
+                popupWindow.location.href = resultObj;
+            } else {
+                console.error("Print generation failed or invalid URL.");
+                popupWindow.close();
+            }
+        } catch (error) {
+            console.error("An error occurred:", error);
+            popupWindow.close();
+        }
+    };
+
+
     return (
         <Box sx={{ display: "flex", flexDirection: "column", width: "100%", position: 'relative' }}>
             <Box
@@ -871,7 +903,7 @@ export default function RiskAssesmentDetails({
                             label={"Work Order/File No"}
                             name={"FileNo"}
                             type={"text"}
-                            disabled={false}
+                            disabled={true}
                             mandatory={true}
                             value={mainDetails}
                             setValue={setMainDetails}

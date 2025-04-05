@@ -397,6 +397,20 @@ const inspectionApis = () => {
     }
   };
 
+  const upsertmultiapprove = async (payload) => {
+    try {
+      const response = await makeAuthorizedRequestBase(
+        "post",
+        "approve/upsertmultiapprove",
+        payload,
+        true
+      );
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  };
+
   const generatecertificate = async (payload) => {
     try {
       const response = await makeAuthorizedRequestBase(
@@ -416,6 +430,20 @@ const inspectionApis = () => {
       const response = await makeAuthorizedRequestBase(
         "get",
         "approve/getpendingapproval",
+        payload,
+        true
+      );
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const generatepdfprint = async (payload) => {
+    try {
+      const response = await makeAuthorizedRequestBase(
+        "get",
+        "document/generatepdfprint",
         payload,
         true
       );
@@ -461,7 +489,9 @@ const inspectionApis = () => {
     deleteAcknowledgement,
     upsertApprove,
     generatecertificate,
-    getpendingapproval
+    getpendingapproval,
+    generatepdfprint,
+    upsertmultiapprove
   }
 }
 

@@ -99,7 +99,7 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
         />
       )} */}
       {!hasEditAction &&
-        userAction.some((action) => action.Name === "View") && (
+        userAction.some((action) => action.Action === "View") && (
           <ActionButton
             iconsClick={iconsClick}
             icon={"fa-solid fa-eye"}
@@ -236,6 +236,7 @@ export default function TimeRecordSummary({
         break;
       case "view":
         handleAdd("edit");
+        break;
       case "excel":
         handleExcelExport();
         break;

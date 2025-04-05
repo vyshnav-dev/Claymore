@@ -12,6 +12,7 @@ import { masterApis } from "../../service/Master/master";
 import ExcelExport from "../../component/Excel/Excel";
 import { identity } from "lodash";
 import { inspectionApis } from "../../service/Inspection/inspection";
+import { allocationApis } from "../../service/Allocation/allocation";
 
 function BasicBreadcrumbs() {
   const style = {
@@ -48,7 +49,7 @@ function BasicBreadcrumbs() {
           aria-label="breadcrumb"
         >
           <Typography underline="hover" sx={style} key="1">
-            Site Time Records
+          Acknowledgement Job Orders
           </Typography>
         </Breadcrumbs>
       </Stack>
@@ -86,14 +87,7 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
           iconName={"excel"}
         />
       )}
-      {/* {userAction.some((action) => action.Action === "Delete") && (
-        <ActionButton
-          iconsClick={iconsClick}
-          icon={"trash"}
-          caption={"Delete"}
-          iconName={"delete"}
-        />
-      )} */}
+      
       {!hasEditAction &&
         userAction.some((action) => action.Action === "View") && (
           <ActionButton
@@ -115,14 +109,10 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
   );
 };
 
-
-
-export default function TimeRecordSubSummary({
+export default function AckMainSummary({
   setPageRender,
   setId,
   userAction,
-  Id,
-  setTimeId
 }) {
   const [rows, setRows] = React.useState([]); //To Pass in Table
   const [displayLength, setdisplayLength] = React.useState(25); // Show Entries
@@ -137,22 +127,23 @@ export default function TimeRecordSubSummary({
   const [confirmAlert, setConfirmAlert] = useState(false); //To handle alert open
   const [confirmData, setConfirmData] = useState({}); //To pass alert data
   const latestSearchKeyRef = useRef(searchKey);
-  const { GetTimeSheetSummary,deleteTimeSheet} =
-    inspectionApis();
   
+  const { GetAllocatedJobOrderSummary,deleteAllocatedJobOrder} =
+    allocationApis();
+
   //Role Summary
   const fetchRoleSummary = async () => {
     setselectedDatas([]);
     const currentSearchKey = latestSearchKeyRef.current;
 
     try {
-      const response = await GetTimeSheetSummary({
-        allocation:Id,
+      const response = await GetAllocatedJobOrderSummary({
         pageNo: pageNumber,
         pageSize: displayLength,
         search: currentSearchKey,
+        type:3,
       });
-      setTimeId(Id)
+
       setrefreshFlag(false);
       if (
         response?.status === "Success" &&
@@ -183,7 +174,7 @@ export default function TimeRecordSubSummary({
 
   React.useEffect(() => {
     fetchRoleSummary(); // Initial data fetch
-  }, [pageNumber, displayLength, searchKey, changesTriggered,Id]);
+  }, [pageNumber, displayLength, searchKey, changesTriggered]);
 
 
  
@@ -235,6 +226,7 @@ export default function TimeRecordSubSummary({
         break;
       case "view":
         handleAdd("edit");
+        break;
       case "excel":
         handleExcelExport();
         break;
@@ -246,8 +238,7 @@ export default function TimeRecordSubSummary({
   };
 
   const handleclose = () => {
-    // window.history.back();
-    setPageRender(1)
+    window.history.back();
   };
 
   
@@ -292,7 +283,7 @@ export default function TimeRecordSubSummary({
     }));
 
     try {
-      let response = await deleteTimeSheet(deletePayload);
+      let response = await deleteAllocatedJobOrder(deletePayload);
 
       if (response?.status === "Success") {
         showAlert("success", response?.message);
@@ -316,8 +307,8 @@ export default function TimeRecordSubSummary({
 
   const handleExcelExport = async () => {
     try {
-      const response = await GetTimeSheetSummary({
-        allocation:Id,
+      const response = await GetAllocatedJobOrderSummary({
+        type:1,
         pageNumber: 0,
         pageSize: 0,
         search: "",
@@ -326,7 +317,7 @@ export default function TimeRecordSubSummary({
       const filteredRows = JSON.parse(response?.result)?.Data;
 
       await ExcelExport({
-        reportName: "Site Time Records",
+        reportName: "Risk Assessment Job Orders",
         filteredRows,
         excludedFields,
       });
@@ -370,6 +361,7 @@ export default function TimeRecordSubSummary({
             totalPages={totalPages}
             hardRefresh={hardRefresh}
             IdName={"Id"}
+            statusName={'Status'}
           />
         </Box>
         <ConfirmationAlert
@@ -378,14 +370,10 @@ export default function TimeRecordSubSummary({
           data={confirmData}
           submite={handledeleteRole}
         />
-        {/* <MasterProductConfirmation
-          handleClose={() => setProperty(false)}
-          open={property}
-          data={confirmData}
-          submite={handlePropertyConfirmation}
-          selectedDatas={selectedDatas?.length === 1 ? selectedDatas[0] : null}
-        /> */}
+        
       </Box>
     </>
   );
 }
+
+

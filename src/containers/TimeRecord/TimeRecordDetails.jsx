@@ -350,7 +350,7 @@ export default function TimeRecordDetails({
                 // if (!mainDetails?.Contact) emptyFields.push("Contact");
                 // if (!mainDetails?.Location) emptyFields.push("Location");
                 // if (!mainDetails?.EqpDescription) emptyFields.push("Equipment Description");
-                // if (!mainDetails?.CustomerAcceptanceCertificate) emptyFields.push("Customer Acceptance Certificate");
+                if (!mainDetails?.CustomerAcceptanceCertificate) emptyFields.push("Customer Acceptance Certificate");
                 if (emptyFields.length > 0) {
                     showAlert("info", `Please Provide ${emptyFields[0]}`);
                     return;
@@ -603,7 +603,7 @@ export default function TimeRecordDetails({
                                 label={"CSSC Report No"}
                                 name={"CSSCReportNo"}
                                 type={"text"}
-                                disabled={false}
+                                disabled={true}
                                 mandatory={true}
                                 value={mainDetails}
                                 setValue={setMainDetails}
@@ -632,7 +632,7 @@ export default function TimeRecordDetails({
                                 label={"Job Order No"}
                                 name={"JobOrderNo"}
                                 type={"text"}
-                                disabled={false}
+                                disabled={true}
                                 mandatory={true}
                                 value={mainDetails}
                                 setValue={setMainDetails}
@@ -642,7 +642,7 @@ export default function TimeRecordDetails({
                                 label={"Purchase Order No"}
                                 name={"PurchaseOrderNo"}
                                 type={"text"}
-                                disabled={false}
+                                disabled={true}
                                 mandatory={true}
                                 value={mainDetails}
                                 setValue={setMainDetails}
@@ -673,7 +673,7 @@ export default function TimeRecordDetails({
                                 label={"Technician"}
                                 name={"Inspector_Name"}
                                 type={"text"}
-                                disabled={false}
+                                disabled={true}
                                 mandatory={true}
                                 value={mainDetails}
                                 setValue={setMainDetails}
@@ -684,7 +684,7 @@ export default function TimeRecordDetails({
                                 label={"Date of Inspection"}
                                 name={"DateOfInspection"}
                                 type={"date"}
-                                disabled={false}
+                                disabled={true}
                                 mandatory={true}
                                 value={mainDetails}
                                 setValue={setMainDetails}
@@ -694,7 +694,7 @@ export default function TimeRecordDetails({
                                 label={"Time Arrived"}
                                 name={"TimeArrived"}
                                 type={"time"}
-                                disabled={false}
+                                disabled={true}
                                 mandatory={true}
                                 value={mainDetails}
                                 setValue={setMainDetails}
@@ -704,7 +704,7 @@ export default function TimeRecordDetails({
                                 label={"Time Left"}
                                 name={"TimeLeft"}
                                 type={"time"}
-                                disabled={false}
+                                disabled={true}
                                 mandatory={true}
                                 value={mainDetails}
                                 setValue={setMainDetails}
@@ -715,7 +715,7 @@ export default function TimeRecordDetails({
                                 label={"Site Hour"}
                                 name={"SiteHour"}
                                 type={"text"}
-                                disabled={false}
+                                disabled={true}
                                 mandatory={false}
                                 value={mainDetails}
                                 setValue={setMainDetails}
@@ -725,7 +725,7 @@ export default function TimeRecordDetails({
                                 label={"Travel Hours"}
                                 name={"TravelHour"}
                                 type={"text"}
-                                disabled={false}
+                                disabled={true}
                                 mandatory={false}
                                 value={mainDetails}
                                 setValue={setMainDetails}
@@ -735,7 +735,7 @@ export default function TimeRecordDetails({
                                 label={"Total Time"}
                                 name={"TotalTime"}
                                 type={"text"}
-                                disabled={false}
+                                disabled={true}
                                 mandatory={true}
                                 value={mainDetails}
                                 setValue={setMainDetails}

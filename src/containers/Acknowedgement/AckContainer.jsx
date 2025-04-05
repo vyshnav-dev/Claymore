@@ -3,11 +3,18 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { securityApis } from "../../service/Security/security";
 import AckSummary from "./AckSummary";
 import AckDetails from "./AckDetails";
+import AckMainSummary from "./AckMainSummary";
+import InspDetails from "../Inspection/InspDetails";
 
 export default function AckContainer() {
   const location = useLocation();
   const [page, setPage] = useState(1);
   const [id, setId] = useState(0);
+  const [backId1, setBackId1] = useState(0);
+  const [backId, setBackId] = useState(0);
+  const [productId, setProductId] = useState(0);
+  const [inspId, setInspId] = useState(0);
+  const [newId,setNewId] = useState(false);
   const [menuIdLocal, setmenuIdLocal] = useState(null);
   const [userAction, setuserAction] = useState([]);
   const menuId = location?.state;
@@ -40,7 +47,7 @@ export default function AckContainer() {
   return (
     <>
       {page === 1 ? (
-        <AckSummary
+        <AckMainSummary
           setPageRender={setPage}
           setId={setId}
           Id={id}
@@ -48,11 +55,38 @@ export default function AckContainer() {
           screenId={menuId}
  
         />
-      ) : page === 2 ? (
+      ):page === 2 ? (
+        <AckSummary
+          setPageRender={setPage}
+          setId={setId}
+          Id={id}
+          setBackId1={setBackId1}
+          userAction={userAction}
+          screenId={menuId}
+ 
+        />
+      ) : page === 3 ? (
         <AckDetails
           setPageRender={setPage}
           detailPageId={id}
           userAction={userAction}
+          setProductId={setProductId}
+          setId={setId}
+          backId1={backId1}
+          setBackId={setBackId}
+          setInspId={setInspId}
+        />
+      ):page === 4 ? (
+        <InspDetails
+          setPageRender={setPage}
+          detailPageId={inspId}
+          userAction={userAction}
+          productId={productId}
+          backId={backId}
+          setId={setId}
+          newId={newId}
+          menuId={menuId?.ScreenId}
+          menuLabel={'Acknowedgement'}
         />
       ) : null}
     </>

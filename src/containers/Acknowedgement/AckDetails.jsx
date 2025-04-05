@@ -33,6 +33,7 @@ import { inspectionApis } from "../../service/Inspection/inspection";
 import { allocationApis } from "../../service/Allocation/allocation";
 import ImageNotSupportedIcon from '@mui/icons-material/ImageNotSupported';
 import ImageModal from "../../component/Modal/ImageModal";
+import AckTable from "./AckTable";
 
 function CustomTabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -188,6 +189,11 @@ export default function AckDetails({
     detailPageId: summaryId,
     userAction,
     disabledDetailed,
+    setProductId,
+    setInspId,
+    setBackId,
+    backId1,
+    setId
 }) {
     const [mainDetails, setMainDetails] = useState({});
     const [detailPageId, setDetailPageId] = useState(summaryId);
@@ -195,6 +201,7 @@ export default function AckDetails({
     const [confirmData, setConfirmData] = useState({});
     const [confirmType, setConfirmType] = useState(null);
     const [isImageModalOpenSign, setIsImageModalOpenSign] = useState(false);
+    const [rows, setRows] = useState([]);
 
 
     const { showAlert } = useAlert();
@@ -220,22 +227,15 @@ export default function AckDetails({
             if (detailPageId == 0) {
                 handleNew();
             } else {
+                setBackId(detailPageId);
                 const response = await getAcknowledgemenDetails({
                     id: detailPageId,
                 });
                 if (response?.status === "Success") {
                     const myObject = JSON.parse(response?.result);
-
-                    if (myObject) {
-                        const formattedDate = myObject[0]?.TargetDateOfClosure?.split("T")[0];
-
-                        // Update the main details with the formatted date
-                        setMainDetails({
-                            ...myObject[0],
-                            TargetDateOfClosure: formattedDate,
-                        });
-                    }
-
+                    setMainDetails(myObject?.Acknowledgement)
+                    setRows(myObject?.Inspections)
+                    
                 } else {
                     handleNew();
                 }
@@ -245,19 +245,7 @@ export default function AckDetails({
         }
     };
 
-    const handleNew = async () => {
-        setMainDetails({
-            Finding: null,
-            CriticalFinding: null,
-            TargetDateOfClosure: null,
-            OtherRemarks: null,
-            JobOrderNo: null,
-            Id: detailPageId,
-            Allocation: null,
-        });
-
-        setDetailPageId(0);
-    };
+    
 
 
 
@@ -265,9 +253,6 @@ export default function AckDetails({
 
     const handleIconsClick = async (value) => {
         switch (value.trim()) {
-            case "new":
-                handleNew();
-                break;
             case "close":
                 handleclose();
                 break;
@@ -287,7 +272,7 @@ export default function AckDetails({
                 setConfirmType("save");
                 setConfirmAlert(true);
                 break;
-                case "prev":
+            case "prev":
                 handlePrevNext(1);
                 break;
             case "next":
@@ -305,27 +290,28 @@ export default function AckDetails({
     // Handlers for your icons
 
     const handleclose = () => {
-        setPageRender(1);
+        setId(backId1);
+        setPageRender(2);
     };
 
-    const handlePrevNext = async (value) =>{
+    const handlePrevNext = async (value) => {
         try {
             const response = await getrecordprevnext({
-                allocation:null,
-                category:4,
+                allocation: mainDetails?.Allocation,
+                category: 4,
                 id: detailPageId,
-                type:value
+                type: value
             })
             if (response.status == "Success") {
                 const detailId = Number(response.result)
                 setDetailPageId(detailId)
-            }else {
+            } else {
                 showAlert("info", "No more records available.");
             }
         } catch (error) {
             throw error
         }
-        
+
     }
 
     const handleSave = async () => {
@@ -334,27 +320,20 @@ export default function AckDetails({
             const saveData = {
                 id: mainDetails?.Id,
                 allocation: mainDetails?.Allocation,
-                finding: mainDetails?.Finding,
-                criticalFinding: mainDetails?.CriticalFinding,
-                targetDateOfClosure: mainDetails?.TargetDateOfClosure,
-                otherRemarks: mainDetails?.OtherRemarks,
-                clientSign:mainDetails?.ClientSign
+                clientSign: mainDetails?.ClientSign
             };
             const response = await upsertAcknowledgement(saveData);
             if (response.status === "Success") {
-    
+
                 showAlert("success", response?.message);
-                handleNew();
-                const actionExists = userAction.some((action) => action.Action === "New");
-                if (!actionExists) {
-                    setPageRender(1);
-                }
-            } 
+                handleclose();
+                
+            }
         } catch (error) {
             throw error
         }
 
-        
+
     };
 
     //confirmation
@@ -390,7 +369,7 @@ export default function AckDetails({
             handleNew();
             const actionExists = userAction.some((action) => action.Action === "New");
             if (!actionExists) {
-                setPageRender(1);
+                setPageRender(2);
             }
         }
     };
@@ -472,83 +451,10 @@ export default function AckDetails({
                         }}
                     >
 
-                        <UserInputField
-                            label={"JobOrder No"}
-                            name={"JobOrderNo"}
-                            type={"text"}
-                            disabled={true}
-                            mandatory={true}
-                            value={mainDetails}
-                            setValue={setMainDetails}
-                            maxLength={100}
-                        />
+                        <AckTable rows={rows} excludedColumns={["Id","List"]} setInspId={setInspId} setProductId={setProductId} setPageRender={setPageRender} />
 
                         
-
-                        <Box
-                            sx={{
-                                display: "flex",
-                                width: "100%",
-                                flexDirection: "row",
-                                justifyContent: "flex-start", // Changed from center to flex-start
-                                padding: 1,
-                                gap: "10px",
-
-                                flexWrap: "wrap",
-                                "@media (max-width: 768px)": {
-                                    gap: "10px", // Reduced width for small screens
-                                },
-                                "@media (max-width: 420px)": {
-                                    gap: "2px", // Reduced width for small screens
-                                },
-                            }}
-                        >
-
-
-                            <UserInputField
-                                label={"Findings"}
-                                name={"Finding"}
-                                type={"text"}
-                                disabled={false}
-                                mandatory={true}
-                                value={mainDetails}
-                                setValue={setMainDetails}
-                                multiline={true}
-                                maxLength={50}
-                            />
-                            <UserInputField
-                                label={"Critical Finding"}
-                                name={"CriticalFinding"}
-                                type={"text"}
-                                disabled={false}
-                                mandatory={true}
-                                value={mainDetails}
-                                setValue={setMainDetails}
-                                multiline={true}
-                                maxLength={60}
-                            />
-                            <UserInputField
-                                label={"Other Remarks"}
-                                name={"OtherRemarks"}
-                                type={"text"}
-                                disabled={false}
-                                mandatory={true}
-                                value={mainDetails}
-                                setValue={setMainDetails}
-                                multiline={true}
-                                maxLength={60}
-                            />
-                            <UserInputField
-                                label={"Target Date of Closure"}
-                                name={"TargetDateOfClosure"}
-                                type={"date"}
-                                disabled={false}
-                                mandatory={true}
-                                value={mainDetails}
-                                setValue={setMainDetails}
-                            />
-                        </Box>
-                        <Box sx={{ width:'100%', display: "flex",flexDirection: "column", alignItems: "end", p: 3 }}>
+                        <Box sx={{ width: '100%', display: "flex", flexDirection: "column", alignItems: "end", p: 3 }}>
                             {mainDetails?.ClientSignPath ? (
                                 <img
                                     src={mainDetails?.ClientSignPath}
@@ -559,13 +465,13 @@ export default function AckDetails({
                             ) : (
                                 <ImageNotSupportedIcon sx={{ color: secondaryColor }} />
                             )}
-                            <Typography variant="body2" sx={{ mt: 1, color: "black",fontWeight:'bold' }}> {/* Adjust color as needed */}
+                            <Typography variant="body2" sx={{ mt: 1, color: "black", fontWeight: 'bold' }}> {/* Adjust color as needed */}
                                 Client Sign
                             </Typography>
                         </Box>
 
                     </Box>
-                   
+
                 </Box>
             </Box>
 
@@ -581,7 +487,7 @@ export default function AckDetails({
                 handleCloseImagePopup={handleCloseImagePopupSign}
             />
 
-            
+
         </Box>
     );
 }

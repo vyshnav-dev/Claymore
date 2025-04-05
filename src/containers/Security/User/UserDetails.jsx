@@ -279,6 +279,7 @@ export default function UserDetails({
     setDetailPageId(0);
   };
 
+
   const emailRegex =
     /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
@@ -328,6 +329,8 @@ export default function UserDetails({
           emptyFields.push("Valid Mobile Number");
         if (mainDetails.Phone && !/^[0-9]{10,15}$/.test(mainDetails.Phone))
           emptyFields.push("Valid Phone Number");
+        if (!mainDetails.signature_file)
+          emptyFields.push("Signature");
         if (emptyFields.length > 0) {
           showAlert("info", `Please Provide ${emptyFields[0]}`);
           return;

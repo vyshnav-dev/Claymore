@@ -14,8 +14,9 @@ import { summaryData } from "../../config";
 import { allocationApis } from "../../service/Allocation/allocation";
 import InspSummaryTable from "../../component/Table/InspSummaryTable";
 import { inspectionApis } from "../../service/Inspection/inspection";
+import ApproveConfirmation from "./ApproveConfirmation";
 
-function BasicBreadcrumbs({mId}) {
+function BasicBreadcrumbs({ mId }) {
   const style = {
     display: "flex",
     alignItems: "center",
@@ -50,7 +51,7 @@ function BasicBreadcrumbs({mId}) {
           aria-label="breadcrumb"
         >
           <Typography underline="hover" sx={style} key="1">
-            { mId !== 31 ? 'Inspection Product list ' :'Authorize Product list'}
+            {mId !== 31 ? 'Inspection Product list ' : 'Authorize Product list'}
           </Typography>
         </Breadcrumbs>
       </Stack>
@@ -59,8 +60,9 @@ function BasicBreadcrumbs({mId}) {
 }
 
 const DefaultIcons = ({ iconsClick, userAction }) => {
-  
+
   const hasEditAction = userAction?.some((action) => action.Action === "Edit");
+  const hasAproove = userAction.some((action) => action.Action == "Authorise");
   return (
     <Box
       sx={{
@@ -88,6 +90,35 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
           iconName={"edit"}
         />
       )}
+      {hasAproove &&
+        <>
+          <ActionButton
+            iconsClick={iconsClick}
+            icon={"fa-solid fa-thumbs-up"}
+            caption={"Approve"}
+            iconName={"approve"}
+          />
+          <ActionButton
+            iconsClick={iconsClick}
+            icon={"fa-solid fa-ban"}
+            caption={"Reject"}
+            iconName={"reject"}
+          />
+          <ActionButton
+            iconsClick={iconsClick}
+            icon={"fa-solid fa-file-pen"}
+            caption={"Correction"}
+            iconName={"correction"}
+          />
+          <ActionButton
+                                iconsClick={iconsClick}
+                                icon={"fa-regular fa-rectangle-xmark"}
+                                caption={"Suspend"}
+                                iconName={"suspend"}
+                            />
+
+        </>}
+
       {userAction?.some((action) => action.Action === "Excel") && (
         <ActionButton
           iconsClick={iconsClick}
@@ -136,9 +167,9 @@ export default function InspSummary({
   setNewId
 }) {
 
-  const inspection =["AuthorizedOn","AuthorizedBy"]
-  const authorize =["ModifiedOn","ModifiedBy"]
-  
+  const inspection = ["AuthorizedOn", "AuthorizedBy"]
+  const authorize = ["ModifiedOn", "ModifiedBy"]
+
   const [rows, setRows] = React.useState([]); //To Pass in Table
   const [displayLength, setdisplayLength] = React.useState(25); // Show Entries
   const [pageNumber, setpageNumber] = React.useState(1); //Table current page number
@@ -153,53 +184,57 @@ export default function InspSummary({
   const { showAlert } = useAlert();
   const [confirmAlert, setConfirmAlert] = useState(false); //To handle alert open
   const [confirmData, setConfirmData] = useState({}); //To pass alert data
+  const [property, setProperty] = useState(false);
+  const [itemLabel, setItemLabel] = useState('');
+  const [mainDetails1, setMainDetails1] = useState({
+    Remarks: null,
+  });
+
   const latestSearchKeyRef = useRef(searchKey);
 
   const loginName = localStorage.getItem("LoginName");
-  
-  const { getInspectionSummary,deleteInspection,getAssignjoborderlist,getjoborderproductlistsummary} =
+
+  const { getInspectionSummary, upsertmultiapprove, getAssignjoborderlist, getjoborderproductlistsummary } =
     inspectionApis();
-  
+
 
   //Role Summary
   const fetchRoleSummary = async () => {
     setselectedDatas([]);
     const currentSearchKey = latestSearchKeyRef.current;
     let Type;
-    if(menuIdLocal == 31)
-    {
+    if (menuIdLocal == 31) {
       Type = 2;
     }
-    else if(menuIdLocal == 28){
+    else if (menuIdLocal == 28) {
       Type = 1;
     }
-    else{
+    else {
       return;
     }
     try {
 
       let response;
-      if(!Id){
-        if(mainDetails?.Allocation)
-        {
+      if (!Id) {
+        if (mainDetails?.Allocation) {
           setNewId(true)
         }
         response = await getjoborderproductlistsummary({
-          id: mainDetails?.Allocation ,
+          id: mainDetails?.Allocation,
           pageNo: pageNumber,
           pageSize: displayLength,
           search: currentSearchKey,
         });
       }
-      else{
+      else {
         setNewId(false);
         response = await getInspectionSummary({
-          allocation: Id ,
+          allocation: Id,
           pageNo: pageNumber,
           pageSize: displayLength,
           search: currentSearchKey,
-          type:Type,
-          status:mainDetails?.Status
+          type: Type,
+          status: mainDetails?.Status
         });
       }
       // setMainDetails({
@@ -213,7 +248,7 @@ export default function InspSummary({
       ) {
         const myObject = JSON.parse(response?.result);
 
-        setRows(myObject?.Data );
+        setRows(myObject?.Data);
 
         const totalRows = myObject?.Metadata.TotalRows;
         const totalPages = myObject?.Metadata.TotalPages;
@@ -221,8 +256,8 @@ export default function InspSummary({
         settotalRows(totalRows);
         setTotalPages(totalPages);
       }
-      
-      
+
+
       else {
         setRows([]);
       }
@@ -231,7 +266,7 @@ export default function InspSummary({
         setRows([]);
         settotalRows(null);
         setTotalPages(null);
-    
+
       }
     } finally {
     }
@@ -239,13 +274,13 @@ export default function InspSummary({
 
   React.useEffect(() => {
     fetchRoleSummary(); // Initial data fetch
-  }, [pageNumber, displayLength, searchKey, changesTriggered,mainDetails?.Allocation,mainDetails?.Status]);
+  }, [pageNumber, displayLength, searchKey, changesTriggered, mainDetails?.Allocation, mainDetails?.Status]);
 
 
- 
 
-  const handleRowDoubleClick = (rowiId,row) => {
-    if (rowiId > 0 && userAction.some((action) => action.Action === "View" || action.Action === "Edit") ) {
+
+  const handleRowDoubleClick = (rowiId, row) => {
+    if (rowiId > 0 && userAction.some((action) => action.Action === "View" || action.Action === "Edit")) {
       // if(menuIdLocal == 29 && row.CreatedBy !== loginName){
       //   showAlert('info',"You can't edit")
       //     return;
@@ -305,6 +340,18 @@ export default function InspSummary({
       case "view":
         handleAdd("edit");
         break;
+      case "approve":
+        handleProperty(value);
+        break;
+      case "reject":
+        handleProperty(value);
+        break;
+      case "correction":
+        handleProperty(value);
+        break;
+      case "suspend":
+        handleProperty(value);
+        break;
       case "excel":
         handleExcelExport();
         break;
@@ -322,7 +369,7 @@ export default function InspSummary({
     setselectedStatus([])
   };
 
-  
+
 
   // Handlers for your icons
   const handleAdd = (value) => {
@@ -349,17 +396,16 @@ export default function InspSummary({
     setPageRender(3);
   };
 
- 
+
   const handleExcelExport = async () => {
     let Type;
-    if(menuIdLocal == 31)
-    {
+    if (menuIdLocal == 31) {
       Type = 2;
     }
-    else if(menuIdLocal == 28){
+    else if (menuIdLocal == 28) {
       Type = 1;
     }
-    else{
+    else {
       return;
     }
     try {
@@ -368,23 +414,76 @@ export default function InspSummary({
         pageNumber: 0,
         pageSize: 0,
         search: "",
-        type:Type
+        type: Type
       });
       const excludedFields = ["Id"];
       const filteredRows = JSON.parse(response?.result)?.Data;
 
       await ExcelExport({
-        reportName:  menuIdLocal !== 31 ? 'Inspection Product list': 'Approve Product list',
+        reportName: menuIdLocal !== 31 ? 'Inspection Product list' : 'Approve Product list',
         filteredRows,
         excludedFields,
       });
-    } catch (error) {}
+    } catch (error) { }
   };
 
-  
- 
-  
-  
+
+  const handleProperty = (value) => {
+    if (selectedDatas.length === 0) {
+      showAlert(
+        "info", "Please Select row ");
+      return;
+    }
+    const blockedStatuses = ["Approved", "Rejected", "Suspended","Correction"];
+
+    // Get all items with blocked status
+    const blockedItems = selectedStatus.filter(item => blockedStatuses.includes(item?.Status));
+
+    if (menuIdLocal === 31 && blockedItems.length > 0) {
+      const certNos = blockedItems.map(item => item.CertificateNo).join(", ");
+      showAlert('info', `These products are Already Authorized. Certificate No(s): ${certNos}`);
+      return;
+    }
+    setItemLabel(value)
+    setConfirmData({
+      message: `You want to Approve.`,
+      type: "info",
+      header: value == 'correction' ? 'Correction' : value == 'suspend' ? 'Suspend' : "Authorization",
+    });
+    setProperty(true);
+  };
+
+  const handleAuthorize = async (status) => {
+
+    const saveData = {
+      status: status,
+      remarks: mainDetails1?.Remarks,
+      idCollection: selectedDatas.map(id => ({ id })) // Convert [197, 196] → [{ id: 197 }, { id: 196 }]
+    };
+
+    try {
+      const response = await upsertmultiapprove(saveData);
+      if (response?.status === "Success") {
+        showAlert("success", response?.message);
+        handleApproveClose();
+        hardRefresh();
+        setMainDetails1({});
+      }
+    } catch (error) {
+      throw error
+    }
+
+  }
+
+  const handleApproveClose = () => {
+    setProperty(false);
+    setMainDetails1({});
+    setselectedDatas([])
+  }
+
+
+
+
   return (
     <>
       <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
@@ -399,7 +498,7 @@ export default function InspSummary({
             flexWrap: "wrap",
           }}
         >
-          <BasicBreadcrumbs mId={menuIdLocal}  />
+          <BasicBreadcrumbs mId={menuIdLocal} />
           <DefaultIcons iconsClick={handleIconsClick} userAction={userAction} />
         </Box>
         <Box sx={{ width: "100%", overflowX: "auto", paddingBottom: "10px" }}>
@@ -420,8 +519,8 @@ export default function InspSummary({
             //   currentTheme={currentTheme}
             totalPages={totalPages}
             hardRefresh={hardRefresh}
-            IdName={"Id"} 
-            statusName={menuIdLocal == 31 ? authorize: inspection}
+            IdName={"Id"}
+            statusName={menuIdLocal == 31 ? authorize : inspection}
             getAssignjoborderlist={getAssignjoborderlist}
             mainDetails={mainDetails}
             setMainDetails={setMainDetails}
@@ -429,8 +528,16 @@ export default function InspSummary({
             menuIdLocal={menuIdLocal}
           />
         </Box>
-        
-       
+
+        <ApproveConfirmation
+          handleClose={handleApproveClose}
+          open={property}
+          data={confirmData}
+          submite={handleAuthorize}
+          itemLabel={itemLabel}
+          mainDetails={mainDetails1}
+          setMainDetails={setMainDetails1}
+        />
       </Box>
     </>
   );

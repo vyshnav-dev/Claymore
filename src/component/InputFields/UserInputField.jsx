@@ -57,6 +57,7 @@ export default function UserInputField({
   onBlurAction,
   decimalLength,
   max,
+  min,
   placeholder,
   DonotAllowSpecialChar,
 }) {
@@ -167,6 +168,7 @@ export default function UserInputField({
         inputProps: {
           maxLength: maxLength,
           max:max,
+          min:min,
           autoComplete: `off`,
           ...(type === "date"
             ? {

@@ -29,6 +29,9 @@ import Loader from "../../component/Loader/Loader";
 import ApproveConfirmation from "./ApproveConfirmation";
 import TagFileTab from "./TagFileTab";
 import { allocationApis } from "../../service/Allocation/allocation";
+import AcknowledgementTab from "./AcknowledgementTab";
+import ImageModal from "../../component/Modal/ImageModal";
+import ImageNotSupportedIcon from '@mui/icons-material/ImageNotSupported';
 const currentDate = new Date().toISOString().split("T")[0];
 function CustomTabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -418,6 +421,7 @@ export default function InspDetails({
     setMainDetails,
     newId,
     menuId,
+    menuLabel
 }) {
 
 
@@ -443,6 +447,11 @@ export default function InspDetails({
         CalibratedTestEquipment: null,
         ClientTestEquipment: null,
         InspectionInformation: {},
+        Finding: null,
+        CriticalFinding: null,
+        TargetDateOfClosure: currentDate,
+        TargetDateOfClosure1: currentDate,
+        OtherRemarks: null,
         Attachment: [],
     });
     const [mainDetails1, setMainDetails1] = useState({
@@ -473,6 +482,17 @@ export default function InspDetails({
     //TagAttachmentTab
     const [dbTagAttachmentDetails, setdbTagAttachmentDetails] = useState([])
 
+    // client sign
+    const [isImageModalOpenSign, setIsImageModalOpenSign] = useState(false);
+
+    const handleImageClickSign = (index) => {
+        setIsImageModalOpenSign(true);
+    };
+
+    const handleCloseImagePopupSign = () => {
+        setIsImageModalOpenSign(false);
+    };
+
 
     const { showAlert } = useAlert();
     const {
@@ -502,6 +522,11 @@ export default function InspDetails({
                     ClientTestEquipment: null,
                     TestDate: currentDate,
                     InspectionInformation: {},
+                    Finding: null,
+                    CriticalFinding: null,
+                    TargetDateOfClosure: currentDate,
+                    TargetDateOfClosure1: currentDate,
+                    OtherRemarks: null,
                     Attachment: [],
                 })
 
@@ -604,6 +629,11 @@ export default function InspDetails({
                         ClientTestEquipment: null,
                         TestDate: null,
                         InspectionInformation: {},
+                        Finding: null,
+                        CriticalFinding: null,
+                        TargetDateOfClosure: currentDate,
+                        TargetDateOfClosure1: currentDate,
+                        OtherRemarks: null,
                         Attachment: [],
                     })
                     setFieldsWithStructure([])
@@ -640,6 +670,11 @@ export default function InspDetails({
                     ClientTestEquipment: null,
                     TestDate: null,
                     InspectionInformation: {},
+                    Finding: null,
+                    CriticalFinding: null,
+                    TargetDateOfClosure: currentDate,
+                    TargetDateOfClosure1: currentDate,
+                    OtherRemarks: null,
                     Attachment: [],
                 })
                 setFieldsWithStructure([])
@@ -689,7 +724,7 @@ export default function InspDetails({
 
 
                 const result = JSON.parse(response?.result)
-                
+
 
                 let updatedData = {
                     ...formData,
@@ -812,6 +847,10 @@ export default function InspDetails({
         if (detailPageId == 0) {
             setPageRender(1);
         }
+        else if(menuLabel == 'Acknowedgement'){
+            setId(backId)
+            setPageRender(3);
+        }
         else {
             setId(backId)
             setPageRender(2);
@@ -931,9 +970,14 @@ export default function InspDetails({
                 calibratedTestEquipment: formData?.CalibratedTestEquipment,
                 clientTestEquipment: formData?.ClientTestEquipment,
                 testDate: formData?.TestDate,
-                location:formData?.Location,
+                location: formData?.Location,
                 inspectionInformation: inspectionInformationArray,
                 examination: exam,
+                finding: formData?.Finding,
+                criticalFinding: formData?.CriticalFinding,
+                targetDateOfClosure: formData?.TargetDateOfClosure,
+                targetDateOfClosure1: formData?.TargetDateOfClosure1,
+                otherRemarks: formData?.OtherRemarks,
                 attachments: formData?.Attachment || []
             };
 
@@ -1057,32 +1101,33 @@ export default function InspDetails({
     };
 
     const handleCertificate = async () => {
+        // Open a blank popup immediately on user action
+        const popupWindow = window.open("", "PDFPopup", "width=800,height=600,resizable=yes,scrollbars=yes");
+        if (!popupWindow) {
+            alert("Popup blocked! Please allow popups for this site.");
+            return;
+        }
+
         try {
             const response = await generatecertificate({ inspectionId: detailPageId });
-            const myObject = JSON.parse(response?.result)
+            // Assuming response.result is a JSON string containing a URL property
+            const resultObj = JSON.parse(response?.result);
 
-            if (response?.status === "Success") {
-                const popupWindow = window.open(
-                    myObject,
-                    "PDFPopup",
-                    "width=800,height=600,resizable=yes,scrollbars=yes"
-                );
-                if (!popupWindow) {
-                    alert("Popup blocked! Please allow popups for this site.");
-                }
-            } 
-
+            if (response?.status === "Success" && resultObj) {
+                // Set the popup's location to the PDF URL
+                popupWindow.location.href = resultObj;
+            } else {
+                console.error("Certificate generation failed or invalid URL.");
+                popupWindow.close();
+            }
         } catch (error) {
-            throw error;
-
-        }
-        finally{
-            const popupWindow = window.open(
-                myObject,
-            );
+            console.error("An error occurred:", error);
+            popupWindow.close();
         }
     };
 
+
+    
 
     return (
         <Box sx={{ display: "flex", flexDirection: "column", width: "100%", position: 'relative' }}>
@@ -1279,6 +1324,15 @@ export default function InspDetails({
                         </>
                     ))}
 
+                    <CustomizedAccordions
+                        // icons="fa-solid fa-briefcase"
+                        label={'Findings'}
+                        expanded={expanded == "Findings"}
+                        onChange={handleChange("Findings")}
+                    >
+                        <AcknowledgementTab key={998} formData={formData} setFormData={setFormData} />
+                    </CustomizedAccordions>
+
                     <TagFileTab
 
                         // fieldsWithStructure6={fieldsWithStructure6} // Pass fields belonging to this tab
@@ -1297,6 +1351,24 @@ export default function InspDetails({
 
 
                 </Box>
+                {menuId == 31 && 
+                    <Box sx={{ width:'100%', display: "flex",flexDirection: "column", alignItems: "end", p: 3 }}>
+                    {formData?.ClientSignPath ? (
+                        <img
+                            src={formData?.ClientSignPath}
+                            alt="Thumbnail"
+                            style={{ cursor: "pointer", width: "50px", height: "50px" }}
+                            onClick={handleImageClickSign}
+                        />
+                    ) : (
+                        <ImageNotSupportedIcon sx={{ color: secondaryColor }} />
+                    )}
+                    <Typography variant="body2" sx={{ mt: 1, color: "black",fontWeight:'bold' }}> {/* Adjust color as needed */}
+                        Client Sign
+                    </Typography>
+                </Box>
+                }
+                
 
             </Box>
 
@@ -1315,6 +1387,12 @@ export default function InspDetails({
                 itemLabel={itemLabel}
                 mainDetails={mainDetails1}
                 setMainDetails={setMainDetails1}
+            />
+
+            <ImageModal
+                isOpen={isImageModalOpenSign}
+                imageUrl={formData?.ClientSignPath}
+                handleCloseImagePopup={handleCloseImagePopupSign}
             />
 
         </Box>
