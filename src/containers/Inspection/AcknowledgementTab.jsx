@@ -29,7 +29,7 @@ export default function AcknowledgementTab({formData,setFormData}) {
         name={"Finding"}
         type={"text"}
         disabled={false}
-        mandatory={true}
+        mandatory={false}
         value={formData}
         setValue={setFormData}
         multiline={true}
@@ -40,7 +40,7 @@ export default function AcknowledgementTab({formData,setFormData}) {
         name={"TargetDateOfClosure"}
         type={"date"}
         disabled={false}
-        mandatory={true}
+        mandatory={false}
         value={formData}
         setValue={setFormData}
     />
@@ -49,7 +49,7 @@ export default function AcknowledgementTab({formData,setFormData}) {
         name={"CriticalFinding"}
         type={"text"}
         disabled={false}
-        mandatory={true}
+        mandatory={false}
         value={formData}
         setValue={setFormData}
         multiline={true}
@@ -60,7 +60,7 @@ export default function AcknowledgementTab({formData,setFormData}) {
         name={"TargetDateOfClosure1"}
         type={"date"}
         disabled={false}
-        mandatory={true}
+        mandatory={false}
         value={formData}
         setValue={setFormData}
     />
@@ -69,7 +69,7 @@ export default function AcknowledgementTab({formData,setFormData}) {
         name={"OtherRemarks"}
         type={"text"}
         disabled={false}
-        mandatory={true}
+        mandatory={false}
         value={formData}
         setValue={setFormData}
         multiline={true}

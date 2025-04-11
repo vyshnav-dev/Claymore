@@ -35,7 +35,6 @@ import { Info } from "@mui/icons-material";
 import AutoSelect from "../../../component/AutoComplete/AutoSelect";
 import UserAutoComplete from "../../../component/AutoComplete/UserAutoComplete";
 import PDFieldAutoCompleteList from "./PDFieldAutoCompleteList";
-const currentDate = new Date().toISOString().split("T")[0];
 function CustomTabPanel(props) {
     const { children, value, index, ...other } = props;
 

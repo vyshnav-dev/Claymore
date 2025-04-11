@@ -459,7 +459,7 @@ export default function AckDetails({
                                 <img
                                     src={mainDetails?.ClientSignPath}
                                     alt="Thumbnail"
-                                    style={{ cursor: "pointer", width: "50px", height: "50px" }}
+                                    style={{ cursor: "pointer", width: "50px", height: "50px",border: `1px solid #000` }}
                                     onClick={handleImageClickSign}
                                 />
                             ) : (

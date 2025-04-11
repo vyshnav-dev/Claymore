@@ -5,13 +5,7 @@ import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import ActionButton from "../../component/Buttons/ActionButton";
 import { useAlert } from "../../component/Alerts/AlertContext";
 import { primaryColor } from "../../config/config";
-import ConfirmationAlert from "../../component/Alerts/ConfirmationAlert";
-import { masterApis } from "../../service/Master/master";
-// import MasterProductConfirmation from "./MasterProductConfirmation";
 import ExcelExport from "../../component/Excel/Excel";
-import { identity } from "lodash";
-import { summaryData } from "../../config";
-import { allocationApis } from "../../service/Allocation/allocation";
 import InspSummaryTable from "../../component/Table/InspSummaryTable";
 import { inspectionApis } from "../../service/Inspection/inspection";
 import ApproveConfirmation from "./ApproveConfirmation";
@@ -416,11 +410,11 @@ export default function InspSummary({
         search: "",
         type: Type
       });
-      const excludedFields = ["Id"];
+      const excludedFields = ["Id","AuthorizedBy","AuthorizedOn","ModifiedBy","ModifiedOn"];
       const filteredRows = JSON.parse(response?.result)?.Data;
 
       await ExcelExport({
-        reportName: menuIdLocal !== 31 ? 'Inspection Product list' : 'Approve Product list',
+        reportName: menuIdLocal !== 31 ? 'Inspection Product list' : 'Authorize Product list',
         filteredRows,
         excludedFields,
       });

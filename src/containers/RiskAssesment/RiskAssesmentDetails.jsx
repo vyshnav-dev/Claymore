@@ -33,7 +33,7 @@ import RiskBodyTable from "./RiskBodyTable";
 import { allocationApis } from "../../service/Allocation/allocation";
 import UserAutoComplete from "../../component/AutoComplete/UserAutoComplete";
 import { inspectionApis } from "../../service/Inspection/inspection";
-const currentDate = new Date().toISOString().split("T")[0];
+const currentDate = new Date().toLocaleDateString("en-CA");
 function CustomTabPanel(props) {
     const { children, value, index, ...other } = props;
 
@@ -462,7 +462,6 @@ export default function RiskAssesmentDetails({
     setId
 }) {
 
-    const currentDate = new Date().toISOString().split("T")[0];
     const [mainDetails, setMainDetails] = useState({});
     const [detailPageId, setDetailPageId] = useState(summaryId);
     const [confirmAlert, setConfirmAlert] = useState(false);

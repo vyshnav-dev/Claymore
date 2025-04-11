@@ -89,19 +89,11 @@ const loginApi = () => {
     }
   };
 
-  const gettagdetails = async (payload) => {
-    try {
-      const response = await axios.get(`${baseUrl}tag/gettagdetails?tagId=${payload?.tagId}`);
-      return response.data;
-    } catch (error) {
-      handleError(error);
-    }
-  };
+  
 
   return {
 
     loginLogin,
-    gettagdetails
   };
 };
 

@@ -9,7 +9,6 @@ export let selectedColor = null
 export let backgroundColor = null
 export let profileDateFields = null
 export let reportDateFields = null
-export let baseUrlMob = null
 export let rowsPerSheet = null;
 export let IMAGE_URL = null;
 export let allowedExtensionsReceipt = null
@@ -18,6 +17,7 @@ export let MastersTagId = null
 export let TransactionData = null
 export let FixedValues = null
 export let allowedExtensionsUser = null
+export let transactionDateTimeFields = null
 
 
 export const getConfig = () => {
@@ -41,7 +41,6 @@ export const getConfig = () => {
     backgroundColor=config.backgroundColor
     profileDateFields=config.profileDateFields
     reportDateFields=config.reportDateFields
-    baseUrlMob=config.baseUrlMob
     rowsPerSheet = config.rowsPerSheet
     IMAGE_URL = config.IMAGE_URL
     allowedExtensionsReceipt = config.allowedExtensionsReceipt
@@ -50,4 +49,5 @@ export const getConfig = () => {
     TransactionData = config1.TransactionData
     FixedValues = config1.FixedValues
     allowedExtensionsUser = config.allowedExtensionsUser
+    transactionDateTimeFields = config.transactionDateTimeFields
 }

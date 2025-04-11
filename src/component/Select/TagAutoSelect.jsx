@@ -21,7 +21,7 @@ const TagAutoSelect = ({
   languageName,
   width = 250,
   ColumnSpan = 0,
-  Menu=[]
+  Menu=[],
 }) => {
   const [searchkey, setsearchkey] = useState("");
   const [autoCompleteKey, setAutoCompleteKey] = useState(0);
@@ -40,15 +40,18 @@ const TagAutoSelect = ({
 
       // Set the formDataName if the selected option is found
       
-      if (selectedOption) {
+      if (selectedOption ) {
         setFormData({
           ...formData,
-          [formDataName]: selectedOption.Name,
-          [formDataiId]: selectedOption.Id,   // Set the Name corresponding to the Id
+          // [formDataName]: selectedOption?.Name,
+          [formDataiId]: selectedOption?.Id,   // Set the Name corresponding to the Id
         });
       }
     }
   }, [formData[formDataiId]]);
+
+
+  
 
   
   const handleAutocompleteChange = (event, newValue) => {
@@ -374,4 +377,3 @@ const TagAutoSelect = ({
 };
 
 export default TagAutoSelect;
-

@@ -321,7 +321,7 @@ export default function RiskAssesmentSummary({
         pageSize: 0,
         search: '',
       });
-      const excludedFields = ["Id","Time"];
+      const excludedFields = ["Id","Time","ModifiedBy","ModifiedOn"];
       const filteredRows = JSON.parse(response?.result)?.Data;
 
       await ExcelExport({

@@ -41,7 +41,6 @@ import StaticTable from "../Home/StaticTable";
 import TimeRecordTable from "./TimeRecordTable";
 import ImageNotSupportedIcon from '@mui/icons-material/ImageNotSupported';
 
-const currentDate = new Date().toISOString().split("T")[0];
 function CustomTabPanel(props) {
     const { children, value, index, ...other } = props;
 
@@ -335,21 +334,6 @@ export default function TimeRecordDetails({
                 break;
             case "save":
                 const emptyFields = [];
-                // if (!mainDetails?.CSSCReportNo) emptyFields.push("CSSC Report No");
-                // if (!mainDetails?.PurchaseOrderNo) emptyFields.push("Purchase Order No");
-                // if (!mainDetails?.Inspector) emptyFields.push("Inspector");
-                // if (!mainDetails?.DateOfInspection) emptyFields.push("Date Of Inspection");
-                // if (!mainDetails?.TimeArrived) emptyFields.push("Time Arrived");
-                // if (!mainDetails?.TimeLeft) emptyFields.push("Time Left");
-                // if (!mainDetails?.SiteHour) emptyFields.push("Site Hour");
-                // if (!mainDetails?.TravelHour) emptyFields.push("Travel Hour");
-                // if (!mainDetails?.TotalTime) emptyFields.push("Total Time");
-                // if (!mainDetails?.Comments) emptyFields.push("Comments");
-                // if (!mainDetails?.Client_Name) emptyFields.push("Client Name");
-                // if (!mainDetails?.Address) emptyFields.push("Address");
-                // if (!mainDetails?.Contact) emptyFields.push("Contact");
-                // if (!mainDetails?.Location) emptyFields.push("Location");
-                // if (!mainDetails?.EqpDescription) emptyFields.push("Equipment Description");
                 if (!mainDetails?.CustomerAcceptanceCertificate) emptyFields.push("Customer Acceptance Certificate");
                 if (emptyFields.length > 0) {
                     showAlert("info", `Please Provide ${emptyFields[0]}`);
@@ -402,6 +386,8 @@ export default function TimeRecordDetails({
     }
 
    
+   
+        
     
 
     const handleSave = async () => {
@@ -434,13 +420,11 @@ export default function TimeRecordDetails({
                 travelHour: mainDetails?.TravelHour,
                 totalTime: mainDetails?.TotalTime,
                 comments: mainDetails?.Comments,
-                eqpDescription: mainDetails?.EqpDescription,
                 virtualTest: mainDetails?.VirtualTest,
                 loadTest: mainDetails?.LoadTest,
                 witness: mainDetails?.Witness,
                 verification: mainDetails?.Verification,
                 functionalTest: mainDetails?.FunctionalTest,
-                // inspector: mainDetails?.Inspector,
                 customerAcceptanceCertificate: mainDetails?.CustomerAcceptanceCertificate,
                 equipmentDescription:equipmentDescription,
                 remarks:mainDetails?.Remarks,
@@ -458,10 +442,10 @@ export default function TimeRecordDetails({
 
                 showAlert("success", response?.message);
                 handleNew();
-                const actionExists = userAction.some((action) => action.Action === "New");
-                if (!actionExists) {
+                // const actionExists = userAction.some((action) => action.Action === "New");
+                // if (!actionExists) {
                     handleclose();
-                }
+                // }
             }
         } catch (error) {
             throw error
@@ -996,8 +980,9 @@ export default function TimeRecordDetails({
                                 <img
                                     src={mainDetails?.ClientSignPath}
                                     alt="Thumbnail"
-                                    style={{ cursor: "pointer", width: "50px", height: "50px" }}
+                                    style={{ cursor: "pointer", width: "50px", height: "50px",border: `1px solid #000` }}
                                     onClick={handleImageClickSign}
+                                    
                                 />
                             ) : (
                                 <ImageNotSupportedIcon sx={{ color: secondaryColor }} />

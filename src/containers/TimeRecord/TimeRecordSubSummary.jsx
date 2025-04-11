@@ -322,7 +322,7 @@ export default function TimeRecordSubSummary({
         pageSize: 0,
         search: "",
       });
-      const excludedFields = ["Id"];
+      const excludedFields = ["Id","ModifiedBy","ModifiedOn"];
       const filteredRows = JSON.parse(response?.result)?.Data;
 
       await ExcelExport({
@@ -378,13 +378,7 @@ export default function TimeRecordSubSummary({
           data={confirmData}
           submite={handledeleteRole}
         />
-        {/* <MasterProductConfirmation
-          handleClose={() => setProperty(false)}
-          open={property}
-          data={confirmData}
-          submite={handlePropertyConfirmation}
-          selectedDatas={selectedDatas?.length === 1 ? selectedDatas[0] : null}
-        /> */}
+        
       </Box>
     </>
   );

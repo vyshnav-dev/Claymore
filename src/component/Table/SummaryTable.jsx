@@ -36,6 +36,7 @@ import {
   secondaryColor,
   selectedColor,
   thirdColor,
+  transactionDateTimeFields,
 } from "../../config/config";
 import RouteMap from "../RouteMap/RouteMap";
 import { MDBIcon } from "mdb-react-ui-kit";
@@ -65,6 +66,8 @@ export default function SummaryTable(props) {
     IdName,
     statusName,
   } = props;
+
+  
   const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(25);
@@ -78,7 +81,13 @@ export default function SummaryTable(props) {
   const profileDateFieldsArray = profileDateFields
     .split(",")
     .map((field) => field.trim());
-  const excludedFields = [statusName, "Group", "GroupId", "TotalRows", "UserName", "Time","Allocation","Id"];
+
+    const transactionDateTimeFieldsArray = transactionDateTimeFields
+    .split(",")
+    .map((field) =>field.trim());
+
+    
+  const excludedFields = [statusName, "Group", "GroupId", "TotalRows", "UserName", "Time", "Allocation", "Id"];
 
   //To apply some filters on table rows
   const initialColumns =
@@ -101,7 +110,7 @@ export default function SummaryTable(props) {
     setColumns(initialColumns);
   }, [rows]);
 
-  
+
 
   //To expand column on mouse dragging
   const handleResize = (index, event) => {
@@ -238,6 +247,20 @@ export default function SummaryTable(props) {
     const year = localDate.getFullYear();
 
     return `${day}-${month}-${year}`;
+  };
+
+  const convertToLocaleDateTimeString = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    if (isNaN(date)) return dateString;
+    const localDateTime = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+    const day = String(localDateTime.getDate()).padStart(2, "0");
+    const month = String(localDateTime.getMonth() + 1).padStart(2, "0");
+    const year = localDateTime.getFullYear();
+    const hours = String(localDateTime.getHours()).padStart(2, "0");
+    const minutes = String(localDateTime.getMinutes()).padStart(2, "0");
+    const seconds = String(localDateTime.getSeconds()).padStart(2, "0");
+    return `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
   };
 
   const handleMapOpen = (id) => {
@@ -423,7 +446,7 @@ export default function SummaryTable(props) {
           >
             <Table stickyHeader sx={{ minWidth: 750 }}>
               <TableHead>
-                <TableRow sx={{ position: "sticky", top: 0,zIndex:3 }}>
+                <TableRow sx={{ position: "sticky", top: 0, zIndex: 3 }}>
                   {columns.map((column, index) => (
                     <TableCell
                       key={column.id}
@@ -481,7 +504,7 @@ export default function SummaryTable(props) {
                       }}
                     >
                       {columns.map((column) => (
-                        <Tooltip key={column.id}  title={["Technician", "ProductName","Client"]?.includes(column.id) ? row[column.id] : null}>
+                        <Tooltip key={column.id} title={["Technician", "ProductName", "Client"]?.includes(column.id) ? row[column.id] : null}>
                           <TableCell
                             key={column.id}
                             sx={{
@@ -493,7 +516,7 @@ export default function SummaryTable(props) {
                               whiteSpace: "nowrap",
                               overflow: "hidden",
                               textOverflow: "ellipsis",
-                              fontWeight: row["Group"] ? 800 : "normal",
+                              fontWeight:"normal",
                               textAlign: column.id === "GeoLocation" ? "center" : "left",
                             }}
                           >
@@ -504,16 +527,18 @@ export default function SummaryTable(props) {
                                 sx={iconsExtraSxCell}
                               >
                                 <Stack direction="column" alignItems="center">
-                                  <MDBIcon  fas icon="fa-solid fa-location-dot" className="responsiveAction-icon" />
+                                  <MDBIcon fas icon="fa-solid fa-location-dot" className="responsiveAction-icon" />
                                 </Stack>
                               </IconButton>
                             ) : profileDateFieldsArray.includes(column.label) ? (
                               convertToLocaleDateString(row[column.id])
-                            ) : row[column.id] === null ? (
-                              ""
-                            ) : (
-                              row[column.id]
-                            )}
+                            ) : transactionDateTimeFieldsArray.includes(column.label)
+                              ? convertToLocaleDateTimeString(row[column.id])
+                              : row[column.id] === null ? (
+                                ""
+                              ) : (
+                                row[column.id]
+                              )}
                           </TableCell>
                         </Tooltip>
                       ))}

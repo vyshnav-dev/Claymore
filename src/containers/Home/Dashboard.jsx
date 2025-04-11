@@ -52,7 +52,7 @@ const ShakingIconButton = styled(IconButton)(({ isshaking }) => ({
   border: "1px solid #f57c00",
   animation: isshaking ? `${shakeAnimation} 0.5s ease-in-out infinite` : "none",
 }));
-const currentDate = new Date().toISOString().split("T")[0];
+const currentDate = new Date().toLocaleDateString("en-CA");;
 export default function Dashboard() {
   const [alertVisible, setAlertVisible] = useState(false);
   const [shake, setShake] = useState(true);
@@ -212,26 +212,27 @@ export default function Dashboard() {
     const today = new Date();
     let fromDate = currentDate;
     let toDate = currentDate;
-
+  
     if (dataType === 2) {
       // This Week (Monday to today)
       const firstDayOfWeek = new Date(today);
       const day = today.getDay(); // 0 (Sunday) to 6 (Saturday)
       const diff = day === 0 ? 6 : day - 1; // Make Monday (1) the first day
       firstDayOfWeek.setDate(today.getDate() - diff);
-      fromDate = firstDayOfWeek.toISOString().split("T")[0];
+      fromDate = firstDayOfWeek.toLocaleDateString("en-CA");
     } else if (dataType === 3) {
       // This Month (1st day of month to today)
       const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-      fromDate = firstDayOfMonth.toISOString().split("T")[0];
+      fromDate = firstDayOfMonth.toLocaleDateString("en-CA");
     } else if (dataType === 4) {
       // This Year (Jan 1st to today)
       const firstDayOfYear = new Date(today.getFullYear(), 0, 1);
-      fromDate = firstDayOfYear.toISOString().split("T")[0];
+      fromDate = firstDayOfYear.toLocaleDateString("en-CA");
     }
-
-    setDateForm({ fromDate,toDate});
-};
+  
+    setDateForm({ fromDate, toDate });
+  };
+  
 
 const handleDate = (data) =>{
   setDateForm(data);

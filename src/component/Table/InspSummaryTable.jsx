@@ -36,6 +36,7 @@ import {
   secondaryColor,
   selectedColor,
   thirdColor,
+  transactionDateTimeFields,
 } from "../../config/config";
 import UserAutoComplete from "../AutoComplete/UserAutoComplete";
 import RouteMap from "../RouteMap/RouteMap";
@@ -88,6 +89,11 @@ export default function InspSummaryTable(props) {
   const profileDateFieldsArray = profileDateFields
     .split(",")
     .map((field) => field.trim());
+
+    const transactionDateTimeFieldsArray = transactionDateTimeFields
+    .split(",")
+    .map((field) =>field.trim());
+
   const excludedFields = ["Group", "GroupId", "TotalRows", "UserName","Id",statusName[0],statusName[1]];
 
   //To apply some filters on table rows
@@ -271,6 +277,20 @@ export default function InspSummaryTable(props) {
     const year = localDate.getFullYear();
 
     return `${day}-${month}-${year}`;
+  };
+
+  const convertToLocaleDateTimeString = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    if (isNaN(date)) return dateString;
+    const localDateTime = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+    const day = String(localDateTime.getDate()).padStart(2, "0");
+    const month = String(localDateTime.getMonth() + 1).padStart(2, "0");
+    const year = localDateTime.getFullYear();
+    const hours = String(localDateTime.getHours()).padStart(2, "0");
+    const minutes = String(localDateTime.getMinutes()).padStart(2, "0");
+    const seconds = String(localDateTime.getSeconds()).padStart(2, "0");
+    return `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
   };
 
   const handleMapOpen = (id) => {
@@ -593,7 +613,8 @@ export default function InspSummaryTable(props) {
                               </IconButton>
                             ) : profileDateFieldsArray.includes(column.label)
                               ? convertToLocaleDateString(row[column.id])
-                              : row[column.id] === null
+                              :transactionDateTimeFieldsArray.includes(column.label)
+                              ? convertToLocaleDateTimeString(row[column.id]): row[column.id] === null
                                 ? ""
                                 : `${row[column.id]}`}
                           </TableCell>

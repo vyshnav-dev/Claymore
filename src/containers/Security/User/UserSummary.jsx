@@ -318,7 +318,7 @@ export default function UserSummary({ setPageRender, setId, userAction }) {
         },
         "user/getusersummary"
       );
-      const excludedFields = ["Id"];
+      const excludedFields = ["Id","ModifiedBy","ModifiedOn"];
       const filteredRows = JSON.parse(response?.result)?.Data;
 
       await ExcelExport({

@@ -6,7 +6,7 @@ import InputCommon from '../../component/InputFields/InputCommon';
 import TagAutoSelect from '../../component/Select/TagAutoSelect';
 import CheckBoxTag from '../../component/CheckBox/CheckBoxTag';
 
-const TabFields = ({ formData,setFormData,fields, expanded, onChange,language,tagDetails,isAccordion=true ,handleTagSwitch,disabledDetailed,userAction,fetchDetailTagInfo,detailScreeniId}) => {
+const TabFields = ({ formData,setFormData,fields, expanded, onChange,language,isAccordion=true ,disabledDetailed}) => {
 
    //Tag page Apis
 //    const { gettagparentlist ,gettaglist,checktagexistence,gettaglanguageexistence,tag_getbusinessentitysummary,getmasterdata} = tagsApis();

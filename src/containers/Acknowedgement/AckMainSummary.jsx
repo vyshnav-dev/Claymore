@@ -308,16 +308,16 @@ export default function AckMainSummary({
   const handleExcelExport = async () => {
     try {
       const response = await GetAllocatedJobOrderSummary({
-        type:1,
+        type:3,
         pageNumber: 0,
         pageSize: 0,
         search: "",
       });
-      const excludedFields = ["Id"];
+      const excludedFields = ["Id","ModifiedBy","ModifiedOn"];
       const filteredRows = JSON.parse(response?.result)?.Data;
 
       await ExcelExport({
-        reportName: "Risk Assessment Job Orders",
+        reportName: "Acknowledgement Job Orders",
         filteredRows,
         excludedFields,
       });

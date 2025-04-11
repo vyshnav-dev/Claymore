@@ -20,19 +20,17 @@ import {
 } from "../../config/config";
 import UserInputField from "../../component/InputFields/UserInputField";
 import CustomizedAccordions from "../../component/Accordion/Accordion";
-import { assessmentData, InspectionData, locationType } from "../../config";
 import InspBodyTable from "./InspBodyTable";
 import InspDetailsTab from "./InspDetailsTab";
 import { inspectionApis } from "../../service/Inspection/inspection";
 import TabFields from "./TabFields";
-import Loader from "../../component/Loader/Loader";
 import ApproveConfirmation from "./ApproveConfirmation";
 import TagFileTab from "./TagFileTab";
 import { allocationApis } from "../../service/Allocation/allocation";
 import AcknowledgementTab from "./AcknowledgementTab";
 import ImageModal from "../../component/Modal/ImageModal";
 import ImageNotSupportedIcon from '@mui/icons-material/ImageNotSupported';
-const currentDate = new Date().toISOString().split("T")[0];
+const currentDate = new Date().toLocaleDateString("en-CA");
 function CustomTabPanel(props) {
     const { children, value, index, ...other } = props;
 
@@ -423,35 +421,31 @@ export default function InspDetails({
     menuId,
     menuLabel
 }) {
-
-
-
-
-    const currentDate = new Date().toISOString().split("T")[0];
+  
 
     const [formData, setFormData] = useState({
         Id: null,
-        DocNo: null,
-        Product: null,
+        DocNo: "",
+        Product: "",
         List: null,
-        OwnerName: null,
+        OwnerName: "",
         OfficeAddress: "",
-        EquipmentLocation: null,
+        EquipmentLocation: "",
         DateOfInspection: null,
-        PreviousInspectionReport: null,
-        TestMethod: null,
+        PreviousInspectionReport: "",
+        TestMethod: "",
         ExpiryDate: null,
         TestDate: null,
         InspectionType: null,
-        InspectionType_Name: null,
-        CalibratedTestEquipment: null,
-        ClientTestEquipment: null,
+        InspectionType_Name: "",
+        CalibratedTestEquipment: "",
+        ClientTestEquipment: "",
         InspectionInformation: {},
-        Finding: null,
-        CriticalFinding: null,
-        TargetDateOfClosure: currentDate,
-        TargetDateOfClosure1: currentDate,
-        OtherRemarks: null,
+        Finding: "",
+        CriticalFinding: "",
+        TargetDateOfClosure: null,
+        TargetDateOfClosure1: null,
+        OtherRemarks: "",
         Attachment: [],
     });
     const [mainDetails1, setMainDetails1] = useState({
@@ -506,27 +500,27 @@ export default function InspDetails({
             try {
                 setFormData({
                     Id: 0,
-                    DocNo: null,
-                    Product: null,
+                    DocNo: "",
+                    Product: "",
                     List: null,
-                    OwnerName: null,
+                    OwnerName: "",
                     OfficeAddress: "",
-                    EquipmentLocation: null,
+                    EquipmentLocation: "",
                     DateOfInspection: currentDate,
-                    PreviousInspectionReport: null,
-                    TestMethod: null,
+                    PreviousInspectionReport: "",
+                    TestMethod: "",
                     ExpiryDate: currentDate,
                     InspectionType: null,
-                    InspectionType_Name: null,
-                    CalibratedTestEquipment: null,
-                    ClientTestEquipment: null,
+                    InspectionType_Name: "",
+                    CalibratedTestEquipment: "",
+                    ClientTestEquipment: "",
                     TestDate: currentDate,
                     InspectionInformation: {},
-                    Finding: null,
-                    CriticalFinding: null,
-                    TargetDateOfClosure: currentDate,
-                    TargetDateOfClosure1: currentDate,
-                    OtherRemarks: null,
+                    Finding: "",
+                    CriticalFinding: "",
+                    TargetDateOfClosure: "",
+                    TargetDateOfClosure1: "",
+                    OtherRemarks: "",
                     Attachment: [],
                 })
 
@@ -565,6 +559,7 @@ export default function InspDetails({
                 })
                 if (response.status == "Success") {
                     let fieldsData = JSON.parse(response?.result);
+                    
                     setViewFields(fieldsData)
 
 
@@ -613,27 +608,27 @@ export default function InspDetails({
                     setViewFields([]);
                     setFormData({
                         Id: 0,
-                        DocNo: null,
-                        OwnerName: null,
-                        Product: null,
+                        DocNo: "",
+                        OwnerName: "",
+                        Product: "",
                         List: null,
                         OfficeAddress: "",
-                        EquipmentLocation: null,
+                        EquipmentLocation: "",
                         DateOfInspection: null,
-                        PreviousInspectionReport: null,
-                        TestMethod: null,
+                        PreviousInspectionReport: "",
+                        TestMethod: "",
                         ExpiryDate: null,
                         InspectionType: null,
-                        InspectionType_Name: null,
-                        CalibratedTestEquipment: null,
-                        ClientTestEquipment: null,
+                        InspectionType_Name: "",
+                        CalibratedTestEquipment: "",
+                        ClientTestEquipment: "",
                         TestDate: null,
                         InspectionInformation: {},
-                        Finding: null,
-                        CriticalFinding: null,
-                        TargetDateOfClosure: currentDate,
-                        TargetDateOfClosure1: currentDate,
-                        OtherRemarks: null,
+                        Finding: "",
+                        CriticalFinding: "",
+                        TargetDateOfClosure: "",
+                        TargetDateOfClosure1: "",
+                        OtherRemarks: "",
                         Attachment: [],
                     })
                     setFieldsWithStructure([])
@@ -670,11 +665,11 @@ export default function InspDetails({
                     ClientTestEquipment: null,
                     TestDate: null,
                     InspectionInformation: {},
-                    Finding: null,
-                    CriticalFinding: null,
-                    TargetDateOfClosure: currentDate,
-                    TargetDateOfClosure1: currentDate,
-                    OtherRemarks: null,
+                    Finding: '',
+                    CriticalFinding: '',
+                    TargetDateOfClosure: "",
+                    TargetDateOfClosure1: "",
+                    OtherRemarks: '',
                     Attachment: [],
                 })
                 setFieldsWithStructure([])
@@ -717,14 +712,14 @@ export default function InspDetails({
 
 
 
-            //  const response = await gettagdetails({id:detailPageId,tagId:menuObj?.TagId ,languageId:currentLanguage})
+            
             const response = await getInspectionDetails({ id: detailPageId })
 
             if (response.status == "Success") {
 
-
+                
                 const result = JSON.parse(response?.result)
-
+                
 
                 let updatedData = {
                     ...formData,
@@ -1303,6 +1298,7 @@ export default function InspDetails({
                                         userAction={userAction}
                                         // fetchDetailTagInfo={fetchDetailTagInfo}
                                         detailScreeniId={formData.iId}
+                                       
                                     />
                                 );
 
@@ -1342,7 +1338,7 @@ export default function InspDetails({
                         setFormData={setFormData}
                         // currentLanguageName={currentLanguageName}
                         // menuObj={menuObj}
-                        disabledDetailed={menuId == 31 ? true : false}
+                        disabledDetailed={menuId == 31 || menuId == 30  ? true : false}
                         detailPageId={formData.Id}
                         // handleTagSwitch={!preview ? handleTagSwitch : false}
                         dbTagAttachmentDetails={dbTagAttachmentDetails}
@@ -1357,7 +1353,7 @@ export default function InspDetails({
                         <img
                             src={formData?.ClientSignPath}
                             alt="Thumbnail"
-                            style={{ cursor: "pointer", width: "50px", height: "50px" }}
+                            style={{ cursor: "pointer", width: "50px", height: "50px",border: `1px solid #000` }}
                             onClick={handleImageClickSign}
                         />
                     ) : (

@@ -27,8 +27,6 @@ import sangsolution from "/Images/CSSC_logo-new.png";
 import Loader from "../Loader/Loader";
 import { securityApis } from "../../service/Security/security";
 import ConfirmationAlert from "../Alerts/ConfirmationAlert";
-import { set } from "lodash";
-import { getScreen } from "../../config";
 
 function Header() {
   const navigate = useNavigate();

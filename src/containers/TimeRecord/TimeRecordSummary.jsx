@@ -323,7 +323,7 @@ export default function TimeRecordSummary({
         pageSize: 0,
         search: "",
       });
-      const excludedFields = ["Id"];
+      const excludedFields = ["Id","ModifiedBy","ModifiedOn"];
       const filteredRows = JSON.parse(response?.result)?.Data;
 
       await ExcelExport({

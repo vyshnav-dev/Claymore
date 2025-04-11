@@ -6,12 +6,8 @@ import ActionButton from "../../component/Buttons/ActionButton";
 import { useAlert } from "../../component/Alerts/AlertContext";
 import SummaryTable from "../../component/Table/SummaryTable";
 import { primaryColor } from "../../config/config";
-import ConfirmationAlert from "../../component/Alerts/ConfirmationAlert";
-import { masterApis } from "../../service/Master/master";
 // import MasterProductConfirmation from "./MasterProductConfirmation";
 import ExcelExport from "../../component/Excel/Excel";
-import { identity } from "lodash";
-import { summaryData } from "../../config";
 import NormalModal from "../../component/Modal/NormalModal";
 import AllocationModal from "./AllocationModal";
 import { allocationApis } from "../../service/Allocation/allocation";
@@ -265,7 +261,7 @@ export default function AllocationSummary({
         pageSize: 0,
         search: "",
       });
-      const excludedFields = ["Id"];
+      const excludedFields = ["Id","ModifiedBy","ModifiedOn"];
       const filteredRows = JSON.parse(response?.result)?.Data;
 
       await ExcelExport({

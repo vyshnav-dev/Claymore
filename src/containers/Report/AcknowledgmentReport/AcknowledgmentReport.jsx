@@ -23,8 +23,7 @@ import NormalButton from "../../../component/Buttons/NormalButton";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { allocationApis } from "../../../service/Allocation/allocation";
 import UserAutoComplete from "../../../component/AutoComplete/UserAutoComplete";
-import AutoSelect from "../../../component/AutoComplete/AutoSelect";
-const currentDate = new Date().toISOString().split("T")[0];
+const currentDate = new Date().toLocaleDateString("en-CA");
 const suggestionType = [
     { Id: 1, Name: "Reconciliation Date" },
     { Id: 2, Name: "Doc Date" },

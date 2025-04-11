@@ -1,4 +1,4 @@
-import { baseUrlMob } from "../../config/config";
+
 import { baseApis } from "../ApiInterceptors/interceptorApi";
 
 const inspectionApis = () => {

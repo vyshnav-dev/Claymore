@@ -2,17 +2,9 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import "./checkbox.css"
 import SearchBox from './SearchBox';
 import { Typography } from '@mui/material';
-// import { tagsApis } from '../../../../services/tags/tagsApi';
 import Loader from '../../component/Loader/Loader';
-import { multiData } from '../../config';
 
-function MultiCheckBox({ formData, setFormData, tagId, sFieldName, label, isMandatory, disabled, objectName, tag_getbusinessentitysummary, userData }) {
-
-  //Tag page Apis
-  //  const { gettaglist } = tagsApis();
-
-
-
+function MultiCheckBox({ formData, setFormData, sFieldName, label, isMandatory, disabled, objectName, tag_getbusinessentitysummary, userData }) {
 
   const [companyList, setcompanyList] = useState([]);
   const [changesTriggered, setchangesTriggered] = useState(false);

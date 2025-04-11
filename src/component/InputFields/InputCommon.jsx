@@ -950,72 +950,35 @@ export default function InputCommon({
               autoComplete: autoCompleteValue,
               ...(type == InputType.date
                 ? {
-                  min: minDate,
-                  max: maxDate,
-                  onKeyDown: (e) => {
-                    // Prevent default only for keys other than Tab
-                    if (e.key !== "Tab") {
-                      e.preventDefault();
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        // Open picker on Enter or Space key
-                        e.target.showPicker?.();
-                      }
-                    }
-                  },
-
-                  onFocus: (e) => e.target.showPicker?.(),
-                }
+                    min: minDate,
+                    max: maxDate,
+                    // Remove onKeyDown, onClick, and onFocus handlers
+                  }
                 : type == InputType.time
-                  ? {
-                    step: 1, // Allows time input in HH:mm:ss format
-                    onKeyDown: (e) => {
-                      // Prevent default only for keys other than Tab
-                      if (e.key !== "Tab") {
-                        e.preventDefault();
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          // Open picker on Enter or Space key
-                          e.target.showPicker?.();
-                        }
+                ? {
+                    step: 1,
+                    // Remove onKeyDown and onFocus handlers
+                  }
+                : type == InputType.datetime
+                ? {
+                    step: 1,
+                    // Remove onKeyDown and onFocus handlers
+                    min: minDateTime || undefined,
+                    max: maxDateTime || undefined,
+                  }
+                : [InputType.numeric, InputType.tinyinteger, InputType.smallinteger, InputType.integer, InputType.biginteger].includes(type)
+                ? {
+                    onFocus: (e) => {
+                      if (parseFloat(e.target.value) === 0) {
+                        setInputValue("");
+                        requestAnimationFrame(() => e.target.setSelectionRange(0, 0));
                       }
                     },
-
-                    onFocus: (e) => e.target.showPicker?.(),
                   }
-                  : type == InputType.datetime
-                    ? {
-                      step: 1, // For precise datetime input including seconds
-                      onKeyDown: (e) => {
-                        // Disable manual typing for datetime fields
-                        if (e.key !== "Tab") {
-                          e.preventDefault();
-                          if (e.key === 'Enter' || e.key === ' ') {
-                            // Open picker on Enter or Space key
-                            e.target.showPicker?.();
-                          }
-                        }
-
-                      },
-                      onFocus: (e) => e.target.showPicker?.(),
-                      min: minDateTime || undefined, // Set min to restrict future dates
-                      max: maxDateTime || undefined, // Set max if needed for past dates
-                    }
-                    : [InputType.numeric, InputType.tinyinteger, InputType.smallinteger, InputType.integer, InputType.biginteger].includes(type)
-                      ? {
-                        onFocus: (e) => {
-
-
-                          // If the field is numeric and its current value is "0" or "0.00", clear it
-                          if (parseFloat(e.target.value) === 0) {
-                            setInputValue("");
-                            // Force cursor to the start
-                            requestAnimationFrame(() => e.target.setSelectionRange(0, 0));
-                          }
-                        },
-                      }
-                      : {}),
+                : {}),
               style: {
-                direction: type == InputType.text ? direction : "ltr", // Default to LTR if direction is not found
-                fontFamily: "inherit", // Default to inherit if fontFamily is not found
+                direction: type == InputType.text ? direction : "ltr",
+                fontFamily: "inherit",
               },
             },
             endAdornment:
@@ -1034,17 +997,17 @@ export default function InputCommon({
                   </IconButton>
                 </InputAdornment>
               ) : null,
-            sx: {
-              '& input[type="date"]::-webkit-calendar-picker-indicator': {
-                filter: "invert(0)",
+              sx: {
+                '& input[type="date"]::-webkit-calendar-picker-indicator': {
+                  filter: "invert(0)",
+                },
+                '& input[type="datetime-local"]::-webkit-calendar-picker-indicator': {
+                  filter: "invert(0)",
+                },
+                '& input[type="time"]::-webkit-calendar-picker-indicator': {
+                  filter: "invert(0)",
+                },
               },
-              '& input[type="datetime-local"]::-webkit-calendar-picker-indicator': {
-                filter: "invert(0)",
-              },
-              '& input[type="time"]::-webkit-calendar-picker-indicator': {
-                filter: "invert(0)", // Ensures visibility in dark mode
-              },
-            },
           }}
           InputLabelProps={{
             shrink: type == InputType.password && value ? true : undefined, // Shrink the label if it's a password field and has a value

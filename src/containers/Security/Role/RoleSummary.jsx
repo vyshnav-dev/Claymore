@@ -309,7 +309,7 @@ export default function RoleSummary({ setPageRender, setId, userAction }) {
         },
         "role/getrolesummary"
       );
-      const excludedFields = ["Id"];
+      const excludedFields = ["Id","ModifiedBy","ModifiedOn"];
       const filteredRows = JSON.parse(response?.result)?.Data;
 
       await ExcelExport({

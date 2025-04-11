@@ -171,8 +171,11 @@ export default function ReportSummary(props) {
     setSearchTerm("")
   }, [props.changesTriggered]);
 
+  
+
   //To convert date and time to dd/mm/yyyy format
   const convertToLocaleDateString = (dateString) => {
+    
     if (!dateString) return ""; // Return an empty string for null or undefined values
     const date = new Date(dateString);
     if (isNaN(date)) return dateString; // If date is invalid, return the original string

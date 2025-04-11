@@ -1,7 +1,7 @@
 import React from 'react';
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
-import { profileDateFields, rowsPerSheet } from '../../config/config';
+import { profileDateFields, rowsPerSheet,transactionDateTimeFields,reportDateFields} from '../../config/config';
 
 const ExcelExport = async ({ reportName, filteredRows, excludedFields}) => {
 
@@ -20,6 +20,20 @@ const ExcelExport = async ({ reportName, filteredRows, excludedFields}) => {
         const year = localDate.getFullYear();
         
         return `${day}-${month}-${year}`;
+      };
+
+      const convertToLocaleDateTimeString = (dateString) => {
+        if (!dateString) return "";
+        const date = new Date(dateString);
+        if (isNaN(date)) return dateString;
+        const localDateTime = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+        const day = String(localDateTime.getDate()).padStart(2, "0");
+        const month = String(localDateTime.getMonth() + 1).padStart(2, "0");
+        const year = localDateTime.getFullYear();
+        const hours = String(localDateTime.getHours()).padStart(2, "0");
+        const minutes = String(localDateTime.getMinutes()).padStart(2, "0");
+        const seconds = String(localDateTime.getSeconds()).padStart(2, "0");
+        return `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
       };
       
   function columnIndexToLetter(columnIndex) {
@@ -68,16 +82,41 @@ const ExcelExport = async ({ reportName, filteredRows, excludedFields}) => {
   createNewSheet();
 
  // Add the data
- filteredRows.forEach((row) => {
-    if (currentRowCount >= rowsPerSheet) {
-      createNewSheet();
-    }
-    const rowData = Object.keys(filteredRows[0])
-      .filter(header => !excludedFields.includes(header))
-      .map((header) => profileDateFields.includes(header) ? formatDate(row[header]) : row[header]) || '';
-    sheet.addRow(rowData);
-    currentRowCount++;
-  });
+//  filteredRows.forEach((row) => {
+//     if (currentRowCount >= rowsPerSheet) {
+//       createNewSheet();
+//     }
+//     const rowData = Object.keys(filteredRows[0])
+//       .filter(header => !excludedFields.includes(header))
+//       .map((header) => profileDateFields.includes(header) ? formatDate(row[header]) : row[header]) || '';
+//     sheet.addRow(rowData);
+//     currentRowCount++;
+//   });
+
+
+// Add the data
+filteredRows.forEach((row) => {
+  if (currentRowCount > rowsPerSheet) {
+    createNewSheet();
+  }
+  const rowData = Object.keys(filteredRows[0])
+    .filter(header => !excludedFields.includes(header))
+    .map((header) => {
+      if (profileDateFields.includes(header)) {
+        return formatDate(row[header]);
+      } else if (transactionDateTimeFields.includes(header)) {
+        return convertToLocaleDateTimeString(row[header]);
+      }else if (reportDateFields.includes(header)) {
+        return formatDate(row[header]);
+      } else {
+        return row[header];
+      }
+    }) || '';
+  sheet.addRow(rowData);
+  currentRowCount++;
+});
+
+
 
   // Write to a buffer and then save using FileSaver
   const formatDateTimeForFilename = () => {

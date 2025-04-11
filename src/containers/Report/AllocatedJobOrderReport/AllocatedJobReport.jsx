@@ -24,11 +24,8 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { allocationApis } from "../../../service/Allocation/allocation";
 import UserAutoComplete from "../../../component/AutoComplete/UserAutoComplete";
 import AutoSelect from "../../../component/AutoComplete/AutoSelect";
-const currentDate = new Date().toISOString().split("T")[0];
-const suggestionType = [
-    { Id: 1, Name: "Reconciliation Date" },
-    { Id: 2, Name: "Doc Date" },
-];
+const currentDate = new Date().toLocaleDateString("en-CA");
+
 function CustomTabPanel(props) {
     const { children, value, index, ...other } = props;
 

@@ -297,8 +297,7 @@ export default function AckTable({
                         {key.id === "Finding" || key.id === "CriticalFindings" ? (
                           <Checkbox
                             checked={Boolean(row[key.id])}
-                            sx={{ padding: "0px" }}
-
+                            sx={{ padding: "0px",m:0  }}
                           />
                         ) : (
                           row[key.id]

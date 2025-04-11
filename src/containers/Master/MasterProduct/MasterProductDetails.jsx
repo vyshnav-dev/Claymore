@@ -30,7 +30,6 @@ import {
 import UserInputField from "../../../component/InputFields/UserInputField";
 import { masterApis } from "../../../service/Master/master";
 import AutoSelect from "../../../component/AutoComplete/AutoSelect";
-const currentDate = new Date().toISOString().split("T")[0];
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
 

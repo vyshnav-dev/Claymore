@@ -7,11 +7,7 @@ import { useAlert } from "../../component/Alerts/AlertContext";
 import SummaryTable from "../../component/Table/SummaryTable";
 import { primaryColor } from "../../config/config";
 import ConfirmationAlert from "../../component/Alerts/ConfirmationAlert";
-import { masterApis } from "../../service/Master/master";
-// import MasterProductConfirmation from "./MasterProductConfirmation";
 import ExcelExport from "../../component/Excel/Excel";
-import { identity } from "lodash";
-import { summaryData } from "../../config";
 import { inspectionApis } from "../../service/Inspection/inspection";
 
 function BasicBreadcrumbs() {
@@ -326,11 +322,12 @@ export default function AckSummary({
   const handleExcelExport = async () => {
     try {
       const response = await getAcknowledgementSummary({
+        allocation:Id,
         pageNumber: 0,
         pageSize: 0,
         search: "",
       });
-      const excludedFields = ["Id"];
+      const excludedFields = ["Id","ModifiedBy","ModifiedOn"];
       const filteredRows = JSON.parse(response?.result)?.Data;
 
       await ExcelExport({

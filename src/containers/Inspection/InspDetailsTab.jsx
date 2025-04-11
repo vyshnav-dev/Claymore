@@ -5,7 +5,7 @@ import AutoSelect from '../../component/AutoComplete/AutoSelect'
 import TagAutoSelect from '../../component/Select/TagAutoSelect'
 
 export default function InspDetailsTab({formData,setFormData}) {
-    const currentDate = new Date().toISOString().split("T")[0];
+    const currentDate = new Date().toLocaleDateString("en-CA");
   return (
     
     <Box sx={{
