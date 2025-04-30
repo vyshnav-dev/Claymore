@@ -90,14 +90,7 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
           iconName={"excel"}
         />
       )}
-      {/* {userAction.some((action) => action.Action === "Delete") && (
-        <ActionButton
-          iconsClick={iconsClick}
-          icon={"trash"}
-          caption={"Delete"}
-          iconName={"delete"}
-        />
-      )} */}
+      
       {!hasEditAction &&
         userAction.some((action) => action.Action === "View") && (
           <ActionButton
@@ -323,7 +316,7 @@ export default function TimeRecordSummary({
         pageSize: 0,
         search: "",
       });
-      const excludedFields = ["Id","ModifiedBy","ModifiedOn"];
+      const excludedFields = ["Id","ModifiedBy","ModifiedOn","Status"];
       const filteredRows = JSON.parse(response?.result)?.Data;
 
       await ExcelExport({

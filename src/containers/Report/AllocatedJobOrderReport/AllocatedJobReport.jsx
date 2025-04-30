@@ -433,7 +433,7 @@ export default function AllocatedJobReport({ userAction, disabledDetailed }) {
                                     required={false}
                                     label={"Status"}
                                     ColumnSpan={0}
-                                    Menu={[{ "Id": 1, "Name": "Allocated" }, { "Id": 2, "Name": "Working" }, { "Id": 3, "Name": "Closed" }]}
+                                    Menu={[{ "Id": 1, "Name": "Allocated" }, { "Id": 2, "Name": "Working" }, { "Id": 3, "Name": "Completed" }]}
 
                                 />
 

@@ -1,23 +1,14 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, useTheme, Typography, Dialog, DialogTitle, DialogContent, DialogActions, Tooltip, Stack, Popover, Checkbox, FormControl, RadioGroup, FormControlLabel, Radio } from '@mui/material';
-import { MDBCardBody, MDBCol, MDBIcon } from 'mdb-react-ui-kit';
-import { useEffect } from 'react';
-import { IconButton, Menu, MenuItem } from '@mui/material';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-
 import InputCommon from '../../component/InputFields/InputCommon';
-// import ConfirmationAlert2 from '../../../component/Alerts/ConfirmationAlert2';
 import Loader from '../../component/Loader/Loader';
-import AutoComplete from '../../component/AutoComplete/AutoComplete';
 import { secondaryColor, thirdColor } from '../../config/config';
-import { useAlert } from '../../component/Alerts/AlertContext';
-// import { ItemSelectionPopup } from './ItemSelectionPopup';
 
 
 
 const InspBodyTable = ({ fields, tableData, settableData, Batch, setBatch, preview = false, language = "english", languageId = 1, typeName }) => {
 
-    
+
     const [loading, setloading] = useState(false)
 
 
@@ -43,7 +34,7 @@ const InspBodyTable = ({ fields, tableData, settableData, Batch, setBatch, previ
         color: "white",
         paddingTop: "3px",
         paddingBottom: "3px",
-        textAlign:'center'
+        textAlign: 'center'
     }), [
 
     ]);
@@ -60,8 +51,8 @@ const InspBodyTable = ({ fields, tableData, settableData, Batch, setBatch, previ
 
 
     const handleRowChange = (index, field, data) => {
-        
-        
+
+
         if (preview) {
             return
         }
@@ -71,10 +62,10 @@ const InspBodyTable = ({ fields, tableData, settableData, Batch, setBatch, previ
         settableData(prevRows => {
             const updatedRows = [...prevRows];
 
-             
-            if (field.FieldDisplayType == "check type"){
-                let newArray = updatedRows.find((item)=>item.Category_Name === typeName)
-                
+
+            if (field.FieldDisplayType == "check type") {
+                let newArray = updatedRows.find((item) => item.Category_Name === typeName)
+
                 const Data1 = [...newArray.Items]
                 Data1[index] = {
                     ...Data1[index],
@@ -82,18 +73,18 @@ const InspBodyTable = ({ fields, tableData, settableData, Batch, setBatch, previ
                 };
                 newArray = {
                     ...newArray,
-                    Items:Data1
+                    Items: Data1
                 }
-                let typeIndex = updatedRows.findIndex((item)=>item.Category_Name === typeName)
+                let typeIndex = updatedRows.findIndex((item) => item.Category_Name === typeName)
                 updatedRows[typeIndex] = {
                     ...newArray
                 };
             }
             else if (data) {
-                
+
                 const { name, value } = data
 
-                let newArray = updatedRows.find((item)=>item.Category_Name === typeName)
+                let newArray = updatedRows.find((item) => item.Category_Name === typeName)
                 const Data1 = [...newArray.Items]
                 Data1[index] = {
                     ...Data1[index],
@@ -101,21 +92,21 @@ const InspBodyTable = ({ fields, tableData, settableData, Batch, setBatch, previ
                 };
                 newArray = {
                     ...newArray,
-                    Items:Data1
+                    Items: Data1
                 }
-                
-                let typeIndex = updatedRows.findIndex((item)=>item.Category_Name === typeName)
+
+                let typeIndex = updatedRows.findIndex((item) => item.Category_Name === typeName)
                 updatedRows[typeIndex] = {
                     ...newArray
                 };
 
             }
             return updatedRows;
-            
-            
+
+
         });
     };
-   
+
 
 
     const sortedFields = useMemo(() => {
@@ -125,15 +116,15 @@ const InspBodyTable = ({ fields, tableData, settableData, Batch, setBatch, previ
 
         <Box sx={{
             // opacity: preview ? 0.5 : 1,
-            pointerEvents: preview ? 'none' : 'auto', 
-            overflowY:'auto'
+            pointerEvents: preview ? 'none' : 'auto',
+            overflowY: 'auto'
         }}>
 
 
 
             <>
                 <Loader loader={loading} />
-               
+
 
                 <Box
                     sx={{
@@ -159,7 +150,7 @@ const InspBodyTable = ({ fields, tableData, settableData, Batch, setBatch, previ
                             padding: "0px",
                             // width: "fit-content",
                             overflowY: "auto",
-                            width:"fit-Content"
+                            width: "fit-Content"
 
                         }}
 
@@ -170,9 +161,9 @@ const InspBodyTable = ({ fields, tableData, settableData, Batch, setBatch, previ
 
                                     {!preview && <TableCell sx={{ ...headerCellStyle, minWidth: "50px" }}> SI no</TableCell>}
                                     {sortedFields.map((field, idx) => {
-                                        
+
                                         return (
-                                            <TableCell  key={idx} sx={{ ...headerCellStyle, minWidth: "100px",maxWidth: "fit-Content" }}>
+                                            <TableCell key={idx} sx={{ ...headerCellStyle, minWidth: "100px", maxWidth: "fit-Content" }}>
                                                 {field.Caption}
                                             </TableCell>
                                         )
@@ -198,7 +189,7 @@ const InspBodyTable = ({ fields, tableData, settableData, Batch, setBatch, previ
                     </TableContainer>
                 </Box>
             </>
-            
+
 
         </Box>
 
@@ -261,58 +252,58 @@ const MemoizedTableRow = ({ row, index, rowClick, handleRowChange, bodyCell, fie
 
                 return (
                     <Box
-                            sx={{
-                              cursor: "pointer",
-                              border: "1px solid #ccc",
-                              padding: "0px",
-                              borderRadius: "4px",
-                              display:'flex',
-                              justifyContent:'center',
-                              width: field.RowSpan ? `${250 * field.RowSpan}px` : "100%",
-                              minWidth:field.RowSpan ? `${250 * field.RowSpan}px` : "250px"
-                            }}
-                          >
-                            <FormControl>
-                              <RadioGroup
+                        sx={{
+                            cursor: "pointer",
+                            border: "1px solid #ccc",
+                            padding: "0px",
+                            borderRadius: "4px",
+                            display: 'flex',
+                            justifyContent: 'center',
+                            width: field.RowSpan ? `${250 * field.RowSpan}px` : "100%",
+                            minWidth: field.RowSpan ? `${250 * field.RowSpan}px` : "250px"
+                        }}
+                    >
+                        <FormControl>
+                            <RadioGroup
                                 row
                                 aria-labelledby="risk-radio-group-label"
                                 name={`${field.FieldName}-radio-group`}
-                              >
+                            >
                                 <FormControlLabel
-                                  value="S"
-                                  control={<Radio />}
-                                  label="S"
-                                  sx={radioButtonStyle}
-                                  checked={row[field.FieldName] === 1}
-                                  onChange={() => handleRowChange(index, field, 1)} // Pass updated value
+                                    value="S"
+                                    control={<Radio />}
+                                    label="S"
+                                    sx={radioButtonStyle}
+                                    checked={row[field.FieldName] === 1}
+                                    onChange={() => handleRowChange(index, field, 1)} // Pass updated value
                                 />
                                 <FormControlLabel
-                                  value="NS"
-                                  control={<Radio />}
-                                  label="NS"
-                                  sx={radioButtonStyle}
-                                  checked={row[field.FieldName] === 2}
-                                  onChange={() => handleRowChange(index, field, 2)} // Pass updated value
+                                    value="NS"
+                                    control={<Radio />}
+                                    label="NS"
+                                    sx={radioButtonStyle}
+                                    checked={row[field.FieldName] === 2}
+                                    onChange={() => handleRowChange(index, field, 2)} // Pass updated value
                                 />
                                 <FormControlLabel
-                                  value="NA"
-                                  control={<Radio />}
-                                  label="NA"
-                                  sx={radioButtonStyle}
-                                  checked={row[field.FieldName] === 3}
-                                  onChange={() => handleRowChange(index, field, 3)} // Pass updated value
+                                    value="NA"
+                                    control={<Radio />}
+                                    label="NA"
+                                    sx={radioButtonStyle}
+                                    checked={row[field.FieldName] === 3}
+                                    onChange={() => handleRowChange(index, field, 3)} // Pass updated value
                                 />
                                 <FormControlLabel
-                                  value="SE"
-                                  control={<Radio />}
-                                  label="SE"
-                                  sx={radioButtonStyle}
-                                  checked={row[field.FieldName] === 4}
-                                  onChange={() => handleRowChange(index, field, 4)} // Pass updated value
+                                    value="SE"
+                                    control={<Radio />}
+                                    label="SE"
+                                    sx={radioButtonStyle}
+                                    checked={row[field.FieldName] === 4}
+                                    onChange={() => handleRowChange(index, field, 4)} // Pass updated value
                                 />
-                              </RadioGroup>
-                            </FormControl>
-                          </Box>
+                            </RadioGroup>
+                        </FormControl>
+                    </Box>
                 );
 
 
@@ -327,16 +318,16 @@ const MemoizedTableRow = ({ row, index, rowClick, handleRowChange, bodyCell, fie
                             borderRadius: "4px",
                             display: 'flex',
                             justifyContent: 'start',
-                            width:"800px",
-                            maxWidth:  "800px",
+                            width: "800px",
+                            maxWidth: "800px",
                             overflowY: 'auto',
-                            scrollbarWidth:'none'
+                            scrollbarWidth: 'none'
                         }}
                     >
                         <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', width: '100%' }}>
-                        <Tooltip title={row.Name}  disableHoverListener={row.Name.length <= 110}>
-                        <Typography sx={{ fontSize: '14px' }}>{row.Name}</Typography>
-                        </Tooltip>
+                            <Tooltip title={row.Name} disableHoverListener={row.Name.length <= 110}>
+                                <Typography sx={{ fontSize: '14px' }}>{row.Name}</Typography>
+                            </Tooltip>
                         </label>
                     </Box>
                 )
@@ -357,14 +348,14 @@ const MemoizedTableRow = ({ row, index, rowClick, handleRowChange, bodyCell, fie
         >
             <TableCell
                 sx={{ ...bodyCell, minWidth: "30px", textAlign: "left", paddingLeft: "10px", width: "50px", position: "relative" }}
-                
+
             >
                 {row.SlNo}
 
             </TableCell>
 
             {fields.map((field, idx) => (
-                <TableCell key={idx} sx={{ ...bodyCell, paddingLeft: "0px",maxWidth: "fit-Content" }}>
+                <TableCell key={idx} sx={{ ...bodyCell, paddingLeft: "0px", maxWidth: "fit-Content" }}>
                     {renderCellContent(field, index)}
                 </TableCell>
             ))}

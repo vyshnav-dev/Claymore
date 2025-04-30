@@ -24,7 +24,7 @@ import {
 
 
 
-export default function AllocationModal({ handleCloseModal, selected, hardRefresh }) {
+export default function AllocationModal({ handleCloseModal, selected, hardRefresh, userAction }) {
 
     const headerCellStyle = {
         padding: "0px",
@@ -69,8 +69,8 @@ export default function AllocationModal({ handleCloseModal, selected, hardRefres
                 });
                 if (response?.status === "Success") {
                     const myObject = JSON.parse(response.result);
-                    
-                    
+
+
 
                     setMainDetails(myObject?.PendingJobOrderDetails);
                     setProducts(myObject?.ProductDetails)
@@ -113,7 +113,7 @@ export default function AllocationModal({ handleCloseModal, selected, hardRefres
         <>
             <DialogContent>
 
-                <Box sx={{ display: 'flex', flexDirection: 'column', flexWrap: 'wrap',minHeight:'350px' }} >
+                <Box sx={{ display: 'flex', flexDirection: 'column', flexWrap: 'wrap', minHeight: '350px' }} >
 
                     <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                         <UserInputField
@@ -153,7 +153,7 @@ export default function AllocationModal({ handleCloseModal, selected, hardRefres
                     </Box>
 
                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, maxHeight: '200px', minHeight: '200px' }}>
-                        <TableContainer component={Paper} sx={{  minHeight:'275px', maxWidth: '370px', overflowY: 'auto', mt: 2, scrollbarWidth: 'thin' }}>
+                        <TableContainer component={Paper} sx={{ minHeight: '275px', maxWidth: '370px', overflowY: 'auto', mt: 2, scrollbarWidth: 'thin' }}>
                             <Table stickyHeader size="small" sx={{ minWidth: '200px' }}>
                                 <TableHead>
                                     <TableRow>
@@ -184,12 +184,11 @@ export default function AllocationModal({ handleCloseModal, selected, hardRefres
                         <MultiCheckBox
                             key={'Technician'}
                             sFieldName={'Inspector'}
-                            label={'Technician'}
-                            // isMandatory={field?.Mandatory}
+                            label={'Technicians'}
+                            isMandatory={true}
                             formDataHeader={mainDetails}
                             key1={'Technician'}
                             //disabled={isDisabled}
-                            // tagId={field.LinkTag}'technition'
                             objectName="details"
                             formData={formData}
                             setFormData={setFormData}
@@ -205,8 +204,10 @@ export default function AllocationModal({ handleCloseModal, selected, hardRefres
 
             </DialogContent>
             <DialogActions>
+                {userAction.some((action) => action.Action === "Save") && (
+                    <NormalButton action={handleSave} label="Save" />
+                )}
                 <NormalButton action={handleCloseModal} label="Cancel" />
-                <NormalButton action={handleSave} label="Ok" />
             </DialogActions>
 
         </>

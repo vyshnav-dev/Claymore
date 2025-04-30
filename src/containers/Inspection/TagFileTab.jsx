@@ -14,7 +14,6 @@ import {
   TableRow,
   useTheme,
 } from "@mui/material";
-// import { tagsApis } from "../../../../services/tags/tagsApi";
 import { useEffect } from "react";
 import TagAccordions from "../../component/Accordion/Accordion";
 

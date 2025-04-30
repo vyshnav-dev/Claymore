@@ -6,7 +6,6 @@ import ActionButton from "../../component/Buttons/ActionButton";
 import { useAlert } from "../../component/Alerts/AlertContext";
 import SummaryTable from "../../component/Table/SummaryTable";
 import { primaryColor } from "../../config/config";
-// import MasterProductConfirmation from "./MasterProductConfirmation";
 import ExcelExport from "../../component/Excel/Excel";
 import NormalModal from "../../component/Modal/NormalModal";
 import AllocationModal from "./AllocationModal";
@@ -321,9 +320,8 @@ export default function AllocationSummary({
         <AllocationModal
           handleCloseModal={() => setAddMenu(false)}
           selected={Id}
-          // submitAction={fetchData}
-          treeRefresh={() => setTreeKey((prevKey) => prevKey + 1)}
           hardRefresh={hardRefresh}
+          userAction={userAction}
         />
       </NormalModal>
       </Box>

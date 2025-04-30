@@ -20,14 +20,7 @@ import {
   thirdColor,
 } from "../../../config/config";
 import TableInputes from "../../../component/InputFields/TableInputes";
-import TableProductAutoComplete from "../../../component/AutoComplete/TableProductAutoComplete";
-import TableBinAutoComplete from "../../../component/AutoComplete/TableBinAutoComplete";
-import TableUnitAutoComplete from "../../../component/AutoComplete/TableUnitAutoComplete";
-import NormalModal from "../../../component/Modal/NormalModal";
 import { useAlert } from "../../../component/Alerts/AlertContext";
-import TableAutoComplete from "../../../component/AutoComplete/TableAutoComplete";
-import ChecKBoxLabel from "../../../component/CheckBox/CheckBoxLabel";
-import TableChecKBox from "../../../component/CheckBox/TableCheckBox";
 import MasterUnitTableAutoComplete from "../../../component/AutoComplete/MasterAutoComplete/MasterUnitTableAutoComplete";
 import AutoSelectNoHeader from "../../../component/AutoComplete/AutoSelectNoHeader";
 

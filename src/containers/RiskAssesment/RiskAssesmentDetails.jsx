@@ -3,17 +3,7 @@ import {
     Box,
     Stack,
     Button as ButtonM,
-    useTheme,
-    useMediaQuery,
     Typography,
-    TableCell,
-    Table,
-    TableHead,
-    TableRow,
-    TableContainer,
-    IconButton,
-    Paper,
-    TableBody,
 } from "@mui/material";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
 import PropTypes from "prop-types";
@@ -49,29 +39,7 @@ function CustomTabPanel(props) {
         </div>
     );
 }
-const headerCellStyle = {
-    padding: "0px 4px",
-    border: `1px solid #ddd`,
-    fontWeight: "600",
-    fontSize: "14px",
-    color: "white",
-};
 
-const bodyCellStyle = {
-    border: `1px solid #ddd`,
-    whiteSpace: "nowrap",
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-    fontSize: "12px",
-};
-
-const iconsExtraSx = {
-    fontSize: "0.8rem",
-    padding: "0.4rem",
-    "&:hover": {
-        backgroundColor: thirdColor,
-    },
-};
 
 const visibleHeaders = ["Name"];
 
@@ -134,16 +102,7 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction }) => {
                 scrollbarWidth: "thin",
             }}
         >
-            {/* {userAction.some(
-                (action) => action.Action === "New" && detailPageId !== 0
-            ) && (
-                    <ActionButton
-                        iconsClick={iconsClick}
-                        icon={"fa-solid fa-plus"}
-                        caption={"New"}
-                        iconName={"new"}
-                    />
-                )} */}
+           
             {userAction.some(
                 (action) =>
                     (action.Action === "New" && detailPageId === 0) ||
@@ -156,18 +115,7 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction }) => {
                         iconName={"save"}
                     />
                 )}
-            {/* {userAction.some((action) => action.Action === "Delete") && (
-                <>
-                    {detailPageId != 0 ? (
-                        <ActionButton
-                            iconsClick={iconsClick}
-                            icon={"trash"}
-                            caption={"Delete"}
-                            iconName={"delete"}
-                        />
-                    ) : null}
-                </>
-            )} */}
+            
 
 
             {userAction.some((action) => action.Action === "View" || action.Action === "Edit") && (
@@ -856,7 +804,7 @@ export default function RiskAssesmentDetails({
                         },
                     }} >
 
-                        <UserAutoComplete
+                        {/* <UserAutoComplete
                             apiKey={getAssignjoborderlist}
                             formData={mainDetails}
                             setFormData={setMainDetails}
@@ -867,6 +815,16 @@ export default function RiskAssesmentDetails({
                             formDataiId={"Allocation"}
                             criteria={1}
                             disable={isGet}
+                        /> */}
+                        <UserInputField
+                            label={"Job Order No"}
+                            name={"JobOrderNo"}
+                            type={"text"}
+                            disabled={true}
+                            mandatory={true}
+                            value={mainDetails}
+                            setValue={setMainDetails}
+                            maxLength={100}
                         />
                         <UserInputField
                             label={"Client"}

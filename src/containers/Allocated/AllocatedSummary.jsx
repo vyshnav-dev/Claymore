@@ -402,6 +402,7 @@ export default function AllocatedSummary({
           handleCloseModal={() => setAddMenu(false)}
           selected={Id}
           hardRefresh={hardRefresh}
+          userAction={userAction}
         />
       </NormalModal>
         {/* <MasterProductConfirmation

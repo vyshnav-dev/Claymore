@@ -7,10 +7,7 @@ import { useAlert } from "../../component/Alerts/AlertContext";
 import SummaryTable from "../../component/Table/SummaryTable";
 import { primaryColor } from "../../config/config";
 import ConfirmationAlert from "../../component/Alerts/ConfirmationAlert";
-import { masterApis } from "../../service/Master/master";
-// import MasterProductConfirmation from "./MasterProductConfirmation";
 import ExcelExport from "../../component/Excel/Excel";
-import { identity } from "lodash";
 import { inspectionApis } from "../../service/Inspection/inspection";
 
 function BasicBreadcrumbs() {
@@ -86,14 +83,7 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
           iconName={"excel"}
         />
       )}
-      {/* {userAction.some((action) => action.Action === "Delete") && (
-        <ActionButton
-          iconsClick={iconsClick}
-          icon={"trash"}
-          caption={"Delete"}
-          iconName={"delete"}
-        />
-      )} */}
+      
       {!hasEditAction &&
         userAction.some((action) => action.Action === "View") && (
           <ActionButton

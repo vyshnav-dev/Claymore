@@ -313,7 +313,7 @@ export default function AckMainSummary({
         pageSize: 0,
         search: "",
       });
-      const excludedFields = ["Id","ModifiedBy","ModifiedOn"];
+      const excludedFields = ["Id","ModifiedBy","ModifiedOn","Status"];
       const filteredRows = JSON.parse(response?.result)?.Data;
 
       await ExcelExport({

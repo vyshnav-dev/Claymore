@@ -3,18 +3,7 @@ import {
     Box,
     Stack,
     Button as ButtonM,
-    useTheme,
-    useMediaQuery,
     Typography,
-    TableCell,
-    Table,
-    TableHead,
-    TableRow,
-    TableContainer,
-    IconButton,
-    Paper,
-    TableBody,
-    Tooltip,
     Switch,
 } from "@mui/material";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
@@ -25,19 +14,14 @@ import ConfirmationAlert from "../../component/Alerts/ConfirmationAlert";
 import ActionButton from "../../component/Buttons/ActionButton";
 import { useAlert } from "../../component/Alerts/AlertContext";
 import {
-    logoImage,
     primaryColor,
     secondaryColor,
-    thirdColor,
 } from "../../config/config";
 import UserInputField from "../../component/InputFields/UserInputField";
 import ChecKBoxLabel from "../../component/CheckBox/CheckBoxLabel";
-import NoteAltIcon from "@mui/icons-material/NoteAlt";
 import ImageModal from "../../component/Modal/ImageModal";
 import { inspectionApis } from "../../service/Inspection/inspection";
-import UserAutoComplete from "../../component/AutoComplete/UserAutoComplete";
 import { allocationApis } from "../../service/Allocation/allocation";
-import StaticTable from "../Home/StaticTable";
 import TimeRecordTable from "./TimeRecordTable";
 import ImageNotSupportedIcon from '@mui/icons-material/ImageNotSupported';
 
@@ -139,18 +123,7 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction }) => {
                         iconName={"save"}
                     />
                 )}
-            {/* {userAction.some((action) => action.Action === "Delete") && (
-                <>
-                    {detailPageId != 0 ? (
-                        <ActionButton
-                            iconsClick={iconsClick}
-                            icon={"trash"}
-                            caption={"Delete"}
-                            iconName={"delete"}
-                        />
-                    ) : null}
-                </>
-            )} */}
+            
             {userAction.some((action) => action.Action === "View" || action.Action === "Edit") && (
                 <>
                     {detailPageId != 0 ? (
@@ -764,7 +737,6 @@ export default function TimeRecordDetails({
                             flexDirection: "row", // Changed from center to flex-start
                             padding: 1,
                             gap: "50px",
-
                             flexWrap: "wrap",
                             "@media (max-width: 768px)": {
                                 gap: "10px", // Reduced width for small screens

@@ -10,8 +10,6 @@ import {
   MDBModalFooter,
 } from "mdb-react-ui-kit";
 import { Typography, useTheme } from "@mui/material";
-// import { masterApis } from "../../../service/Master/master";
-// import ChecKBoxLabel from "../../../component/CheckBox/CheckBoxLabel";
 import UserInputField from "../../component/InputFields/UserInputField";
 
 export default function ApproveConfirmation({

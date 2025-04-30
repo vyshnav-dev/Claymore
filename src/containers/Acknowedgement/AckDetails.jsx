@@ -3,18 +3,8 @@ import {
     Box,
     Stack,
     Button as ButtonM,
-    useTheme,
-    useMediaQuery,
     Typography,
-    TableCell,
-    Table,
-    TableHead,
-    TableRow,
-    TableContainer,
-    IconButton,
-    Paper,
-    TableBody,
-    Button,
+   
 } from "@mui/material";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
 import PropTypes from "prop-types";
@@ -28,7 +18,6 @@ import {
     secondaryColor,
     thirdColor,
 } from "../../config/config";
-import UserInputField from "../../component/InputFields/UserInputField";
 import { inspectionApis } from "../../service/Inspection/inspection";
 import { allocationApis } from "../../service/Allocation/allocation";
 import ImageNotSupportedIcon from '@mui/icons-material/ImageNotSupported';
@@ -157,18 +146,7 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction }) => {
                     ) : null}
                 </>
             )}
-            {/* {userAction.some((action) => action.Action === "Delete") && (
-                <>
-                    {detailPageId != 0 ? (
-                        <ActionButton
-                            iconsClick={iconsClick}
-                            icon={"trash"}
-                            caption={"Delete"}
-                            iconName={"delete"}
-                        />
-                    ) : null}
-                </>
-            )} */}
+            
 
 
 

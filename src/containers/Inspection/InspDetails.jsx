@@ -101,7 +101,7 @@ function BasicBreadcrumbs() {
 const DefaultIcons = ({ iconsClick, detailPageId, userAction, certify, isSave, menuId }) => {
 
 
-    const hasAproove = userAction.some((action) => action.Action == "Authorise");
+    const hasAproove = userAction.some((action) => action.Action == "Authorize");
     return (
         <Box
             sx={{
@@ -421,7 +421,7 @@ export default function InspDetails({
     menuId,
     menuLabel
 }) {
-  
+
 
     const [formData, setFormData] = useState({
         Id: null,
@@ -559,7 +559,7 @@ export default function InspDetails({
                 })
                 if (response.status == "Success") {
                     let fieldsData = JSON.parse(response?.result);
-                    
+
                     setViewFields(fieldsData)
 
 
@@ -712,14 +712,14 @@ export default function InspDetails({
 
 
 
-            
+
             const response = await getInspectionDetails({ id: detailPageId })
 
             if (response.status == "Success") {
 
-                
+
                 const result = JSON.parse(response?.result)
-                
+
 
                 let updatedData = {
                     ...formData,
@@ -842,7 +842,7 @@ export default function InspDetails({
         if (detailPageId == 0) {
             setPageRender(1);
         }
-        else if(menuLabel == 'Acknowedgement'){
+        else if (menuLabel == 'Acknowedgement') {
             setId(backId)
             setPageRender(3);
         }
@@ -1085,7 +1085,25 @@ export default function InspDetails({
             const response = await upsertApprove(saveData);
             if (response?.status === "Success") {
                 showAlert("success", response?.message);
-                handleclose();
+                if (response?.result
+                    == '2' || response?.result
+                    == '4') {
+                    setCertify(2)
+                    setIsSave(true);
+                }
+                else if (response?.result
+                    == '7' || response?.result
+                    == '6') {
+                    if (response?.result
+                        == '7') {
+                        setIsSave(true);
+                    }
+                    setCertify(0)
+                }
+                else {
+                    setCertify(1)
+                }
+                // handleclose();
                 setMainDetails1({})
             }
         } catch (error) {
@@ -1122,7 +1140,7 @@ export default function InspDetails({
     };
 
 
-    
+
 
     return (
         <Box sx={{ display: "flex", flexDirection: "column", width: "100%", position: 'relative' }}>
@@ -1298,7 +1316,7 @@ export default function InspDetails({
                                         userAction={userAction}
                                         // fetchDetailTagInfo={fetchDetailTagInfo}
                                         detailScreeniId={formData.iId}
-                                       
+
                                     />
                                 );
 
@@ -1338,7 +1356,7 @@ export default function InspDetails({
                         setFormData={setFormData}
                         // currentLanguageName={currentLanguageName}
                         // menuObj={menuObj}
-                        disabledDetailed={menuId == 31 || menuId == 30  ? true : false}
+                        disabledDetailed={menuId == 31 || menuId == 30 ? true : false}
                         detailPageId={formData.Id}
                         // handleTagSwitch={!preview ? handleTagSwitch : false}
                         dbTagAttachmentDetails={dbTagAttachmentDetails}
@@ -1347,24 +1365,24 @@ export default function InspDetails({
 
 
                 </Box>
-                {menuId == 31 && 
-                    <Box sx={{ width:'100%', display: "flex",flexDirection: "column", alignItems: "end", p: 3 }}>
-                    {formData?.ClientSignPath ? (
-                        <img
-                            src={formData?.ClientSignPath}
-                            alt="Thumbnail"
-                            style={{ cursor: "pointer", width: "50px", height: "50px",border: `1px solid #000` }}
-                            onClick={handleImageClickSign}
-                        />
-                    ) : (
-                        <ImageNotSupportedIcon sx={{ color: secondaryColor }} />
-                    )}
-                    <Typography variant="body2" sx={{ mt: 1, color: "black",fontWeight:'bold' }}> {/* Adjust color as needed */}
-                        Client Sign
-                    </Typography>
-                </Box>
+                {menuId == 31 &&
+                    <Box sx={{ width: '100%', display: "flex", flexDirection: "column", alignItems: "end", p: 3 }}>
+                        {formData?.ClientSignPath ? (
+                            <img
+                                src={formData?.ClientSignPath}
+                                alt="Thumbnail"
+                                style={{ cursor: "pointer", width: "50px", height: "50px", border: `1px solid #000` }}
+                                onClick={handleImageClickSign}
+                            />
+                        ) : (
+                            <ImageNotSupportedIcon sx={{ color: secondaryColor }} />
+                        )}
+                        <Typography variant="body2" sx={{ mt: 1, color: "black", fontWeight: 'bold' }}> {/* Adjust color as needed */}
+                            Client Sign
+                        </Typography>
+                    </Box>
                 }
-                
+
 
             </Box>
 

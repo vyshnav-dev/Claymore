@@ -8,12 +8,6 @@ import CheckBoxTag from '../../component/CheckBox/CheckBoxTag';
 
 const TabFields = ({ formData,setFormData,fields, expanded, onChange,language,isAccordion=true ,disabledDetailed}) => {
 
-   //Tag page Apis
-//    const { gettagparentlist ,gettaglist,checktagexistence,gettaglanguageexistence,tag_getbusinessentitysummary,getmasterdata} = tagsApis();
-
-//    const { direction, fontFamily } = tagFieldLanguageDirection[language] || {};
-
-
   
     const handleChange = (field,data)=>{
       
@@ -67,36 +61,6 @@ const TabFields = ({ formData,setFormData,fields, expanded, onChange,language,is
       
     }
 
-    
-
-    
-   
-
-
-    // const handleOnBlur = (fieldName,value)=>{
-    //   if(disabledDetailed){
-    //     return
-    //   }
-     
-      
-    //  if(!value){
-    //   return
-    //  }
-      
-    //  if(fieldName == "Name"){
-    //   if(value == formData.detailName){
-    //     return
-    //   }
-    //   checkNameExistance(value,1)
-    //  }
-    //  else if(fieldName == "Code"){
-    //   if(value == formData.detailCode){
-    //     return
-    //   }
-    //   checkNameExistance(value,2)
-    //  }
-     
-    // }
     
     
     const sortedFields = [...fields].sort((a, b) => a.FieldOrder - b.FieldOrder);

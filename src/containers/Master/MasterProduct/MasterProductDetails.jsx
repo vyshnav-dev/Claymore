@@ -165,7 +165,7 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction }) => {
         </>
       )}
 
-      
+
       <ActionButton
         iconsClick={iconsClick}
         icon={"fa-solid fa-xmark"}
@@ -229,9 +229,9 @@ export default function MasterProductDetails({
       Id: detailPageId,
       Name: null,
       InspFrequency: 0,
-      Type: null,
-      Type_Name: null,
-      InspFrequency_Name:''
+      Type: 3,
+      Type_Name: 'Service',
+      InspFrequency_Name: ''
     });
 
     setDetailPageId(0);
@@ -239,7 +239,7 @@ export default function MasterProductDetails({
 
 
 
-  
+
 
   const handleIconsClick = async (value) => {
     switch (value.trim()) {
@@ -292,12 +292,12 @@ export default function MasterProductDetails({
     if (response.status === "Success") {
       showAlert("success", response?.message);
       handleNew();
-      const actionExists = userAction.some((action) => action.Action === "New");
-      if (!actionExists) {
-        setPageRender(1);
-      }
+      // const actionExists = userAction.some((action) => action.Action === "New");
+      // if (!actionExists) {
+      setPageRender(1);
+      // }
     }
-    else{
+    else {
       showAlert("info", response?.message);
     }
   };
@@ -343,8 +343,8 @@ export default function MasterProductDetails({
 
 
 
- 
- 
+
+
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
@@ -444,7 +444,7 @@ export default function MasterProductDetails({
               Menu={[{ "Id": 1, "Name": "Finished goods" }, { "Id": 2, "Name": "Raw material" }, { "Id": 3, "Name": "Service" }]}
 
             />
-            <AutoSelect
+            {/* <AutoSelect
               key={"InspFrequency"}
               formData={mainDetails}
               setFormData={setMainDetails}
@@ -457,7 +457,19 @@ export default function MasterProductDetails({
               // disabled={disabledDetailed}
               Menu={[{ "Id": 1, "Name": "6 Months" }, { "Id": 2, "Name": "12 Months" }]}
 
+            /> */}
+        
+        <UserInputField
+              label={"Inspection Frequency (Month)"}
+              name={"InspFrequency"}
+              type={"number"}
+              disabled={false}
+              mandatory={true}
+              value={mainDetails}
+              setValue={setMainDetails}
             />
+      
+            
 
 
           </Box>

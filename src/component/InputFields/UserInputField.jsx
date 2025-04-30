@@ -126,12 +126,13 @@ export default function UserInputField({
     !value[name] && (type === "date" || type === "datetime-local")
       ? placeholder || "YYYY-MM-DD"
       : placeholder;
+      
 
   return (
     <Tooltip
       title={value[name] || ""}
-      disableHoverListener={!value[name] || value[name]?.length <= tooltipThreshold}
-      disableFocusListener={!value[name] || value[name]?.length <= tooltipThreshold}
+      disableHoverListener={!value[name]|| value[name]?.length === undefined || value[name]?.length <= tooltipThreshold}
+      disableFocusListener={!value[name] || value[name]?.length === undefined || value[name]?.length <= tooltipThreshold}
       placement="top"
     >
       <span>

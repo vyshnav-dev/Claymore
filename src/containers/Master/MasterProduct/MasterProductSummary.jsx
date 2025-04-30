@@ -317,7 +317,7 @@ export default function MasterProductSummary({
         PageSize: 0,
         Search: '',
       });
-      const excludedFields = ["Id"];
+      const excludedFields = ["Id","ModifiedBy","ModifiedOn"];
       const filteredRows = JSON.parse(response?.result)?.Data;
 
       await ExcelExport({

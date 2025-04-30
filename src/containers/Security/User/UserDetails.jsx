@@ -27,11 +27,7 @@ import {
 import { securityApis } from "../../../service/Security/security";
 import UserInputField from "../../../component/InputFields/UserInputField";
 import UserAutoComplete from "../../../component/AutoComplete/UserAutoComplete";
-import UserAutoCompleteManual from "../../../component/AutoComplete/UserAutoCompleteManual";
-import AddIcon from "@mui/icons-material/Add";
-import RemoveIcon from "@mui/icons-material/Remove";
 import AutoSelect from "../../../component/AutoComplete/AutoSelect";
-import AutoComplete from "../../../component/AutoComplete/AutoComplete";
 import InputCommon from "../../../component/InputFields/InputCommon";
 
 import { encrypt } from "../../../service/Security/encryptionUtils";
@@ -278,6 +274,7 @@ export default function UserDetails({
     });
     setDetailPageId(0);
   };
+  
 
 
   const emailRegex =
@@ -329,7 +326,7 @@ export default function UserDetails({
           emptyFields.push("Valid Mobile Number");
         if (mainDetails.Phone && !/^[0-9]{10,15}$/.test(mainDetails.Phone))
           emptyFields.push("Valid Phone Number");
-        if (!mainDetails.signature_file)
+        if (!mainDetails.signature_preview)
           emptyFields.push("Signature");
         if (emptyFields.length > 0) {
           showAlert("info", `Please Provide ${emptyFields[0]}`);
@@ -743,7 +740,7 @@ export default function UserDetails({
               setFormData={setMainDetails}
               label={"Technicians"}
               autoId={"Inspector"}
-              required={false}
+              required={true}
               formDataName={"Inspector_Name"}
               formDataiId={"Inspector"}
               criteria={1}
@@ -790,6 +787,7 @@ export default function UserDetails({
               autoId={"TimeZone"}
               formDataName={"Timezone_Name"}
               formDataiId={"Timezone"}
+              required={true}
             />
 
 

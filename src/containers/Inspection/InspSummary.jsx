@@ -56,7 +56,7 @@ function BasicBreadcrumbs({ mId }) {
 const DefaultIcons = ({ iconsClick, userAction }) => {
 
   const hasEditAction = userAction?.some((action) => action.Action === "Edit");
-  const hasAproove = userAction.some((action) => action.Action == "Authorise");
+  const hasAproove = userAction.some((action) => action.Action == "Authorize");
   return (
     <Box
       sx={{
@@ -121,14 +121,7 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
           iconName={"excel"}
         />
       )}
-      {/* {userAction?.some((action) => action.Action === "Delete") && (
-        <ActionButton
-          iconsClick={iconsClick}
-          icon={"trash"}
-          caption={"Delete"}
-          iconName={"delete"}
-        />
-      )} */}
+      
       {!hasEditAction &&
         userAction?.some((action) => action.Action === "View") && (
           <ActionButton
@@ -472,7 +465,7 @@ export default function InspSummary({
   const handleApproveClose = () => {
     setProperty(false);
     setMainDetails1({});
-    setselectedDatas([])
+    // setselectedDatas([])
   }
 
 

@@ -2,7 +2,6 @@ import { Box } from '@mui/material'
 import React from 'react'
 import UserInputField from '../../component/InputFields/UserInputField'
 import AutoSelect from '../../component/AutoComplete/AutoSelect'
-import TagAutoSelect from '../../component/Select/TagAutoSelect'
 
 export default function InspDetailsTab({formData,setFormData}) {
     const currentDate = new Date().toLocaleDateString("en-CA");

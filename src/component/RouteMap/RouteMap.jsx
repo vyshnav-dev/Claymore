@@ -100,7 +100,7 @@ export default function RouteMap({ open, handleClose, mapId }) {
           ) : (
             <MapContainer
               center={centerLocation} // Default center
-              zoom={locations.length === 0 ? 4 : 14}
+              zoom={locations.length === 0 ? 4 : 11}
               minZoom={2.3}
               style={{
                 height: "90vh",

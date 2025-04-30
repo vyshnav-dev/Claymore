@@ -22,7 +22,7 @@ import BarChart from "./BarChart";
 import { dashboardApis } from "../../service/Dashboard/dashboard";
 import UserInputField from "../../component/InputFields/UserInputField";
 import { inspectionApis } from "../../service/Inspection/inspection";
-import WarningAmberIcon from "@mui/icons-material/WarningAmber";
+import MarkUnreadChatAltIcon from '@mui/icons-material/MarkUnreadChatAlt';
 import AlertComponent from "./AlertComponent";
 import CloseIcon from "@mui/icons-material/Close";
 
@@ -48,8 +48,8 @@ const ShakingIconButton = styled(IconButton)(({ isshaking }) => ({
   position: "fixed",
   top: 60,
   right: 20,
-  backgroundColor: "#fff8e1",
-  border: "1px solid #f57c00",
+  // backgroundColor: "#fff8e1", 
+  // border: "1px solid #f57c00",
   animation: isshaking ? `${shakeAnimation} 0.5s ease-in-out infinite` : "none",
 }));
 const currentDate = new Date().toLocaleDateString("en-CA");;
@@ -399,7 +399,7 @@ const handleDate = (data) =>{
               isshaking={shake}
               onClick={handleNotificationClick}
             >
-              <WarningAmberIcon color="warning" />
+              <MarkUnreadChatAltIcon sx={{fontSize:'35px'}} color="warning" />
             </ShakingIconButton>
           </Tooltip>
         )}
@@ -421,7 +421,7 @@ const handleDate = (data) =>{
             >
               <Alert
                 severity="warning"
-                icon={<WarningAmberIcon />}
+                icon={<MarkUnreadChatAltIcon />}
                 action={
                   <>
                     <Button
@@ -443,7 +443,7 @@ const handleDate = (data) =>{
                 }
               >
                 <Typography variant="body2">
-                  You have products to Authorise.
+                  You have products to Authorize.
                 </Typography>
               </Alert>
             </Box>

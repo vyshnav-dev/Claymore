@@ -8,29 +8,14 @@ import {
   TableHead,
   TableRow,
   Paper,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  IconButton,
   Typography,
-  Tooltip,
-  Pagination,
 } from "@mui/material";
 import {
   thirdColor,
   secondaryColor,
-  primaryColor,
 } from "../../config/config";
 
-const iconsExtraSx = {
-  fontSize: "0.8rem",
-  padding: "0.5rem",
-  "&:hover": {
-    backgroundColor: "transparent",
-  },
-  marginRight: 1,
-};
+
 
 export default function TimeRecordTable({ rows,excludedColumns = [] }) {
   const [page, setPage] = React.useState(0);

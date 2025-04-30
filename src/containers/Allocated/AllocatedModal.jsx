@@ -25,7 +25,7 @@ import {
 
 
 
-export default function AllocatedModal({ handleCloseModal, selected, hardRefresh }) {
+export default function AllocatedModal({ handleCloseModal, selected, hardRefresh, userAction }) {
 
     const headerCellStyle = {
         padding: "0px",
@@ -58,7 +58,7 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
     const [suspend, setSuspend] = useState([]);
     const [products, setProducts] = useState([]);
     const { showAlert } = useAlert();
-    const { UpsertJobOrderAllocation, GetAllocatedJobOrderDetails,updateproductsuspend} = allocationApis()
+    const { UpsertJobOrderAllocation, GetAllocatedJobOrderDetails, updateproductsuspend } = allocationApis()
 
 
     React.useEffect(() => {
@@ -156,26 +156,26 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
         });
     };
 
-    const handleSubmitSuspend = async () =>{
+    const handleSubmitSuspend = async () => {
         try {
-            if(!suspend?.length){
+            if (!suspend?.length) {
                 showAlert("info", "Please add Suspend Quantity");
             }
-            else{
+            else {
                 const saveData = {
-                    allocation:selected,
-                    details:suspend
-                  }
-    
-                  const response = await updateproductsuspend(saveData)
-            if (response?.status === "Success") {
-                showAlert('success', response?.message);
-                handleCloseModal()
-                hardRefresh();
+                    allocation: selected,
+                    details: suspend
+                }
+
+                const response = await updateproductsuspend(saveData)
+                if (response?.status === "Success") {
+                    showAlert('success', response?.message);
+                    handleCloseModal()
+                    hardRefresh();
+                }
             }
-            }
-            
-            
+
+
         } catch (error) {
             throw error;
         }
@@ -237,7 +237,10 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
                                         <TableRow>
                                             <TableCell sx={{ ...headerCellStyle }}>Product</TableCell>
                                             <TableCell sx={{ ...headerCellStyle }}>Quantity</TableCell>
-                                            <TableCell sx={{ ...headerCellStyle }}>Suspended Quantity</TableCell>
+                                            {userAction.some((action) => action.Action === "Suspend") && (
+                                                <TableCell sx={{ ...headerCellStyle }}>Suspended Quantity</TableCell>
+                                            )}
+
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
@@ -249,42 +252,45 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
                                                         maxWidth: "150px", // Adjust width as needed
                                                         wordBreak: "break-word",
                                                         whiteSpace: "pre-wrap",
-                                                        pl:1
+                                                        pl: 1
                                                     }}
                                                 >
                                                     {item.Product_Name}
                                                 </TableCell>
                                                 <TableCell sx={{ ...bodyCellStyle, pl: 1 }}>{item.Quantity}</TableCell>
-                                                <TableCell sx={{               // remove extra padding so the cell doesn't force space
-                                                    ...bodyCellStyle
+                                                {userAction.some((action) => action.Action === "Suspend") && (
+                                                    <TableCell sx={{               // remove extra padding so the cell doesn't force space
+                                                        ...bodyCellStyle
 
-                                                }}>
-                                                    <TextField
-                                                        multiline
-                                                        type="number"
-                                                        variant="outlined"
-                                                        onChange={(e) => {
-                                                            const value = e.target.value.replace(/\D/g, ''); // Remove non-numeric characters
-                                                            handleSuspend({ target: { value } }, item);
-                                                        }}
-                                                        value={suspend.find(p => p.product === item?.Product)?.quantity || ''}
-                                                        inputMode="numeric"  // Helps on mobile devices
-                                                        pattern="[0-9]*"     // Allows only numbers
-                                                        inputProps={{ min: 0 }}
-                                                        sx={{
-                                                            width: '100%',
-                                                            '& .MuiOutlinedInput-root': {
-                                                                display: 'flex',
-                                                                flex: 1,
-                                                                alignItems: 'stretch',
-                                                            },
-                                                            '& .MuiOutlinedInput-input': {
-                                                                py: 0,
-                                                            },
-                                                        }}
-                                                    />
+                                                    }}>
+                                                        <TextField
+                                                            multiline
+                                                            type="number"
+                                                            variant="outlined"
+                                                            onChange={(e) => {
+                                                                const value = e.target.value.replace(/\D/g, ''); // Remove non-numeric characters
+                                                                handleSuspend({ target: { value } }, item);
+                                                            }}
+                                                            value={suspend.find(p => p.product === item?.Product)?.quantity || ''}
+                                                            inputMode="numeric"  // Helps on mobile devices
+                                                            pattern="[0-9]*"     // Allows only numbers
+                                                            inputProps={{ min: 0 }}
+                                                            sx={{
+                                                                width: '100%',
+                                                                '& .MuiOutlinedInput-root': {
+                                                                    display: 'flex',
+                                                                    flex: 1,
+                                                                    alignItems: 'stretch',
+                                                                },
+                                                                '& .MuiOutlinedInput-input': {
+                                                                    py: 0,
+                                                                },
+                                                            }}
+                                                        />
 
-                                                </TableCell>
+                                                    </TableCell>
+                                                )}
+
                                             </TableRow>
                                         ))}
                                     </TableBody>
@@ -293,12 +299,11 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
                             <MultiCheckBox
                                 key={'Technician'}
                                 sFieldName={'Inspector'}
-                                label={'Technician'}
-                                // isMandatory={field?.Mandatory}
+                                label={'Technicians'}
+                                isMandatory={true}
                                 formDataHeader={mainDetails}
                                 key1={'Technician'}
                                 //disabled={isDisabled}
-                                // tagId={field.LinkTag}'technition'
                                 objectName="details"
                                 formData={formData}
                                 setFormData={setFormData}
@@ -315,8 +320,14 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
                 </DialogContent>
 
                 <DialogActions >
-                    <NormalButton action={handleSubmitSuspend} label="Suspend" />
-                    <NormalButton action={handleSave} label="Ok" />
+                    {userAction.some((action) => action.Action === "Suspend") && (
+                        <NormalButton action={handleSubmitSuspend} label="Suspend" />
+                    )}
+
+                    {userAction.some((action) => action.Action === "Save") && (
+                        <NormalButton action={handleSave} label="Save" />
+                    )}
+
                     <NormalButton action={handleCloseModal} label="Cancel" />
 
                 </DialogActions>

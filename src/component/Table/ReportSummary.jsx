@@ -45,7 +45,7 @@ const iconsExtraSx = {
 };
 
 export default function ReportSummary(props) {
-  const { rows, totalPages, hardRefresh, IdName, length } = props;
+  const { rows, totalPages, hardRefresh, IdName, length,number } = props;
   const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(25);
@@ -53,7 +53,7 @@ export default function ReportSummary(props) {
   const [filteredRows, setFilteredRows] = React.useState([]);
   const [columns, setColumns] = React.useState([]);
 
-  const excludedFields = [IdName, "Group", "GroupId"];
+  const excludedFields = [IdName, "Group", "GroupId",number];
 
   //To apply some filters on table rows
   const initialColumns =
@@ -393,11 +393,11 @@ export default function ReportSummary(props) {
                       </TableCell> */}
 
                       {columns.map((column) => (
-                        <Tooltip
+                        // <Tooltip
               
-                            title={["Technician", "ProductName","Client"]?.includes(column.id) ? row[column.id] : null}
+                        //     title={["Technician", "ProductName","Client"]?.includes(column.id) ? row[column.id] : null}
                           
-                        >
+                        // >
                           <TableCell
                             sx={{
                               padding: "0px",
@@ -417,7 +417,7 @@ export default function ReportSummary(props) {
                               ? convertToLocaleDateString(row[column.id])
                               : row[column.id] === null? "" : `${row[column.id]}`}
                           </TableCell>
-                        </Tooltip>
+                        // </Tooltip>
                       ))}
                     </TableRow>
                   );

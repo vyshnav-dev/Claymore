@@ -44,7 +44,7 @@ function BasicBreadcrumbs({mId}) {
           aria-label="breadcrumb"
         >
           <Typography underline="hover" sx={style} key="1">
-           { mId !== 31 ? 'Inspection ' :'Authorise'}
+           { mId !== 31 ? 'Inspection Job Orders ' :'Authorize Job Orders'}
           </Typography>
         </Breadcrumbs>
       </Stack>
@@ -271,12 +271,14 @@ export default function InspMainSummary({
 
   const handleExcelExport = async () => {
     let Type;
+    let Status
     if(menuIdLocal == 31)
     {
       Type = 3;
     }
     else if(menuIdLocal == 28){
       Type = 2;
+      Status = "Status"
     }
     else{
       return;
@@ -288,11 +290,11 @@ export default function InspMainSummary({
         type:Type,
         search: "",
       });
-      const excludedFields = ["Id","ModifiedBy","ModifiedOn"];
+      const excludedFields = ["Id","ModifiedBy","ModifiedOn",Status];
       const filteredRows = JSON.parse(response?.result)?.Data;
 
       await ExcelExport({
-        reportName: menuIdLocal !== 31 ? 'Inspection ' :'Approve',
+        reportName: menuIdLocal !== 31 ? 'Inspection Job Orders ' :'Authorize',
         filteredRows,
         excludedFields,
       });
