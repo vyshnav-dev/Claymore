@@ -214,14 +214,8 @@ export default function TimeRecordSubSummary({
 
   const handleIconsClick = (value) => {
     switch (value) {
-      case "new":
-        handleAdd("new");
-        break;
       case "edit":
         handleAdd("edit");
-        break;
-      case "delete":
-        deleteClick();
         break;
       case "view":
         handleAdd("edit");
@@ -261,40 +255,13 @@ export default function TimeRecordSubSummary({
     setPageRender(2);
   };
 
-  //Delete alert open
-  const deleteClick = async () => {
-    if (selectedDatas.length === 0) {
-      showAlert("info", "Select row to Delete");
-      return;
-    }
-    setConfirmData({ message: "Delete", type: "danger" });
-    handleConfrimOpen();
-  };
+  
 
   
 
   
 
-  //To delete
-  const handledeleteRole = async () => {
-    const deletePayload = selectedDatas.map((item) => ({
-      id: item,
-    }));
-
-    try {
-      let response = await deleteTimeSheet(deletePayload);
-
-      if (response?.status === "Success") {
-        showAlert("success", response?.message);
-      }
-    } catch (error) {
-    } finally {
-      setrefreshFlag(true);
-      setselectedDatas([]);
-      setchangesTriggered(true);
-      handleConfrimClose();
-    }
-  };
+ 
 
   //confirmation
   const handleConfrimOpen = () => {
@@ -362,12 +329,12 @@ export default function TimeRecordSubSummary({
             IdName={"Id"}
           />
         </Box>
-        <ConfirmationAlert
+        {/* <ConfirmationAlert
           handleClose={handleConfrimClose}
           open={confirmAlert}
           data={confirmData}
           submite={handledeleteRole}
-        />
+        /> */}
         
       </Box>
     </>

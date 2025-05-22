@@ -42,8 +42,7 @@ function Header() {
   const [confirmData, setConfirmData] = React.useState({});
   const { getscreensforuser } = securityApis();
 
-  const userData = JSON.parse(localStorage.getItem("ClaymoreUserData"))[0];
-
+  const userData = JSON.parse(localStorage?.getItem("ClaymoreUserData") || '[]')?.[0];
 
 
   React.useEffect(() => {
@@ -239,7 +238,7 @@ function Header() {
     setAnchorElLogout(event.currentTarget);
   };
 
-  const handleLogoutClose = () => {
+  const handleLogoutClose = async () => {
     setAnchorElLogout(null);
   };
 
@@ -249,8 +248,9 @@ function Header() {
     setConfirmAlert(true);
   };
 
-  const handleConfirmLogout = () => {
+  const handleConfirmLogout = async() => {
     // Perform the logout action, such as clearing localStorage and navigating to the login page
+    
     setConfirmAlert(false);
     localStorage.removeItem("SangClaymoreAccessToken");
     localStorage.removeItem("SangClaymoreRefreshToken");

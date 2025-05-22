@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Dialog, DialogContent, IconButton, Typography } from "@mui/material";
 
@@ -12,7 +13,7 @@ const ImageModal = ({ isOpen, imageUrl, handleCloseImagePopup }) => {
             <img
               src={imageUrl}
               alt="Not accessible"
-              style={{ width: "100%" }}
+              style={{ width: "300px" }}
             />
           </>
         ) : (

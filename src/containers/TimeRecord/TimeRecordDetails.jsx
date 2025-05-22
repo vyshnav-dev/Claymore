@@ -123,7 +123,7 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction }) => {
                         iconName={"save"}
                     />
                 )}
-            
+
             {userAction.some((action) => action.Action === "View" || action.Action === "Edit") && (
                 <>
                     {detailPageId != 0 ? (
@@ -148,7 +148,18 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction }) => {
                     ) : null}
                 </>
             )}
-
+            {userAction.some((action) => action.Action === "Print") && (
+                <>
+                    {detailPageId != 0 ? (
+                        <ActionButton
+                            iconsClick={iconsClick}
+                            icon={"fa-solid fa-print"}
+                            caption={"Print"}
+                            iconName={"print"}
+                        />
+                    ) : null}
+                </>
+            )}
 
             <ActionButton
                 iconsClick={iconsClick}
@@ -194,7 +205,8 @@ export default function TimeRecordDetails({
     const {
         GetTimeSheetDetails,
         UpsertTimeSheet,
-        deleteTimeSheet
+        deleteTimeSheet,
+        generatepdfprint
     } = inspectionApis();
 
     const {
@@ -322,6 +334,9 @@ export default function TimeRecordDetails({
             case "next":
                 handlePrevNext(2);
                 break;
+            case "print":
+                handlePrint();
+                break;
             case "delete":
                 setConfirmData({ message: "Delete", type: "danger" });
                 setConfirmType("delete");
@@ -358,10 +373,10 @@ export default function TimeRecordDetails({
 
     }
 
-   
-   
-        
-    
+
+
+
+
 
     const handleSave = async () => {
         try {
@@ -381,7 +396,7 @@ export default function TimeRecordDetails({
             const equipmentDescription = rows?.map(item => ({
                 equipment: item.Product,
                 description: item.Description
-              }));
+            }));
 
             const saveData = {
                 Id: detailPageId || 0,
@@ -399,9 +414,9 @@ export default function TimeRecordDetails({
                 verification: mainDetails?.Verification,
                 functionalTest: mainDetails?.FunctionalTest,
                 customerAcceptanceCertificate: mainDetails?.CustomerAcceptanceCertificate,
-                equipmentDescription:equipmentDescription,
-                remarks:mainDetails?.Remarks,
-                clientSign:mainDetails?.ClientSign
+                equipmentDescription: equipmentDescription,
+                remarks: mainDetails?.Remarks,
+                clientSign: mainDetails?.ClientSign
             };
 
             tableBody?.forEach((item) => {
@@ -417,7 +432,7 @@ export default function TimeRecordDetails({
                 handleNew();
                 // const actionExists = userAction.some((action) => action.Action === "New");
                 // if (!actionExists) {
-                    handleclose();
+                handleclose();
                 // }
             }
         } catch (error) {
@@ -470,6 +485,34 @@ export default function TimeRecordDetails({
         setConfirmType(null);
     };
 
+
+    const handlePrint = async () => {
+        // Open a blank popup immediately on user action
+        const popupWindow = window.open("", "PDFPopup", "width=800,height=600,resizable=yes,scrollbars=yes");
+        if (!popupWindow) {
+            alert("Popup blocked! Please allow popups for this site.");
+            return;
+        }
+
+        try {
+            const response = await generatepdfprint({ Id: detailPageId, category: 2 });
+            // Assuming response.result is a JSON string containing a URL property
+            const resultObj = JSON.parse(response?.result);
+
+
+            if (response?.status === "Success" && resultObj) {
+                // Set the popup's location to the PDF URL
+                popupWindow.location.href = resultObj;
+            } else {
+                console.error("Print generation failed or invalid URL.");
+                popupWindow.close();
+            }
+        } catch (error) {
+            console.error("An error occurred:", error);
+            popupWindow.close();
+        }
+    };
+
     //Delete alert open
     const deleteClick = async () => {
         try {
@@ -482,11 +525,11 @@ export default function TimeRecordDetails({
                 if (!actionExists) {
                     setPageRender(3);
                 }
-            } 
+            }
         } catch (error) {
             throw error
         }
-        
+
     };
 
 
@@ -746,7 +789,7 @@ export default function TimeRecordDetails({
                             },
                         }}>
                             <Box>
-                                <TimeRecordTable rows={rows} excludedColumns={["Id", "Time"]} />
+                                <TimeRecordTable rows={rows} excludedColumns={["Id", "Time","RowNo"]} />
                             </Box>
                             <UserInputField
                                 label={"Remarks"}
@@ -952,9 +995,9 @@ export default function TimeRecordDetails({
                                 <img
                                     src={mainDetails?.ClientSignPath}
                                     alt="Thumbnail"
-                                    style={{ cursor: "pointer", width: "50px", height: "50px",border: `1px solid #000` }}
+                                    style={{ cursor: "pointer", width: "50px", height: "50px", border: `1px solid #000` }}
                                     onClick={handleImageClickSign}
-                                    
+
                                 />
                             ) : (
                                 <ImageNotSupportedIcon sx={{ color: secondaryColor }} />

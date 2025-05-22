@@ -443,7 +443,7 @@ const handleDate = (data) =>{
                 }
               >
                 <Typography variant="body2">
-                  You have products to Authorize.
+                  You have Job Orders to Authorize.
                 </Typography>
               </Alert>
             </Box>

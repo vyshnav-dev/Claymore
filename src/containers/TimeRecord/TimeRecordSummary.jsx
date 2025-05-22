@@ -66,14 +66,7 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
         scrollbarWidth: "thin",
       }}
     >
-      {/* {userAction.some((action) => action.Action === "New") && (
-        <ActionButton
-          iconsClick={iconsClick}
-          icon={"fa-solid fa-plus"}
-          caption={"New"}
-          iconName={"new"}
-        />
-      )} */}
+      
       {userAction.some((action) => action.Action === "Edit") && (
         <ActionButton
           iconsClick={iconsClick}
@@ -218,9 +211,6 @@ export default function TimeRecordSummary({
 
   const handleIconsClick = (value) => {
     switch (value) {
-      case "new":
-        handleAdd("new");
-        break;
       case "edit":
         handleAdd("edit");
         break;
@@ -279,26 +269,7 @@ export default function TimeRecordSummary({
 
   
 
-  //To delete
-  const handledeleteRole = async () => {
-    const deletePayload = selectedDatas.map((item) => ({
-      id: item,
-    }));
-
-    try {
-      let response = await deleteAllocatedJobOrder(deletePayload);
-
-      if (response?.status === "Success") {
-        showAlert("success", response?.message);
-      }
-    } catch (error) {
-    } finally {
-      setrefreshFlag(true);
-      setselectedDatas([]);
-      setchangesTriggered(true);
-      handleConfrimClose();
-    }
-  };
+  
 
   //confirmation
   const handleConfrimOpen = () => {
@@ -367,12 +338,12 @@ export default function TimeRecordSummary({
             statusName={'Status'}
           />
         </Box>
-        <ConfirmationAlert
+        {/* <ConfirmationAlert
           handleClose={handleConfrimClose}
           open={confirmAlert}
           data={confirmData}
           submite={handledeleteRole}
-        />
+        /> */}
         
       </Box>
     </>

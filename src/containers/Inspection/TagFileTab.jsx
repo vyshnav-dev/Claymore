@@ -304,20 +304,7 @@ export default function TagFileTab({
   }
   const handledeletePhoto = async (fileObj,index) => {
     
-  //   // Check if the file exists locally but not yet saved on the server (i.e., no FileName, but file exists)
-  // if (!fileObj.FileName && fileObj.file) {
-  //   // Just remove from the allFiles state
-  //   const updatedFiles = formData?.TagAttachments.filter((_, i) => i !== index);
-  //   updateFileTab(updatedFiles);
-  //   handleConfrimClose()
-  //   return; // No API call needed
-  // }
-  // else if(!fileObj.FileName && !fileObj.file){
-  //   const updatedFiles = formData?.TagAttachments.filter((_, i) => i !== index);
-  //   updateFileTab(updatedFiles);
-  //   handleConfrimClose()
-  //   return
-  // }
+  
     // If FileName exists, proceed with API call
     const deletePayload = {
       id: detailPageId,
@@ -445,8 +432,6 @@ export default function TagFileTab({
                 <TableHead>
                   <TableRow>
                     <TableCell sx={headerCellStyle}></TableCell>
-                    {/* <TableCell sx={headerCellStyle}>{languageDatasJson.DocumentType}</TableCell>
-                    <TableCell sx={headerCellStyle}>{languageDatasJson.ReferenceNumber}</TableCell> */}
                     <TableCell sx={headerCellStyle}>File</TableCell>
                     {/* {disabledDetailed && */}
                     <TableCell sx={headerCellStyle}>Image</TableCell>

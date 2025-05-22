@@ -12,23 +12,42 @@ import { Box } from "@mui/material";
 import { useAlert } from "../Alerts/AlertContext";
 import { primaryColor } from "../../config/config";
 
-
+const createCustomIcon = (color) =>
+  L.divIcon({
+    className: "custom-icon", // Optional class for additional styling
+    html: `
+      <svg xmlns="http://www.w3.org/2000/svg" fill="${color}" viewBox="0 0 24 24" width="40px" height="40px">
+        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/>
+      </svg>
+    `,
+    iconSize: [35, 35], // Adjust size
+    iconAnchor: [20, 35], // Anchor point at the bottom center of the icon
+    popupAnchor: [0, -35], // Popup will open above the icon
+  });
 
 export default function RouteMap({ open, handleClose, mapId }) {
-
-  
-  
 
   // const { GetGeoLocation } = routeApis();
   const [locations, setLocations] = React.useState([]); // Default to empty array
   const [centerLocation, setCenterLocation] = useState([]);
   const [loading, setLoading] = React.useState(true);
 
+  // Reset state when dialog closes or mapId changes
   React.useEffect(() => {
-    if (open) {
+    if (!open) {
+      setLocations([]);
+      setCenterLocation([25.276987, 55.296249]);
+      setLoading(true);
+    }
+  }, [open]);
+
+  React.useEffect(() => {
+    if (open && mapId) {
       fetchData();
     }
-  }, [mapId]);
+  }, [mapId, open]);
+
+  
 
   const fetchData = async () => {
     setLoading(true);
@@ -119,7 +138,7 @@ export default function RouteMap({ open, handleClose, mapId }) {
                 <Marker
                   key={index}
                   position={[location.lat, location.lng]}
-                  
+                  icon={ createCustomIcon("#1976d2")}
                   eventHandlers={{
                     mouseover: (e) => {
                       e.target.openPopup(); // Show popup on hover

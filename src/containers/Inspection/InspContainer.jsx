@@ -28,7 +28,14 @@ export default function InspContainer() {
     else if (menuId?.ScreenId == undefined && menuIdLocal == null) {
       navigate("/home");
     }
-    setPage(1);
+    // if(menuId?.ScreenId && menuId?.Page && menuId?.Id){
+    //   setId(menuId?.Id)
+    //   setPage(menuId?.Page)
+    // }
+    // else{
+      setPage(1);
+    // }
+    
   }, [menuId?.ScreenId]);
 
   useEffect(() => {

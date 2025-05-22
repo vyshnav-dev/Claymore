@@ -113,7 +113,7 @@ export default function LoginContainer() {
         ...formData,
         entityId: 1,
         password: encryptedPassword,
-        channelId:1
+        channelId: 1
       };
 
       const response = await loginLogin(submitData);
@@ -204,7 +204,7 @@ export default function LoginContainer() {
 
           }}
         >
-          
+
 
           <Box
             sx={{
@@ -217,8 +217,8 @@ export default function LoginContainer() {
             }}
           >
             <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", mb: 5, gap: 2 }}>
-            <img alt="Logo" src={sangsolution} style={{ width: 180, height: 120 }} />
-          </Box>
+              <img alt="Logo" src={sangsolution} style={{ width: 180, height: 120 }} />
+            </Box>
             <form onSubmit={handleFormSubmit}>
               <Box mb={errors.loginName ? 1 : 3}>
                 <TextField

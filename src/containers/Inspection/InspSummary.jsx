@@ -426,8 +426,8 @@ export default function InspSummary({
     // Get all items with blocked status
     const blockedItems = selectedStatus.filter(item => blockedStatuses.includes(item?.Status));
 
-    if (menuIdLocal === 31 && blockedItems.length > 0) {
-      const certNos = blockedItems.map(item => item.CertificateNo).join(", ");
+    if (menuIdLocal === 31 && blockedItems?.length > 0) {
+      const certNos = blockedItems?.map(item => item.CertificateNo).join(", ");
       showAlert('info', `These products are Already Authorized. Certificate No(s): ${certNos}`);
       return;
     }
@@ -438,6 +438,8 @@ export default function InspSummary({
       header: value == 'correction' ? 'Correction' : value == 'suspend' ? 'Suspend' : "Authorization",
     });
     setProperty(true);
+    
+    
   };
 
   const handleAuthorize = async (status) => {

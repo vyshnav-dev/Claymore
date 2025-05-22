@@ -230,7 +230,7 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
                         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, maxHeight: '200px', minHeight: '200px' }}>
                             <TableContainer
                                 component={Paper}
-                                sx={{ maxHeight: "275px", minHeight: "275px", maxWidth: "fit-Content", overflowY: "auto", mt: 2, scrollbarWidth: "thin" }}
+                                sx={{ maxHeight: "275px", minHeight: "275px", maxWidth: "60%", overflowY: "auto", mt: 2, scrollbarWidth: "thin" }}
                             >
                                 <Table stickyHeader size="small" sx={{ minWidth: "fit-Content" }}>
                                     <TableHead>

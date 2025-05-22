@@ -21,6 +21,7 @@ import {
   thirdColor,
   secondaryColor,
   primaryColor,
+  selectedColor,
 } from "../../config/config";
 
 const iconsExtraSx = {
@@ -32,10 +33,35 @@ const iconsExtraSx = {
   marginRight: 1,
 };
 
-export default function StaticTable({ rows,excludedColumns = [] }) {
+export default function StaticTable({ rows, excludedColumns = [], onSelectedRowsChange,onRowDoubleClick }) {
+
+  const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(25);
   const totalPages = Math.ceil(rows.length / rowsPerPage);
+
+
+  const handleClick = (event, row) => {
+    const selectedIndex = selected.indexOf(row['Id']);
+    let newSelected = [];
+
+    if (selectedIndex === -1) {
+      newSelected = newSelected.concat(selected, row['Id']); // Add the entire row object
+    } else {
+      newSelected = [
+        ...selected.slice(0, selectedIndex),
+        ...selected.slice(selectedIndex + 1),
+      ];
+    }
+
+    setSelected(newSelected);
+  };
+
+  const isSelected = (id) => selected.indexOf(id) !== -1;
+
+  React.useEffect(() => {
+    onSelectedRowsChange(selected);
+  }, [selected]);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage - 1);
@@ -48,18 +74,18 @@ export default function StaticTable({ rows,excludedColumns = [] }) {
 
   const currentRows = rows.slice(page * rowsPerPage, (page + 1) * rowsPerPage);
 
-   // Filter out excluded columns
-   const filteredKeys = Object.keys(rows[0] || {})
-  .filter((key) => !excludedColumns.includes(key))
-  .map((key) => ({
-    label: key
-      .replace(/([A-Z])/g, " $1") // Add space before capital letters
-      .trim() // Remove extra spaces
-      .replace(/^./, (str) => str.toUpperCase()), // Capitalize first letter
-    id: key, // Keep the original key as 'id'
-  }));
+  // Filter out excluded columns
+  const filteredKeys = Object.keys(rows[0] || {})
+    .filter((key) => !excludedColumns.includes(key))
+    .map((key) => ({
+      label: key
+        .replace(/([A-Z])/g, " $1") // Add space before capital letters
+        .trim() // Remove extra spaces
+        .replace(/^./, (str) => str.toUpperCase()), // Capitalize first letter
+      id: key, // Keep the original key as 'id'
+    }));
 
-  
+
   return (
     <Box
       sx={{
@@ -69,7 +95,7 @@ export default function StaticTable({ rows,excludedColumns = [] }) {
         paddingLeft: "10px",
         paddingRight: "10px",
         paddingBottom: "5px",
-        paddingTop:"5px"
+        paddingTop: "5px"
       }}
     >
       <div
@@ -80,7 +106,7 @@ export default function StaticTable({ rows,excludedColumns = [] }) {
           justifyContent: "space-between",
           alignItems: "center",
           flexWrap: "wrap",
-          marginTop:"10px"
+          marginTop: "10px"
         }}
       >
         <FormControl>
@@ -113,86 +139,14 @@ export default function StaticTable({ rows,excludedColumns = [] }) {
               },
             }}
           >
-         
+
             <MenuItem value={25}>25</MenuItem>
             <MenuItem value={50}>50</MenuItem>
             <MenuItem value={100}>100</MenuItem>
           </Select>
         </FormControl>
 
-        {/* <div
-          style={{ display: "flex", alignItems: "center", flexWrap: "wrap" }}
-        >
-          <Tooltip title="Refresh">
-            <IconButton onClick={hardRefresh} sx={iconsExtraSx}>
-              <RefreshIcon />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="Fit Content">
-            <IconButton onClick={handleFitContent} sx={iconsExtraSx}>
-              <FitScreenIcon />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="Expand All">
-            <IconButton onClick={handleExpandAll} sx={iconsExtraSx}>
-              <FullscreenIcon />
-            </IconButton>
-          </Tooltip>
-          <TextField
-            margin="normal"
-            size="small"
-            id="search"
-            label="Search"
-            autoComplete="off"
-            value={searchTerm}
-            onChange={(event)=>setSearchTerm(event.target.value)}
-            onBlur={handleSearch}              
-            onKeyDown={handleKeyDown}            
-            sx={{
-              width: 200, // Default width
-              "@media (max-width: 600px)": {
-                width: 150, // Reduced width for small screens
-              },
-              "& .MuiOutlinedInput-root": {
-                height: 30, // Adjust the height of the input area
-                "& fieldset": {
-                  borderColor: `${primaryColor}`,
-                },
-                "&:hover fieldset": {
-                  borderColor: primaryColor,
-                },
-                "&.Mui-focused fieldset": {
-                  borderColor: primaryColor,
-                },
-              },
-              "& .MuiInputLabel-root": {
-                transform: "translate(10px, 5px) scale(0.9)", // Adjust label position when not focused
-                color: primaryColor,
-              },
-              "& .MuiInputLabel-shrink": {
-                transform: "translate(14px, -9px) scale(0.75)", // Adjust label position when focused
-                color: primaryColor,
-              },
-              "& .MuiInputBase-input": {
-                fontSize: "0.75rem", // Adjust the font size of the input text
-                color: primaryColor,
-              },
-              "& .MuiFormLabel-root.Mui-focused": {
-                color: primaryColor,
-              },
-            }}
-            InputProps={{
-              // (3) add a search icon as an end-adornment:
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton onClick={handleSearch} edge="end">
-                    <SearchIcon />
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
-          />
-        </div> */}
+
       </div>
 
       {currentRows.length > 0 ? (
@@ -203,40 +157,59 @@ export default function StaticTable({ rows,excludedColumns = [] }) {
                 <TableRow>
                   {filteredKeys.map((key) => (
                     <TableCell key={key} sx={{
-                                            padding: "0px",
-                                            paddingLeft: "4px",
-                                            border: `1px solid ${thirdColor}`,
-                                            fontWeight: "600",
-                                            font: "14px",
-                                            backgroundColor: secondaryColor,
-                                            color: "white",
-                                            paddingTop: "3px",
-                                            paddingBottom: "3px",
-                                          }}>
+                      padding: "0px",
+                      paddingLeft: "4px",
+                      border: `1px solid ${thirdColor}`,
+                      fontWeight: "600",
+                      font: "14px",
+                      backgroundColor: secondaryColor,
+                      color: "white",
+                      paddingTop: "3px",
+                      paddingBottom: "3px",
+                    }}>
                       {key?.label}
                     </TableCell>
                   ))}
                 </TableRow>
               </TableHead>
               <TableBody>
-                {currentRows.map((row, index) => (
-                  <TableRow  key={index} sx={{ backgroundColor: index % 2 === 1 ? thirdColor : null }}>
-                    {filteredKeys.map((key, i) => (
-                      <TableCell key={i}  sx={{
-                                                    padding: "0px",
-                                                    paddingLeft: "4px",
-                                                    border: `1px solid ${thirdColor}`,
-                                                    minWidth: "100px",
-                                                    color:row.color?row.color:"#000",
-                                                    whiteSpace: "nowrap",
-                                                    overflow: "hidden",
-                                                    textOverflow: "ellipsis",
-                                                    fontWeight: row["Group"] ? 800 : null,
-                                                    
-                                                  }}>{row[key?.id]}</TableCell>
-                    ))}
-                  </TableRow>
-                ))}
+                {currentRows.map((row, index) => {
+                  const isItemSelected = isSelected(row['Id']);
+                  return (
+                    <TableRow
+                      // onClick={(event) => handleClick(event, row)}
+                      // onDoubleClick={() => onRowDoubleClick(row['Id'])}
+                      key={index}
+                      sx={{
+                        cursor: "pointer",
+                        backgroundColor: isItemSelected
+                          ? selectedColor
+                          : index % 2 === 1
+                            ? thirdColor
+                            : null,
+                      }}
+                    >
+                      {filteredKeys.map((key, i) => (
+                        <TableCell
+                          key={i}
+                          sx={{
+                            padding: "0px",
+                            paddingLeft: "4px",
+                            border: `1px solid ${thirdColor}`,
+                            minWidth: "100px",
+                            color: row.color ? row.color : "#000",
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            fontWeight: row["Group"] ? 800 : null,
+                          }}
+                        >
+                          {row[key?.id]}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           </TableContainer>
