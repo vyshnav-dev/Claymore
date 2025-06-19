@@ -166,6 +166,7 @@ export default function RoleDetails({
         });
         if (response?.status === "Success") {
           const myObject = JSON.parse(response?.result);
+          
           setMainDetails(myObject?.RoleDetails[0]);
           setMenuAction(myObject?.ScreenDetails);
         } else {

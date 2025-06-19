@@ -36,7 +36,6 @@ const Item = styled("div")`
 
 const SearchBox = ({ initialItems, search, handleSelectedIds,setchangesTriggered, initialCheckedIds, disabled, searchTerm, setsearchTerm, formData_obj, sFieldName }) => {
 
-  
 
   const [items, setItems] = useState(
     initialItems?.length > 0

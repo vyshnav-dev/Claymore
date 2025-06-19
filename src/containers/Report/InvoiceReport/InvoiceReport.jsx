@@ -23,11 +23,9 @@ import NormalButton from "../../../component/Buttons/NormalButton";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { allocationApis } from "../../../service/Allocation/allocation";
 import UserAutoComplete from "../../../component/AutoComplete/UserAutoComplete";
+import AutoSelect from "../../../component/AutoComplete/AutoSelect";
 const currentDate = new Date().toLocaleDateString("en-CA");
-const suggestionType = [
-    { Id: 1, Name: "Reconciliation Date" },
-    { Id: 2, Name: "Doc Date" },
-];
+
 function CustomTabPanel(props) {
     const { children, value, index, ...other } = props;
 
@@ -97,7 +95,7 @@ function BasicBreadcrumbs({ viewAction, status }) {
                     aria-label="breadcrumb"
                 >
                     <Typography underline="hover" sx={style} key="1">
-                        Acknowledgment Report
+                   Invoice Report
                     </Typography>
                     <Typography underline="hover" sx={style} key="1"></Typography>
                 </Breadcrumbs>
@@ -152,7 +150,7 @@ const icon = (
     </Paper>
 );
 
-export default function AcknowledgmentReport({ userAction, disabledDetailed }) {
+export default function InvoiceReport({ userAction, disabledDetailed }) {
     const [mainDetails, setMainDetails] = useState({
         fromDate: currentDate,
         toDate: currentDate,
@@ -163,7 +161,7 @@ export default function AcknowledgmentReport({ userAction, disabledDetailed }) {
     const [confirmData, setConfirmData] = useState({});
     const [confirmType, setConfirmType] = useState(null);
     const {
-        getclientlist, GetTechnicianList
+        getclientlist
     } = allocationApis();
     const { showAlert } = useAlert();
     const [rows, setRows] = React.useState([]); //To Pass in Table
@@ -182,7 +180,7 @@ export default function AcknowledgmentReport({ userAction, disabledDetailed }) {
         setChecked((prev) => !prev);
     };
 
-    const { getacknowledgementreport } = reportApis();
+    const { getinvoicereport } = reportApis();
     useEffect(() => {
         const fetchData = async () => {
             await tagDetails();
@@ -197,12 +195,10 @@ export default function AcknowledgmentReport({ userAction, disabledDetailed }) {
                 mainDetails.fromDate &&
                 mainDetails.toDate
             ) {
-                const response = await getacknowledgementreport({
+                const response = await getinvoicereport({
                     fromDate: mainDetails.fromDate,
                     toDate: mainDetails.toDate,
                     client: mainDetails?.Client,
-                    inspector: mainDetails?.Technician,
-                    status: mainDetails?.Status,
                     pageNo: pageNumber,
                     pageSize: displayLength,
                     search: currentSearchKey,
@@ -258,7 +254,7 @@ export default function AcknowledgmentReport({ userAction, disabledDetailed }) {
         setsearchKey("")
         latestSearchKeyRef.current = ""
         setchangesTriggered(!changesTriggered);
-    };
+      };
     const handleIconsClick = async (value) => {
         switch (value.trim()) {
             case "close":
@@ -282,12 +278,10 @@ export default function AcknowledgmentReport({ userAction, disabledDetailed }) {
     };
 
     const handleExcel = async () => {
-        const response = await getacknowledgementreport({
+        const response = await getinvoicereport({
             fromDate: mainDetails.fromDate,
             toDate: mainDetails.toDate,
             client: mainDetails?.Client,
-            inspector: mainDetails?.Technician,
-            status: mainDetails?.Status,
             pageNumber: 0,
             pageSize: 0,
             search: "",
@@ -299,7 +293,7 @@ export default function AcknowledgmentReport({ userAction, disabledDetailed }) {
         const formatedTo = new Date(mainDetails?.toDate).toLocaleDateString("en-GB").split("/").join("-");
         const filteredRows = JSON.parse(response?.result)?.Data;
         await ExcelExport({
-            reportName: formatedFrom == formatedTo?`Acknowledgment Report(${formatedFrom})`:`Acknowledgment Report(${formatedFrom} - ${formatedTo})`,
+            reportName: formatedFrom == formatedTo?`Invoice Report(${formatedFrom})`:`Invoice Report(${formatedFrom} - ${formatedTo})`,
             filteredRows,
             excludedFields,
         });
@@ -411,17 +405,10 @@ export default function AcknowledgmentReport({ userAction, disabledDetailed }) {
                                     formDataiId={"Client"}
                                     formDataName={"Client_Name"}
                                 />
+                                
 
-                                <UserAutoComplete
-                                    apiKey={GetTechnicianList}
-                                    formData={mainDetails}
-                                    setFormData={setMainDetails}
-                                    label={"Technician"}
-                                    autoId={"Technician"}
-                                    required={false}
-                                    formDataiId={"Technician"}
-                                    formDataName={"Technician_Name"}
-                                />
+                               
+
 
                                 <Box p={1.9}>
                                     <NormalButton label={"Search"} action={tagDetails} />
@@ -432,7 +419,7 @@ export default function AcknowledgmentReport({ userAction, disabledDetailed }) {
                 </Slide>
             )}
 
-           
+            
                 <ReportSummary
                     rows={rows}
                     onDisplayLengthChange={handleDisplayLengthChange}
@@ -456,5 +443,7 @@ export default function AcknowledgmentReport({ userAction, disabledDetailed }) {
         </Box>
     );
 }
+
+
 
 

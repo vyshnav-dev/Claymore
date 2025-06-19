@@ -318,6 +318,7 @@ export default function RiskMainSummary({
             hardRefresh={hardRefresh}
             IdName={"Id"}
             statusName={'Status'}
+            remarks={'Remarks'}
           />
         </Box>
         {/* <ConfirmationAlert

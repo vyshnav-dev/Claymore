@@ -32,22 +32,12 @@ function MultiCheckBox({ formData, setFormData, sFieldName, label, isMandatory, 
 
         // Merge the new items from the API with already selected items
         let mergedItems
-        // if(searchTerm)
-        // {
-        //    mergedItems = (results || [])
-        //   .filter((item) => item.Name.toLowerCase().includes(searchTerm.toLowerCase())) // Partial match, case-insensitive
-        //   .map((item) => ({
-        //     ...item,
-        //     selected: selectedItems.includes(item.Id), // Mark as selected if already in formData
-        //   }));
-        // }
-        // else{
+        
         mergedItems = results?.map((item) => ({
           ...item,
           selected: selectedItems.includes(item.Id),  // Mark as selected if already in formData
         }));
-        // }
-        // setcompanyList(mergedItems || []);
+        
         setcompanyList((prevList) => (JSON.stringify(prevList) !== JSON.stringify(mergedItems) ? mergedItems : prevList));
       } catch (error) {
         setcompanyList([])

@@ -52,7 +52,7 @@ const ShakingIconButton = styled(IconButton)(({ isshaking }) => ({
   // border: "1px solid #f57c00",
   animation: isshaking ? `${shakeAnimation} 0.5s ease-in-out infinite` : "none",
 }));
-const currentDate = new Date().toLocaleDateString("en-CA");;
+const currentDate = new Date().toLocaleDateString("en-CA");
 export default function Dashboard() {
   const [alertVisible, setAlertVisible] = useState(false);
   const [shake, setShake] = useState(true);
@@ -61,6 +61,7 @@ export default function Dashboard() {
   const [popupopen, setPopUpOpen] = useState(false);
   const [rows, setRows] = useState([]);
   const [type, setType] = useState(1)
+  const [show, setShow] = useState(false)
 
   const [dateform, setDateForm] = useState({
     fromDate: currentDate,
@@ -70,8 +71,8 @@ export default function Dashboard() {
   const [charts, setCharts] = useState([])
 
   const { getdashboarddetails } = dashboardApis();
-  const { getuseractionsforscreen} = securityApis();
-  const { getpendingapproval} = inspectionApis();
+  const { getuseractionsforscreen } = securityApis();
+  const { getpendingapproval } = inspectionApis();
 
   const isXlDevices = useMediaQuery("(min-width: 1600px)");
   const isLgDevices = useMediaQuery("(min-width: 1200px)");
@@ -117,7 +118,7 @@ export default function Dashboard() {
           setuserAction(userActionsData);
         }
 
-        
+
       } catch (error) {
         navigate("/home");
       } finally {
@@ -142,20 +143,20 @@ export default function Dashboard() {
       }
     };
 
-    
-  
+
+
     if (
       !loading &&
       !alertVisible &&
       userAction.some((action) => action.ActionId == 13)
     ) {
       fetchNotification(); // Initial call
-      const interval = setInterval(fetchNotification, 60000); 
-  
+      const interval = setInterval(fetchNotification, 60000);
+
       return () => clearInterval(interval); // Cleanup on unmount
     }
   }, [loading]);
-  
+
 
   const handleCloseAlert = () => {
     setAlertVisible(false);
@@ -168,9 +169,9 @@ export default function Dashboard() {
     setPopUpOpen(false);
     setAlertVisible(false);
   };
-  
 
-  
+
+
 
   useEffect(() => {
     const controller = new AbortController(); // Create an abort controller
@@ -208,11 +209,14 @@ export default function Dashboard() {
 
 
   const handleCardData = (dataType) => {
+
+    dataType !== 5 ? setShow(false) :setShow(true);
+
     setType(dataType);
     const today = new Date();
     let fromDate = currentDate;
     let toDate = currentDate;
-  
+
     if (dataType === 2) {
       // This Week (Monday to today)
       const firstDayOfWeek = new Date(today);
@@ -228,16 +232,16 @@ export default function Dashboard() {
       // This Year (Jan 1st to today)
       const firstDayOfYear = new Date(today.getFullYear(), 0, 1);
       fromDate = firstDayOfYear.toLocaleDateString("en-CA");
-    }
-  
+    } 
+
     setDateForm({ fromDate, toDate });
   };
-  
 
-const handleDate = (data) =>{
-  setDateForm(data);
-  setType(0);  
-}
+
+  const handleDate = (data) => {
+    setDateForm(data);
+    setType(0);
+  }
 
 
 
@@ -250,7 +254,7 @@ const handleDate = (data) =>{
           alignItems: "center",
           justifyContent: "center",
           gap: { xs: 1, sm: 2 }, // Adjust gap for smaller screens
-          mt: 1,
+          mt: 2,
           width: "100%",
         }}
       >
@@ -295,32 +299,47 @@ const handleDate = (data) =>{
           >
             This Year
           </Button>
+          <Button
+            onClick={() => handleCardData(5)}
+            sx={{
+              textTransform: "none",
+              backgroundColor: type === 5 ? secondaryColor : null,
+              color: type === 5 ? "white" : null,
+            }}
+          >
+            Customize
+          </Button>
         </ButtonGroup>
       </Box>
-      <Box sx={{display:"flex",justifyContent:'center',gap:2,flexWrap:'wrap',m:2}}>
-        <UserInputField
-          label={"From Date"}
-          name={"fromDate"}
-          type={"date"}
-          disabled={false}
-          mandatory={true}
-          value={dateform}
-          setValue={(data)=>{handleDate(data)}}
-          max={currentDate}
-        />
+      
+        <Box sx={{ display: "flex", justifyContent: 'center', gap: 2, flexWrap: 'wrap', m: 2 }}>
+        {show &&
+        <>
+          <UserInputField
+            label={"From Date"}
+            name={"fromDate"}
+            type={"date"}
+            disabled={false}
+            mandatory={true}
+            value={dateform}
+            setValue={(data) => { handleDate(data) }}
+            max={currentDate}
+          />
 
-        <UserInputField
-          label={"To Date"}
-          name={"toDate"}
-          type={"date"}
-          disabled={false}
-          mandatory={true}
-          value={dateform}
-          setValue={(data)=>{handleDate(data)}}
-          max={currentDate}
-        />
-      </Box>
-
+          <UserInputField
+            label={"To Date"}
+            name={"toDate"}
+            type={"date"}
+            disabled={false}
+            mandatory={true}
+            value={dateform}
+            setValue={(data) => { handleDate(data) }}
+            max={currentDate}
+          />
+          </>
+        }
+        </Box>
+      
 
       <Box m="8px">
         {/* GRID & CHARTS */}
@@ -389,7 +408,7 @@ const handleDate = (data) =>{
       </Box>
 
 
-          {/* Notification Icon */}
+      {/* Notification Icon */}
       {!loading &&
         !alertVisible &&
         userAction.some((action) => action.ActionId == 13) &&
@@ -399,7 +418,7 @@ const handleDate = (data) =>{
               isshaking={shake}
               onClick={handleNotificationClick}
             >
-              <MarkUnreadChatAltIcon sx={{fontSize:'35px'}} color="warning" />
+              <MarkUnreadChatAltIcon sx={{ fontSize: '35px' }} color="warning" />
             </ShakingIconButton>
           </Tooltip>
         )}
@@ -407,7 +426,7 @@ const handleDate = (data) =>{
       {/* Alert Popup */}
       {!loading &&
         alertVisible &&
-        userAction.some((action) => action.ActionId == 13)&&
+        userAction.some((action) => action.ActionId == 13) &&
         rows.length > 0 && (
           <Slide direction="left" in={alertVisible} mountOnEnter unmountOnExit>
             <Box

@@ -13,5 +13,5 @@
     "reportDateFields":"",
     "rowsPerSheet":10000,
     "allowedExtensionsUser":["jpg", "jpeg", "png", "gif"],
-    "transactionDateTimeFields":"Created On,Modified On,CreatedOn,ModifiedOn,Authorized On,AuthorizedOn"
+    "transactionDateTimeFields":"Created On,Modified On,CreatedOn,ModifiedOn,Authorized On,AuthorizedOn,"
 }

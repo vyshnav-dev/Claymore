@@ -14,7 +14,7 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import Loader from "../../component/Loader/Loader";
 import ValidationAlert from "../../component/Alerts/ValidationAlert";
-import claymore from "/Images/Claymore-.png";
+import claymore from "/Images/Claymore1.png";
 import sangsolution from "/Images/CSSC logo.jpg";
 import { encrypt } from "../../service/Security/encryptionUtils";
 

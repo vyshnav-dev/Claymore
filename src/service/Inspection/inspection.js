@@ -453,8 +453,33 @@ const inspectionApis = () => {
     }
   };
 
+  const upsertinvoice = async (payload) => {
+    try {
+      const response = await makeAuthorizedRequestBase(
+        "post",
+        "/approve/upsertinvoice",
+        payload,
+        true
+      );
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  };
 
-
+  const getinvoicedetails = async (payload) => {
+    try {
+      const response = await makeAuthorizedRequestBase(
+        "get",
+        "approve/getinvoicedetails",
+        payload,
+        true
+      );
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  };
 
   
 
@@ -491,7 +516,9 @@ const inspectionApis = () => {
     generatecertificate,
     getpendingapproval,
     generatepdfprint,
-    upsertmultiapprove
+    upsertmultiapprove,
+    upsertinvoice,
+    getinvoicedetails
   }
 }
 

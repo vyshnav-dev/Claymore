@@ -65,6 +65,7 @@ export default function SummaryTable(props) {
     hardRefresh,
     IdName,
     statusName,
+    remarks
   } = props;
 
   
@@ -87,7 +88,7 @@ export default function SummaryTable(props) {
     .map((field) =>field.trim());
 
     
-  const excludedFields = [statusName, "Group", "GroupId", "TotalRows", "UserName", "Time", "Allocation", "Id"];
+  const excludedFields = [statusName,remarks,"Group", "GroupId", "TotalRows", "UserName", "Time", "Allocation", "Id"];
 
   //To apply some filters on table rows
   const initialColumns =

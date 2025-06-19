@@ -385,6 +385,7 @@ export default function AllocatedSummary({
             totalPages={totalPages}
             hardRefresh={hardRefresh}
             IdName={"Id"}
+            remarks={'Remarks'}
           />
         </Box>
         <ConfirmationAlert
@@ -405,13 +406,7 @@ export default function AllocatedSummary({
           userAction={userAction}
         />
       </NormalModal>
-        {/* <MasterProductConfirmation
-          handleClose={() => setProperty(false)}
-          open={property}
-          data={confirmData}
-          submite={handlePropertyConfirmation}
-          selectedDatas={selectedDatas?.length === 1 ? selectedDatas[0] : null}
-        /> */}
+        
       </Box>
     </>
   );

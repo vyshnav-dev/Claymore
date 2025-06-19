@@ -362,6 +362,7 @@ export default function AckMainSummary({
             hardRefresh={hardRefresh}
             IdName={"Id"}
             statusName={'Status'}
+            remarks={'Remarks'}
           />
         </Box>
         <ConfirmationAlert

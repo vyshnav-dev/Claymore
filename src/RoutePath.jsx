@@ -32,6 +32,8 @@ import AllocatedJobReportContainer from "./containers/Report/AllocatedJobOrderRe
 import InspectionReportContainer from "./containers/Report/InspectionReport/InspectionReportContainer";
 import AcknowledgmentReportContainer from "./containers/Report/AcknowledgmentReport/AcknowledgmentReportContainer";
 import ApproveReportContainer from "./containers/Report/ApproveReport/ApproveReportContainer";
+import InvoiceContainer from "./containers/Invoice/InvoiceContainer";
+import InvoiceReportContainer from "./containers/Report/InvoiceReport/InvoiceReportContainer";
 
 export default function RoutePath() {
   const location = useLocation();
@@ -274,6 +276,22 @@ export default function RoutePath() {
               element={
                 <ProtectedRoute>
                   <ApproveReportContainer />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/invoice"
+              element={
+                <ProtectedRoute>
+                  <InvoiceContainer/>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/invoicereport"
+              element={
+                <ProtectedRoute>
+                  <InvoiceReportContainer/>
                 </ProtectedRoute>
               }
             />

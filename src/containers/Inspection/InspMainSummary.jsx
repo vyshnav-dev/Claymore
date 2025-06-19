@@ -340,6 +340,7 @@ export default function InspMainSummary({
             hardRefresh={hardRefresh}
             IdName={"Id"}
             statusName={menuIdLocal !== 31 ?"Status":''}
+            remarks={'Remarks'}
           />
         </Box>
         

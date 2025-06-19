@@ -432,17 +432,11 @@ export default function TimeSheetReport({ userAction, disabledDetailed }) {
     
         <ReportSummary
           rows={rows}
-          //onExportData={handleExportData}
           onDisplayLengthChange={handleDisplayLengthChange}
           onpageNumberChange={handlepageNumberChange}
-          //  onSortChange={handleSortChange}
           onSearchKeyChange={handleSearchKeyChange}
           changesTriggered={changesTriggered}
-          //   setchangesTriggered={resetChangesTrigger}
-          // onSelectedRowsChange={handleSelectedRowsChange}
-          // onRowDoubleClick={handleRowDoubleClick}
           totalRows={totalRows}
-          //   currentTheme={currentTheme}
           totalPages={totalPages}
           hardRefresh={hardRefresh}
           IdName={"Id"}

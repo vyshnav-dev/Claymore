@@ -77,6 +77,9 @@ function Header() {
       if (Id?.ScreenId === 31) {
         navigate("/approve", { state: Id });
       }
+      else if(Id?.ScreenId === 34){
+        navigate("/invoice", { state: Id });
+      }
     }
     else {
       setAnchorEl(event.currentTarget);
@@ -101,7 +104,6 @@ function Header() {
     setAnchorElUser(null);
   };
 
-  // console.log('menu', menu);
 
 
   const handleClickEvent = async (menu) => {
@@ -146,7 +148,7 @@ function Header() {
         navigate("/allocated", { state: menu });
       }
     }
-    else if (menu?.Parent === 34) {
+    else if (menu?.Parent === 44) {
       if (menu?.ScreenId === 35) {
         navigate("/joborderreport", { state: menu });
       } else if (menu?.ScreenId === 36) {
@@ -163,6 +165,8 @@ function Header() {
         navigate("/acknowledgmentreport", { state: menu });
       } else if (menu?.ScreenId === 42) {
         navigate("/authorizereport", { state: menu });
+      }else if (menu?.ScreenId === 45) {
+        navigate("/invoicereport", { state: menu });
       }
     }
     else {
@@ -177,6 +181,10 @@ function Header() {
     }
     else if (id === 31) {
       navigate("/approve", { state: menu });
+      setAnchorElNav(null);
+    }
+    else if (id === 34) {
+      navigate("/invoice", { state: menu });
       setAnchorElNav(null);
     }
 

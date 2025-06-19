@@ -102,6 +102,7 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction, certify, isSave, m
 
 
     const hasAproove = userAction.some((action) => action.Action == "Authorize");
+    const hasCertificate = userAction.some((action) => action.Action == "Certificate/Report");
     return (
         <Box
             sx={{
@@ -179,16 +180,20 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction, certify, isSave, m
                                 iconName={"suspend"}
                             />
                         </>
-                    ) : certify == 2 ? (
-                        <ActionButton
-                            iconsClick={iconsClick}
-                            icon={"fa-solid fa-stamp"}
-                            caption={"Certificate"}
-                            iconName={"certificate"}
-                        />
                     ) : null}
+
                 </>
             ) : null}
+
+            {hasCertificate && detailPageId != 0 && certify == 2 && (
+                <ActionButton
+                    iconsClick={iconsClick}
+                    icon={"fa-solid fa-stamp"}
+                    caption={"Certificate"}
+                    iconName={"certificate"}
+                />
+            )
+            }
 
 
             {userAction.some((action) => action.Action === "View" || action.Action === "Edit") && (

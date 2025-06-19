@@ -8,7 +8,9 @@ import SummaryTable from "../../component/Table/SummaryTable";
 import { primaryColor } from "../../config/config";
 import ConfirmationAlert from "../../component/Alerts/ConfirmationAlert";
 import ExcelExport from "../../component/Excel/Excel";
+import NormalModal from "../../component/Modal/NormalModal";
 import { allocationApis } from "../../service/Allocation/allocation";
+import InvoiceModal from "./InvoiceModal";
 
 function BasicBreadcrumbs() {
   const style = {
@@ -45,7 +47,7 @@ function BasicBreadcrumbs() {
           aria-label="breadcrumb"
         >
           <Typography underline="hover" sx={style} key="1">
-            Time sheet Job Orders
+             Completed Job Orders
           </Typography>
         </Breadcrumbs>
       </Stack>
@@ -54,7 +56,7 @@ function BasicBreadcrumbs() {
 }
 
 const DefaultIcons = ({ iconsClick, userAction }) => {
-  const hasEditAction = userAction.some((action) => action.Action === "Edit");
+
   return (
     <Box
       sx={{
@@ -67,12 +69,12 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
       }}
     >
       
-      {userAction.some((action) => action.Action === "Edit") && (
+      {userAction.some((action) => action.Action === "Invoice") && (
         <ActionButton
           iconsClick={iconsClick}
-          icon={"fa-solid fa-pen"}
-          caption={"Edit"}
-          iconName={"edit"}
+          icon={"fa-solid fa-file-invoice"}
+          caption={"Invoice"}
+          iconName={"invoice"}
         />
       )}
       {userAction.some((action) => action.Action === "Excel") && (
@@ -84,17 +86,9 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
         />
       )}
       
-      {!hasEditAction &&
-        userAction.some((action) => action.Action === "View") && (
-          <ActionButton
-            iconsClick={iconsClick}
-            icon={"fa-solid fa-eye"}
-            caption={"View"}
-            iconName={"view"}
-          />
-        )}
       
 
+      
       <ActionButton
         iconsClick={iconsClick}
         icon={"fa-solid fa-xmark"}
@@ -105,10 +99,11 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
   );
 };
 
-export default function TimeRecordSummary({
+export default function InvoiceSummary({
   setPageRender,
   setId,
   userAction,
+  Id
 }) {
   const [rows, setRows] = React.useState([]); //To Pass in Table
   const [displayLength, setdisplayLength] = React.useState(25); // Show Entries
@@ -123,21 +118,21 @@ export default function TimeRecordSummary({
   const [confirmAlert, setConfirmAlert] = useState(false); //To handle alert open
   const [confirmData, setConfirmData] = useState({}); //To pass alert data
   const latestSearchKeyRef = useRef(searchKey);
-  
-  const { GetAllocatedJobOrderSummary,deleteAllocatedJobOrder} =
+  const [addMenu, setAddMenu] = useState(false);
+  const { GetAllocatedJobOrderSummary,deleteAllocatedJobOrder  } =
     allocationApis();
 
   //Role Summary
   const fetchRoleSummary = async () => {
     setselectedDatas([]);
     const currentSearchKey = latestSearchKeyRef.current;
-
+    
     try {
       const response = await GetAllocatedJobOrderSummary({
         pageNo: pageNumber,
         pageSize: displayLength,
         search: currentSearchKey,
-        type:4,
+        type:5
       });
 
       setrefreshFlag(false);
@@ -146,15 +141,17 @@ export default function TimeRecordSummary({
         currentSearchKey === latestSearchKeyRef.current
       ) {
         const myObject = JSON.parse(response?.result);
-
-        setRows(myObject?.Data);
+        setRows(myObject?.Data );
 
         const totalRows = myObject?.Metadata.TotalRows;
         const totalPages = myObject?.Metadata.TotalPages;
 
         settotalRows(totalRows);
         setTotalPages(totalPages);
-      } else {
+      }
+      
+      
+      else {
         setRows([]);
       }
     } catch (error) {
@@ -170,15 +167,14 @@ export default function TimeRecordSummary({
 
   React.useEffect(() => {
     fetchRoleSummary(); // Initial data fetch
-  }, [pageNumber, displayLength, searchKey, changesTriggered]);
+  }, [pageNumber, displayLength, searchKey, changesTriggered,refreshFlag]);
 
 
- 
 
   const handleRowDoubleClick = (rowiId) => {
-    if (rowiId > 0 && userAction.some((action) => action.Action === "View" || action.Action === "Edit")) {
+    if (rowiId > 0 && userAction.some((action) => action.Action === "Access")) {
       setId(rowiId);
-      setPageRender(3);
+      setAddMenu(true);
     }
   };
 
@@ -211,14 +207,11 @@ export default function TimeRecordSummary({
 
   const handleIconsClick = (value) => {
     switch (value) {
-      case "edit":
-        handleAdd("edit");
+      case "invoice":
+        handleAdd("invoice");
         break;
       case "delete":
         deleteClick();
-        break;
-      case "view":
-        handleAdd("edit");
         break;
       case "excel":
         handleExcelExport();
@@ -238,21 +231,23 @@ export default function TimeRecordSummary({
 
   // Handlers for your icons
   const handleAdd = (value) => {
-    if (value === "edit") {
+    if (value === "invoice") {
       if (selectedDatas.length !== 1) {
         showAlert(
           "info",
           selectedDatas.length === 0
-            ? "Please Select row"
-            : "Can't Select Multiple Row"
+            ? "Select a row  "
+            : "Can't Select multiple rows"
         );
         return;
       }
+     
       setId(selectedDatas[0]);
     } else {
       setId(0);
+      
     }
-    setPageRender(3);
+    setAddMenu(true);
   };
 
   //Delete alert open
@@ -269,7 +264,26 @@ export default function TimeRecordSummary({
 
   
 
-  
+  //To delete
+  const handledeleteRole = async () => {
+    const deletePayload = selectedDatas.map((item) => ({
+      id: item,
+    }));
+
+    try {
+      let response = await deleteAllocatedJobOrder(deletePayload);
+
+      if (response?.status === "Success") {
+        showAlert("success", response?.message);
+      }
+    } catch (error) {
+    } finally {
+      setrefreshFlag(true);
+      setselectedDatas([]);
+      setchangesTriggered(true);
+      handleConfrimClose();
+    }
+  };
 
   //confirmation
   const handleConfrimOpen = () => {
@@ -282,24 +296,25 @@ export default function TimeRecordSummary({
   const handleExcelExport = async () => {
     try {
       const response = await GetAllocatedJobOrderSummary({
-        type:4,
         pageNumber: 0,
         pageSize: 0,
         search: "",
+        type:5
       });
-      const excludedFields = ["Id","ModifiedBy","ModifiedOn","Status"];
+      const excludedFields = ["Id","ModifiedBy","ModifiedOn"];
       const filteredRows = JSON.parse(response?.result)?.Data;
 
       await ExcelExport({
-        reportName: "Time sheet Job Orders",
+        reportName: "Completed Job Orders",
         filteredRows,
         excludedFields,
       });
     } catch (error) {}
   };
 
-  
  
+ 
+  
   
   return (
     <>
@@ -327,7 +342,7 @@ export default function TimeRecordSummary({
             //  onSortChange={handleSortChange}
             onSearchKeyChange={handleSearchKeyChange}
             changesTriggered={changesTriggered}
-            setchangesTriggered={resetChangesTrigger}
+            // setchangesTriggered={resetChangesTrigger}
             onSelectedRowsChange={handleSelectedRowsChange}
             onRowDoubleClick={handleRowDoubleClick}
             totalRows={totalRows}
@@ -335,20 +350,31 @@ export default function TimeRecordSummary({
             totalPages={totalPages}
             hardRefresh={hardRefresh}
             IdName={"Id"}
-            statusName={'Status'}
-            remarks={'Remarks'}
           />
         </Box>
-        {/* <ConfirmationAlert
+        <ConfirmationAlert
           handleClose={handleConfrimClose}
           open={confirmAlert}
           data={confirmData}
           submite={handledeleteRole}
-        /> */}
+        />
+
+<NormalModal
+        isOpen={addMenu}
+        handleCloseModal={() => setAddMenu(false)}
+      >
+        <InvoiceModal
+          handleCloseModal={() => setAddMenu(false)}
+          selected={Id}
+          hardRefresh={hardRefresh}
+          userAction={userAction}
+        />
+      </NormalModal>
         
       </Box>
     </>
   );
 }
+
 
 
