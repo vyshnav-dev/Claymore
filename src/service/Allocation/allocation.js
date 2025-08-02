@@ -49,7 +49,7 @@ const allocationApis = () => {
     }
   };
 
-  
+
 
   const GetPendingJobOrderdetails = async (payload) => {
     try {
@@ -139,10 +139,10 @@ const allocationApis = () => {
       throw error;
     }
   };
-  
-   //# Suspend
 
-   const updateproductsuspend = async (payload) => {
+  //# Suspend
+
+  const updateproductsuspend = async (payload) => {
     try {
       const response = await makeAuthorizedRequestBase(
         "post",
@@ -156,10 +156,26 @@ const allocationApis = () => {
     }
   };
 
+  //# Transfer
+
+  const upsertjobtransfer = async (payload) => {
+    try {
+      const response = await makeAuthorizedRequestBase(
+        "post",
+        `allocation/upsertjobtransfer?fromTechnician=${payload?.fromTechnician}&toTechnician=${payload?.toTechnician}&allocation=${payload?.allocation}`,
+        payload,
+        true
+      );
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  };
 
 
-  
-  
+
+
+
 
   return {
     GetTechnicianList,
@@ -171,7 +187,8 @@ const allocationApis = () => {
     GetAllocatedJobOrderDetails,
     getclientlist,
     getrecordprevnext,
-    updateproductsuspend
+    updateproductsuspend,
+    upsertjobtransfer
   }
 }
 

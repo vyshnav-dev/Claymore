@@ -670,7 +670,7 @@ export default function TimeRecordDetails({
 
 
                             <UserInputField
-                                label={"Technician"}
+                                label={"Technician(Time sheet)"}
                                 name={"Inspector_Name"}
                                 type={"text"}
                                 disabled={true}

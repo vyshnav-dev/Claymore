@@ -601,7 +601,7 @@ export default function InspSummaryTable(props) {
                             key={column.id}
                             style={{ minWidth: column.minWidth }}
                           >
-                            {column.id === "GeoLocation" ? (
+                            {column.id === "GeoLocation"  && row["GeoLocation"] !== null  ? (
                               <IconButton
                                 onClick={() => handleMapOpen(row["GeoLocation"])}
                                 aria-label="location"

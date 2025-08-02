@@ -126,6 +126,19 @@ const  reportApis = ()=>{
           throw error;
         }
       };
+      const getjoborderdetailsreport = async (payload) => {
+        try {
+          const response = await makeAuthorizedRequestBase(
+            "get",
+            "report/getjoborderdetailsreport",
+            payload,
+            true
+          );
+          return response;
+        } catch (error) {
+          throw error;
+        }
+      };
 
       return {
         getpendingjoborderreport,
@@ -136,7 +149,8 @@ const  reportApis = ()=>{
         getinspectionreport,
         getacknowledgementreport,
         getapprovereport,
-        getinvoicereport
+        getinvoicereport,
+        getjoborderdetailsreport
       }
 }
 

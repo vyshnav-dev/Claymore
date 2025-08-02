@@ -141,7 +141,7 @@ export default function AckMainSummary({
         pageNo: pageNumber,
         pageSize: displayLength,
         search: currentSearchKey,
-        type:3,
+        type:7,
       });
 
       setrefreshFlag(false);

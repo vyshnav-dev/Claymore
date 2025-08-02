@@ -80,6 +80,9 @@ function Header() {
       else if(Id?.ScreenId === 34){
         navigate("/invoice", { state: Id });
       }
+      else if(Id?.ScreenId === 46){
+        navigate("/proof-reading", { state: Id });
+      }
     }
     else {
       setAnchorEl(event.currentTarget);
@@ -104,6 +107,7 @@ function Header() {
     setAnchorElUser(null);
   };
 
+// console.log('menu',menu);
 
 
   const handleClickEvent = async (menu) => {
@@ -167,6 +171,8 @@ function Header() {
         navigate("/authorizereport", { state: menu });
       }else if (menu?.ScreenId === 45) {
         navigate("/invoicereport", { state: menu });
+      }else if (menu?.ScreenId === 47) {
+        navigate("/jobreport", { state: menu });
       }
     }
     else {
@@ -185,6 +191,10 @@ function Header() {
     }
     else if (id === 34) {
       navigate("/invoice", { state: menu });
+      setAnchorElNav(null);
+    }
+    else if (id === 46) {
+      navigate("/proof-reading", { state: menu });
       setAnchorElNav(null);
     }
 

@@ -25,7 +25,8 @@ export default function UserAutoComplete({
   tagId,
   beId,
   Product,
-  criteria
+  criteria,
+  allocation
 }) {
   const [iTypeF2, setiTypeF2] = useState(1);
   const [searchkey, setsearchkey] = useState("");
@@ -63,7 +64,8 @@ export default function UserAutoComplete({
         Search: searchKey,
         Type: iTypeF2,
         criteria,
-        Product
+        Product,
+        allocation
       });
       const results = JSON.parse(response?.result);
       setMenu(results || []);

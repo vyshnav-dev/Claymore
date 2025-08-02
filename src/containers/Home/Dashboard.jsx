@@ -346,7 +346,7 @@ export default function Dashboard() {
         <Box
           display="grid"
           gridTemplateColumns={gridColumns}
-          gridAutoRows="140px"
+          gridAutoRows="110px"
           gap="10px"
         >
           {cardData.map((item, index) => {

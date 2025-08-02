@@ -5,7 +5,8 @@ import {
     DialogTitle,
     Typography,
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper,
-    TextField
+    TextField,
+    Tooltip
 } from "@mui/material";
 import React, { useState } from "react";
 import NormalButton from "../../component/Buttons/NormalButton";
@@ -21,6 +22,7 @@ import {
     selectedColor,
     thirdColor,
 } from "../../config/config";
+import UserAutoComplete from "../../component/AutoComplete/UserAutoComplete";
 
 
 
@@ -55,10 +57,14 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
     const [formData, setFormData] = useState({
     })
     const [mainDetails, setMainDetails] = useState({});
+    const [transfer, setTransfer] = useState({
+        From: null,
+        To: null
+    });
     const [suspend, setSuspend] = useState([]);
     const [products, setProducts] = useState([]);
     const { showAlert } = useAlert();
-    const { UpsertJobOrderAllocation, GetAllocatedJobOrderDetails, updateproductsuspend } = allocationApis()
+    const { UpsertJobOrderAllocation, GetAllocatedJobOrderDetails, updateproductsuspend, upsertjobtransfer } = allocationApis()
 
 
     React.useEffect(() => {
@@ -133,30 +139,59 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
     };
 
 
-    const handleSuspend = (e, items) => {
+    // const handleSuspend = (e, items) => {
+    //     const value = e.target.value;
+
+    //     const data = {
+    //         product: items?.Product,
+    //         quantity: value || 0
+    //     };
+
+    //     // Check if the product already exists in suspend array
+    //     setSuspend(prev => {
+    //         const existingIndex = prev.findIndex(p => p.product === items?.Product);
+    //         if (existingIndex !== -1) {
+    //             // Update existing product suspendQty
+    //             const updatedSuspend = [...prev];
+    //             updatedSuspend[existingIndex] = data;
+    //             return updatedSuspend;
+    //         } else {
+    //             // Add new product entry
+    //             return [...prev, data];
+    //         }
+    //     });
+    // };
+
+    const handleFieldChange = (e, items, fieldName) => {
         const value = e.target.value;
 
-        const data = {
-            product: items?.Product,
-            quantity: value || 0
-        };
-
-        // Check if the product already exists in suspend array
         setSuspend(prev => {
             const existingIndex = prev.findIndex(p => p.product === items?.Product);
+
             if (existingIndex !== -1) {
-                // Update existing product suspendQty
-                const updatedSuspend = [...prev];
-                updatedSuspend[existingIndex] = data;
-                return updatedSuspend;
+                // Update existing entry
+                return prev.map(item =>
+                    item.product === items?.Product
+                        ? { ...item, [fieldName]: value }
+                        : item
+                );
             } else {
-                // Add new product entry
-                return [...prev, data];
+                // Create new entry with defaults
+                return [
+                    ...prev,
+                    {
+                        product: items?.Product,
+                        quantity: fieldName === 'quantity' ? value : 0,
+                        remarks: fieldName === 'remarks' ? value : ''
+                    }
+                ];
             }
         });
     };
 
     const handleSubmitSuspend = async () => {
+
+
         try {
             if (!suspend?.length) {
                 showAlert("info", "Please add Suspend Quantity");
@@ -174,6 +209,35 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
                     hardRefresh();
                 }
             }
+
+
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    const handleSubmitTransfer = async () => {
+        try {
+            const emptyFields = [];
+            if (!transfer?.From) emptyFields.push(" From Technician");
+            if (!transfer?.To) emptyFields.push(" To Technician");
+            if (emptyFields.length > 0) {
+                showAlert('info', `Please Provide ${emptyFields[0]}`);
+                return;
+            }
+            const saveData = {
+                allocation: selected,
+                fromTechnician: transfer?.From,
+                toTechnician: transfer?.To
+            }
+
+            const response = await upsertjobtransfer(saveData)
+            if (response?.status === "Success") {
+                showAlert('success', response?.message);
+                handleCloseModal()
+                hardRefresh();
+            }
+
 
 
         } catch (error) {
@@ -238,7 +302,10 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
                                             <TableCell sx={{ ...headerCellStyle }}>Product</TableCell>
                                             <TableCell sx={{ ...headerCellStyle }}>Quantity</TableCell>
                                             {userAction.some((action) => action.Action === "Suspend") && (
-                                                <TableCell sx={{ ...headerCellStyle }}>Suspended Quantity</TableCell>
+                                                <>
+                                                    <TableCell sx={{ ...headerCellStyle }}>Suspended Quantity</TableCell>
+                                                    <TableCell sx={{ ...headerCellStyle }}>Remarks</TableCell>
+                                                </>
                                             )}
 
                                         </TableRow>
@@ -259,36 +326,74 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
                                                 </TableCell>
                                                 <TableCell sx={{ ...bodyCellStyle, pl: 1 }}>{item.Quantity}</TableCell>
                                                 {userAction.some((action) => action.Action === "Suspend") && (
-                                                    <TableCell sx={{               // remove extra padding so the cell doesn't force space
-                                                        ...bodyCellStyle
+                                                    <>
+                                                        <TableCell sx={{               // remove extra padding so the cell doesn't force space
+                                                            ...bodyCellStyle
 
-                                                    }}>
-                                                        <TextField
-                                                            multiline
-                                                            type="number"
-                                                            variant="outlined"
-                                                            onChange={(e) => {
-                                                                const value = e.target.value.replace(/\D/g, ''); // Remove non-numeric characters
-                                                                handleSuspend({ target: { value } }, item);
-                                                            }}
-                                                            value={suspend.find(p => p.product === item?.Product)?.quantity || ''}
-                                                            inputMode="numeric"  // Helps on mobile devices
-                                                            pattern="[0-9]*"     // Allows only numbers
-                                                            inputProps={{ min: 0 }}
-                                                            sx={{
-                                                                width: '100%',
-                                                                '& .MuiOutlinedInput-root': {
-                                                                    display: 'flex',
-                                                                    flex: 1,
-                                                                    alignItems: 'stretch',
-                                                                },
-                                                                '& .MuiOutlinedInput-input': {
-                                                                    py: 0,
-                                                                },
-                                                            }}
-                                                        />
+                                                        }}>
+                                                            <TextField
+                                                                multiline
+                                                                type="number"
+                                                                variant="outlined"
+                                                                onChange={(e) => {
+                                                                    const value = e.target.value.replace(/\D/g, ''); // Remove non-numeric characters
+                                                                    handleFieldChange({ target: { value } }, item, 'quantity');
+                                                                }}
+                                                                value={suspend.find(p => p.product === item?.Product)?.quantity || ''}
+                                                                inputMode="numeric"  // Helps on mobile devices
+                                                                pattern="[0-9]*"     // Allows only numbers
+                                                                inputProps={{ min: 0 }}
+                                                                sx={{
+                                                                    width: '100%',
+                                                                    '& .MuiOutlinedInput-root': {
+                                                                        display: 'flex',
+                                                                        flex: 1,
+                                                                        alignItems: 'stretch',
+                                                                    },
+                                                                    '& .MuiOutlinedInput-input': {
+                                                                        py: 0,
+                                                                    },
+                                                                }}
+                                                            />
 
-                                                    </TableCell>
+                                                        </TableCell>
+
+                                                        <TableCell sx={{               // remove extra padding so the cell doesn't force space
+                                                            ...bodyCellStyle
+
+                                                        }}>
+                                                            <Tooltip
+                                                                title={suspend.find(p => p.product === item?.Product)?.remarks || ''}
+                                                                placement="top"
+                                                                arrow
+                                                            >
+                                                                <TextField
+                                                                    multiline
+                                                                    type="text"
+                                                                    variant="outlined"
+                                                                    onChange={(e) => handleFieldChange(e, item, 'remarks')}
+                                                                    value={suspend.find(p => p.product === item?.Product)?.remarks || ''}
+                                                                    sx={{
+                                                                        width: '100%',
+                                                                        '& .MuiOutlinedInput-root': {
+                                                                            display: 'flex',
+                                                                            flex: 1,
+                                                                            alignItems: 'stretch',
+                                                                            maxHeight: '55px', // Fixed height
+                                                                            overflow: 'hidden', // Hide overflow
+                                                                        },
+                                                                        '& .MuiOutlinedInput-input': {
+                                                                            py: 0,
+                                                                            whiteSpace: 'nowrap', // Prevent line breaks
+                                                                            overflow: 'hidden',
+                                                                            textOverflow: 'ellipsis', // Show ellipsis for overflow
+                                                                        },
+                                                                    }}
+                                                                />
+                                                            </Tooltip>
+
+                                                        </TableCell>
+                                                    </>
                                                 )}
 
                                             </TableRow>
@@ -311,15 +416,52 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
                                 tag_getbusinessentitysummary={GetTechnicianList}
                                 userData={userData?.UserId}
                             />
+
+
                         </Box>
 
-
-
                     </Box>
-
                 </DialogContent>
+                {userAction.some((action) => action.Action === "Transfer") && (
+                    <>
+                        <Typography sx={{ pl: 2, fontWeight: 'bold', display: 'flex', flexWrap: 'wrap' }}>Transfer</Typography>
+
+                        <Box sx={{ display: 'flex', justifyContent: 'space-around', flexWrap: 'wrap', p: 1 }}>
+
+                            <UserAutoComplete
+                                apiKey={GetTechnicianList}
+                                formData={transfer}
+                                setFormData={setTransfer}
+                                label={"From Technician"}
+                                autoId={"Inspector"}
+                                required={true}
+                                formDataName={"From_Name"}
+                                formDataiId={"From"}
+                                criteria={2}
+                                allocation={selected}
+                            />
+                            <UserAutoComplete
+                                apiKey={GetTechnicianList}
+                                formData={transfer}
+                                setFormData={setTransfer}
+                                label={"To Technician"}
+                                autoId={"Inspector"}
+                                required={true}
+                                formDataName={"To_Name"}
+                                formDataiId={"To"}
+                                criteria={0}
+                                allocation={selected}
+                            />
+                        </Box>
+                    </>
+
+                )}
+
 
                 <DialogActions >
+                    {userAction.some((action) => action.Action === "Transfer") && (
+                        <NormalButton action={handleSubmitTransfer} label="Trasfer" />
+                    )}
                     {userAction.some((action) => action.Action === "Suspend") && (
                         <NormalButton action={handleSubmitSuspend} label="Suspend" />
                     )}

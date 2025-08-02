@@ -98,7 +98,9 @@ function BasicBreadcrumbs() {
         </div>
     );
 }
-const DefaultIcons = ({ iconsClick, detailPageId, userAction, certify, isSave, menuId }) => {
+const DefaultIcons = ({ iconsClick, detailPageId, userAction, certify, isSave, menuId, }) => {
+
+
 
 
     const hasAproove = userAction.some((action) => action.Action == "Authorize");
@@ -185,6 +187,16 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction, certify, isSave, m
                 </>
             ) : null}
 
+            {menuId == 46 &&
+                <ActionButton
+                    iconsClick={iconsClick}
+                    icon="fa-solid fa-check-double"
+                    caption="Submit"
+                    iconName="save"
+                />
+
+            }
+
             {hasCertificate && detailPageId != 0 && certify == 2 && (
                 <ActionButton
                     iconsClick={iconsClick}
@@ -220,8 +232,6 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction, certify, isSave, m
                     ) : null}
                 </>
             )}
-
-
 
 
             <ActionButton
@@ -427,14 +437,12 @@ export default function InspDetails({
     menuLabel
 }) {
 
-
+    const disabledField = menuId == 46 ? false : true
     const [formData, setFormData] = useState({
         Id: null,
         DocNo: "",
         Product: "",
         List: null,
-        OwnerName: "",
-        OfficeAddress: "",
         EquipmentLocation: "",
         DateOfInspection: null,
         PreviousInspectionReport: "",
@@ -478,6 +486,9 @@ export default function InspDetails({
     const [itemLabel, setItemLabel] = useState('');
     const [certify, setCertify] = useState(0);
 
+
+
+
     //TagAttachmentTab
     const [dbTagAttachmentDetails, setdbTagAttachmentDetails] = useState([])
 
@@ -495,7 +506,7 @@ export default function InspDetails({
 
     const { showAlert } = useAlert();
     const {
-        GetInspectionFields, getexaminationform, getdocno, getjoborderheaddetails, getInspectionDetails, upsertInspection, deleteInspection, upsertApprove, uploadAttachfiles, generatecertificate
+        GetInspectionFields, getexaminationform, getdocno, getjoborderheaddetails, getInspectionDetails, upsertInspection, upsertproofreading, upsertApprove, uploadAttachfiles, generatecertificate
     } = inspectionApis();
 
     const { getrecordprevnext } = allocationApis()
@@ -508,9 +519,6 @@ export default function InspDetails({
                     DocNo: "",
                     Product: "",
                     List: null,
-                    OwnerName: "",
-                    OfficeAddress: "",
-                    EquipmentLocation: "",
                     DateOfInspection: currentDate,
                     PreviousInspectionReport: "",
                     TestMethod: "",
@@ -547,8 +555,10 @@ export default function InspDetails({
                     const response1 = await getjoborderheaddetails({
                         allocation: mainDetails?.Allocation
                     })
+
                     if (response1.status == "Success") {
                         const myObject = JSON.parse(response1?.result);
+
                         setFormData(prevState => ({
                             ...prevState, // Retain previous values
                             Owner: myObject[0]?.Owner,
@@ -614,11 +624,8 @@ export default function InspDetails({
                     setFormData({
                         Id: 0,
                         DocNo: "",
-                        OwnerName: "",
                         Product: "",
                         List: null,
-                        OfficeAddress: "",
-                        EquipmentLocation: "",
                         DateOfInspection: null,
                         PreviousInspectionReport: "",
                         TestMethod: "",
@@ -655,11 +662,8 @@ export default function InspDetails({
                 setFormData({
                     Id: 0,
                     DocNo: null,
-                    OwnerName: null,
                     Product: null,
                     List: null,
-                    OfficeAddress: "",
-                    EquipmentLocation: null,
                     DateOfInspection: null,
                     PreviousInspectionReport: null,
                     TestMethod: null,
@@ -726,6 +730,7 @@ export default function InspDetails({
                 const result = JSON.parse(response?.result)
 
 
+
                 let updatedData = {
                     ...formData,
                     ...result,
@@ -779,6 +784,8 @@ export default function InspDetails({
         });
         setProperty(true);
     };
+
+
 
 
 
@@ -957,6 +964,20 @@ export default function InspDetails({
                 }, {});
             const inspectionInformationArray = [filteredInspectionInformation]
 
+            if (menuId == 46) {
+                const headData = {
+                    id: formData?.Id,
+                    list: formData?.List,
+                    owner: formData?.Owner,
+                    address: formData?.Address,
+                    location: formData?.Location
+                }
+
+                const response3 = await upsertproofreading(headData);
+
+            }
+
+
             const saveData = {
                 id: formData?.Id,
                 docNo: formData?.DocNo,
@@ -978,7 +999,10 @@ export default function InspDetails({
                 targetDateOfClosure: formData?.TargetDateOfClosure,
                 targetDateOfClosure1: formData?.TargetDateOfClosure1,
                 otherRemarks: formData?.OtherRemarks,
-                attachments: formData?.Attachment || []
+                attachments: formData?.Attachment || [],
+                reject: formData?.Reject,
+                rejectRemarks: formData?.RejectRemarks,
+                pfStatus: menuId == 46 ? true : false
             };
 
 
@@ -1073,6 +1097,7 @@ export default function InspDetails({
 
 
 
+
     const handlePropertyConfirmation = async (status) => {
         if (status == 1 || status == 3 || status == 4) {
             if (!mainDetails1?.Remarks) {
@@ -1117,6 +1142,8 @@ export default function InspDetails({
             setProperty(false);
         }
     };
+
+
 
     const handleCertificate = async () => {
         // Open a blank popup immediately on user action
@@ -1250,7 +1277,7 @@ export default function InspDetails({
                                 label={"Owner Name"}
                                 name={"Owner"}
                                 type={"text"}
-                                disabled={true}
+                                disabled={disabledField}
                                 mandatory={false}
                                 value={formData}
                                 setValue={setFormData}
@@ -1260,7 +1287,7 @@ export default function InspDetails({
                                 label={"Office Address"}
                                 name={"Address"}
                                 type={"text"}
-                                disabled={true}
+                                disabled={disabledField}
                                 mandatory={false}
                                 value={formData}
                                 setValue={setFormData}
@@ -1270,7 +1297,7 @@ export default function InspDetails({
                                 label={"Equipment Location"}
                                 name={"Location"}
                                 type={"text"}
-                                disabled={true}
+                                disabled={disabledField}
                                 mandatory={false}
                                 value={formData}
                                 setValue={setFormData}
@@ -1289,7 +1316,7 @@ export default function InspDetails({
                         expanded={expanded == "InspectionDetails"}
                         onChange={handleChange("InspectionDetails")}
                     >
-                        <InspDetailsTab key={999} formData={formData} setFormData={setFormData} />
+                        <InspDetailsTab key={999} formData={formData} setFormData={setFormData} disabledField={disabledField} />
                     </CustomizedAccordions>
 
 
@@ -1402,11 +1429,11 @@ export default function InspDetails({
                 open={property}
                 data={confirmData}
                 submite={handlePropertyConfirmation}
-                // selectedDatas={selectedDatas?.length === 1 ? selectedDatas[0] : null}
                 itemLabel={itemLabel}
                 mainDetails={mainDetails1}
                 setMainDetails={setMainDetails1}
             />
+
 
             <ImageModal
                 isOpen={isImageModalOpenSign}

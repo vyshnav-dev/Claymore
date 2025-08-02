@@ -3,7 +3,7 @@ import React from 'react'
 import UserInputField from '../../component/InputFields/UserInputField'
 import AutoSelect from '../../component/AutoComplete/AutoSelect'
 
-export default function InspDetailsTab({formData,setFormData}) {
+export default function InspDetailsTab({formData,setFormData,disabledField}) {
     const currentDate = new Date().toLocaleDateString("en-CA");
   return (
     
@@ -27,7 +27,7 @@ export default function InspDetailsTab({formData,setFormData}) {
             label={"Date of Inspection"}
             name={"DateOfInspection"}
             type={"date"}
-            disabled={true}
+            disabled={disabledField}
             mandatory={true}
             value={formData}
             setValue={setFormData}
@@ -65,7 +65,7 @@ export default function InspDetailsTab({formData,setFormData}) {
             label={"Test Method"}
             name={"TestMethod"}
             type={"text"}
-            disabled={true}
+            disabled={disabledField}
             mandatory={true}
             value={formData}
             setValue={setFormData}

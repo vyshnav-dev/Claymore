@@ -21,6 +21,7 @@ function MultiCheckBox({ formData, setFormData, sFieldName, label, isMandatory, 
             type: 1,
             User: userData,
             search: searchTerm,
+            criteria:0
           });
         }
 

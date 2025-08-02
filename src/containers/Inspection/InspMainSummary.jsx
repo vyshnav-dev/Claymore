@@ -10,6 +10,7 @@ import ExcelExport from "../../component/Excel/Excel";;
 import { allocationApis } from "../../service/Allocation/allocation";
 
 function BasicBreadcrumbs({mId}) {
+  
   const style = {
     display: "flex",
     alignItems: "center",
@@ -44,7 +45,7 @@ function BasicBreadcrumbs({mId}) {
           aria-label="breadcrumb"
         >
           <Typography underline="hover" sx={style} key="1">
-           { mId !== 31 ? 'Inspection Job Orders ' :'Authorize Job Orders'}
+           { mId === 46 ? 'Pending Job Orders ': mId == 28 ? 'Inspection Job Orders ':'Authorize Job Orders'}
           </Typography>
         </Breadcrumbs>
       </Stack>
@@ -138,6 +139,9 @@ export default function InspMainSummary({
     }
     else if(menuIdLocal == 28){
       Type = 2;
+    }
+    else if(menuIdLocal == 46){
+      Type = 6;
     }
     else{
       return;
@@ -280,6 +284,9 @@ export default function InspMainSummary({
       Type = 2;
       Status = "Status"
     }
+    else if(menuIdLocal == 46){
+      Type = 6;
+    }
     else{
       return;
     }
@@ -294,7 +301,7 @@ export default function InspMainSummary({
       const filteredRows = JSON.parse(response?.result)?.Data;
 
       await ExcelExport({
-        reportName: menuIdLocal !== 31 ? 'Inspection Job Orders ' :'Authorize',
+        reportName: menuIdLocal == 46 ? 'Pending Job Orders' : menuIdLocal == 31 ? 'Authorize' :'Inspection Job Orders',
         filteredRows,
         excludedFields,
       });
@@ -339,7 +346,7 @@ export default function InspMainSummary({
             totalPages={totalPages}
             hardRefresh={hardRefresh}
             IdName={"Id"}
-            statusName={menuIdLocal !== 31 ?"Status":''}
+            statusName={menuIdLocal == 31 || menuIdLocal == 46  ? "":'Status'}
             remarks={'Remarks'}
           />
         </Box>

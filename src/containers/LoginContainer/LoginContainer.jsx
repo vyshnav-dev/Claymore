@@ -9,7 +9,7 @@ import {
 } from "mdb-react-ui-kit";
 import { useNavigate } from "react-router-dom";
 import { loginApi } from "../../service/Security/login";
-import { Autocomplete, Box, Paper, TextField, Typography } from "@mui/material";
+import { Autocomplete, Box, FormControlLabel, Paper, Switch, TextField, Typography } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import Loader from "../../component/Loader/Loader";
@@ -17,7 +17,7 @@ import ValidationAlert from "../../component/Alerts/ValidationAlert";
 import claymore from "/Images/Claymore1.png";
 import sangsolution from "/Images/CSSC logo.jpg";
 import { encrypt } from "../../service/Security/encryptionUtils";
-
+import { localStoredDecryption, localStoredEncryption } from "../../service/Security/localStoredEncryption";
 
 // Custom styles for TextField
 const textFieldStyle = {
@@ -55,10 +55,42 @@ export default function LoginContainer() {
   const [loader, setLoader] = useState(false);
   const [warning, setWarning] = useState(false);
   const [warningData, setWarningData] = useState({});
+  
+  const [rememberMe, setRememberMe] = useState(false);
 
   const [tabPressed, setTabPressed] = useState(false);
   const companyInputRef = useRef(null);
   const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    const savedCredentials = localStorage.getItem("rememberedCredentials");
+    if (savedCredentials) {
+      try {
+        const creds = JSON.parse(savedCredentials);
+        if (creds.loginName && creds.password) {
+          const decryptedPassword = localStoredDecryption(creds.password, true);
+          if (!decryptedPassword) {
+            console.error("Decryption failed, please check the encryption key and IV.");
+            localStorage.removeItem("rememberedCredentials");
+            setFormData({ loginName: "", password: "" });
+            return;
+          }
+          setFormData({ ...creds, password: decryptedPassword });
+          setRememberMe(true);
+        } else {
+          // If stored creds are incomplete, reset the state.
+          setFormData({ loginName: "", password: "" });
+        }
+      } catch (error) {
+        console.error("Error parsing stored credentials:", error);
+        localStorage.removeItem("rememberedCredentials");
+        setFormData({ loginName: "", password: "" });
+      }
+    } else {
+      
+      setFormData({ loginName: "", password: "" });
+    }
+  }, []);
 
   // Effect to handle closing dropdown on outside click
   useEffect(() => {
@@ -124,6 +156,13 @@ export default function LoginContainer() {
         localStorage.setItem("SangClaymoreAccessToken", JSON.parse(response?.result?.accessToken));
         localStorage.setItem("SangClaymoreRefreshToken", JSON.parse(response?.result?.refreshToken));
         localStorage.setItem("ClaymoreUserData", response?.result?.userData);
+
+        if (rememberMe) {
+          const encryptedPassword = localStoredEncryption(formData.password);
+          localStorage.setItem("rememberedCredentials", JSON.stringify({ loginName: formData.loginName, password: encryptedPassword }));
+        } else {
+          localStorage.removeItem("rememberedCredentials");
+        }
 
         showWarning(response?.message, "success");
         navigate("/home");
@@ -282,6 +321,26 @@ export default function LoginContainer() {
                   </Typography>
                 )}
               </Box>
+
+              {/* Remember Me Checkbox */}
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                    color="primary"
+                    size="small"
+                    sx={{ transform: "scale(0.9)" }} // further reduces the switch size
+                  />
+                }
+                label="Remember credentials"
+                sx={{
+                  mb: 2,
+                  color: "#141b2d",
+                  fontWeight: "bold",
+                  "& .MuiFormControlLabel-label": { fontSize: "0.9rem" } // reduces text font size
+                }}
+              />
 
               <MDBBtn
 

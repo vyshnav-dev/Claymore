@@ -1,18 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { securityApis } from "../../service/Security/security";
-import RiskAssesmentSummary from "./RiskAssesmentSummary";
-import RiskAssesmentDetails from "./RiskAssesmentDetails";
-import RiskMainSummary from "./RiskMainSummary";
+import { securityApis } from "../../../service/Security/security";
+import JobReport from "./JobReport";
 
-export default function RiskAssesmentContainer() {
+export default function JobReportContainer() {
   const location = useLocation();
   const [page, setPage] = useState(1);
   const [id, setId] = useState(0);
   const [menuIdLocal, setmenuIdLocal] = useState(null);
   const [userAction, setuserAction] = useState([]);
   const menuId = location?.state;
-  const [riskId, setRiskId] = useState(0);
   const navigate = useNavigate();
   const { getuseractionsforscreen } = securityApis();
 
@@ -31,8 +28,6 @@ export default function RiskAssesmentContainer() {
           screenId: menuIdLocal,
         });
         const data = JSON.parse(response?.result);
-        console.log('d',data);
-        
         setuserAction(data);
       } catch (error) {
         navigate("/home");
@@ -43,32 +38,8 @@ export default function RiskAssesmentContainer() {
 
   return (
     <>
-      {page === 1 ? (
-        <RiskMainSummary
-          setPageRender={setPage}
-          setId={setId}
-          Id={id}
-          userAction={userAction}
-          screenId={menuId}
-        />
-      ):page === 2 ? (
-        <RiskAssesmentSummary
-          setPageRender={setPage}
-          setId={setId}
-          Id={id}
-          userAction={userAction}
-          screenId={menuId}
-          setRiskId={setRiskId}
-        />
-      ) : page === 3 ? (
-        <RiskAssesmentDetails
-          setPageRender={setPage}
-          detailPageId={id}
-          userAction={userAction}
-          riskId={riskId}
-          setId={setId}
-        />
-      ) : null}
+      <JobReport detailPageId={id} userAction={userAction} />
     </>
   );
 }
+

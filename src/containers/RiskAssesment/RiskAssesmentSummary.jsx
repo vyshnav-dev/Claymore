@@ -146,6 +146,7 @@ export default function RiskAssesmentSummary({
         response?.status === "Success" 
       ) {
         const myObject = JSON.parse(response?.result);
+        
         setRows(myObject?.Data);
 
         const totalRows = myObject?.Metadata.TotalRows;

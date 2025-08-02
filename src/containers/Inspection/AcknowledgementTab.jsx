@@ -1,7 +1,7 @@
 import React from 'react'
 import UserInputField from '../../component/InputFields/UserInputField'
 import { Box } from '@mui/material'
-// import ChecKBoxLabel from '../../component/CheckBox/CheckBoxLabel'
+import ChecKBoxLabel from '../../component/CheckBox/CheckBoxLabel'
 
 export default function AcknowledgementTab({ formData, setFormData }) {
     return (
@@ -77,7 +77,7 @@ export default function AcknowledgementTab({ formData, setFormData }) {
                 maxLength={60}
             />
 
-            {/* <ChecKBoxLabel
+            <ChecKBoxLabel
                 label={"Reject"}
                 value={formData}
                 changeValue={setFormData}
@@ -94,7 +94,7 @@ export default function AcknowledgementTab({ formData, setFormData }) {
                 setValue={setFormData}
                 multiline={true}
                 maxLength={60}
-            /> */}
+            />
 
         </Box>
     )

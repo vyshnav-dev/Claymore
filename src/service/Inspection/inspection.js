@@ -481,6 +481,23 @@ const inspectionApis = () => {
     }
   };
 
+  // ---------proof reading--------------
+
+  const upsertproofreading = async (payload) => {
+    try {
+      const response = await makeAuthorizedRequestBase(
+        "post",
+        "/approve/upsertproofreading",
+        payload,
+        true
+      );
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+ 
   
 
   
@@ -518,7 +535,8 @@ const inspectionApis = () => {
     generatepdfprint,
     upsertmultiapprove,
     upsertinvoice,
-    getinvoicedetails
+    getinvoicedetails,
+    upsertproofreading
   }
 }
 

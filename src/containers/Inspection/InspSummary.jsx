@@ -45,7 +45,7 @@ function BasicBreadcrumbs({ mId }) {
           aria-label="breadcrumb"
         >
           <Typography underline="hover" sx={style} key="1">
-            {mId !== 31 ? 'Inspection Product list ' : 'Authorize Product list'}
+            {mId == 46 ? 'Pending Product list ':mId == 28 ? 'Inspection Product list ' : 'Authorize Product list'}
           </Typography>
         </Breadcrumbs>
       </Stack>
@@ -196,25 +196,28 @@ export default function InspSummary({
     else if (menuIdLocal == 28) {
       Type = 1;
     }
+    else if (menuIdLocal == 46) {
+      Type = 3;
+    }
     else {
       return;
     }
     try {
 
       let response;
-      if (!Id) {
-        if (mainDetails?.Allocation) {
-          setNewId(true)
-        }
-        response = await getjoborderproductlistsummary({
-          id: mainDetails?.Allocation,
-          pageNo: pageNumber,
-          pageSize: displayLength,
-          search: currentSearchKey,
-        });
-      }
-      else {
-        setNewId(false);
+      // if (!Id) {
+      //   if (mainDetails?.Allocation) {
+      //     setNewId(true)
+      //   }
+      //   response = await getjoborderproductlistsummary({
+      //     id: mainDetails?.Allocation,
+      //     pageNo: pageNumber,
+      //     pageSize: displayLength,
+      //     search: currentSearchKey,
+      //   });
+      // }
+      // else {
+        // setNewId(false);
         response = await getInspectionSummary({
           allocation: Id,
           pageNo: pageNumber,
@@ -223,7 +226,7 @@ export default function InspSummary({
           type: Type,
           status: mainDetails?.Status
         });
-      }
+      // }
       // setMainDetails({
       //   Allocation:Id
       // })
@@ -267,7 +270,7 @@ export default function InspSummary({
 
 
   const handleRowDoubleClick = (rowiId, row) => {
-    if (rowiId > 0 && userAction.some((action) => action.Action === "View" || action.Action === "Edit")) {
+    if (rowiId > 0  && userAction.some((action) => action.Action === "View" || action.Action === "Edit")) {
       // if(menuIdLocal == 29 && row.CreatedBy !== loginName){
       //   showAlert('info',"You can't edit")
       //     return;
@@ -392,6 +395,9 @@ export default function InspSummary({
     else if (menuIdLocal == 28) {
       Type = 1;
     }
+    else if (menuIdLocal == 46) {
+      Type = 3;
+    }
     else {
       return;
     }
@@ -407,7 +413,7 @@ export default function InspSummary({
       const filteredRows = JSON.parse(response?.result)?.Data;
 
       await ExcelExport({
-        reportName: menuIdLocal !== 31 ? 'Inspection Product list' : 'Authorize Product list',
+        reportName: menuIdLocal == 46 ? 'Pending Product list' :menuIdLocal == 31 ? 'Authorize Product list' : 'Inspection Product list',
         filteredRows,
         excludedFields,
       });

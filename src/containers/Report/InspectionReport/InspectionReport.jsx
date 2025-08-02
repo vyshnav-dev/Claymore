@@ -18,6 +18,7 @@ import { primaryColor } from "../../../config/config";
 import UserInputField from "../../../component/InputFields/UserInputField";
 import { reportApis } from "../../../service/Report/report";
 import ExcelExport from "../../../component/Excel/Excel";
+import ExcelExport1 from "../../../component/Excel/NewExcel";
 import ReportSummary from "../../../component/Table/ReportSummary";
 import NormalButton from "../../../component/Buttons/NormalButton";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -123,6 +124,14 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
                     iconName={"excel"}
                 />
             )}
+            {userAction.some((action) => action.Action === "Excel") && (
+                <ActionButton
+                    iconsClick={iconsClick}
+                    icon={"fa-solid fa-file-excel"}
+                    caption={"prjct Excel"}
+                    iconName={"excel1"}
+                />
+            )}
 
             <ActionButton
                 iconsClick={iconsClick}
@@ -149,6 +158,88 @@ const icon = (
         </svg>
     </Paper>
 );
+
+const data = {
+    vendor: {
+      name: "ABC Pvt. Ltd.",
+      address: ["123 Street", "Area", "City"],
+      phone: "9876543210",
+      email: "contact@abc.com",
+      documentRef: "DOC12345"
+    },
+    rfq: {
+      date: "2025-07-23",
+      rfqNumber: "RFQ-2025-008",
+      deadline: "2025-07-30",
+      deliveryLocation: "Warehouse 7, Pune",
+      deliveryTimeline: "7 days",
+      currency: "INR"
+    },
+    items: [
+      {
+        item: "Steel Rod",
+        partNo: "ST123",
+        description: "Stainless Steel Rod",
+        manufacturer: "SteelCorp",
+        model: "SRX-01",
+        type: "Round",
+        uom: "Kg",
+        requiredQty: 100,
+        offeredQty: 100,
+        unitPrice: 150,
+        attachment: "Yes",
+        comments: "Standard spec",
+        vendorRemarks: "Available"
+      },
+      {
+        item: "Bolts",
+        partNo: "BT456",
+        description: "M10 Bolts",
+        manufacturer: "BoltMakers",
+        model: "M10-B",
+        type: "Hex",
+        uom: "Box",
+        requiredQty: 50,
+        offeredQty: 45,
+        unitPrice: 500,
+        attachment: "No",
+        comments: "",
+        vendorRemarks: "Partial stock"
+      },
+      {
+        item: "Bolts",
+        partNo: "BT456",
+        description: "M10 Bolts",
+        manufacturer: "BoltMakers",
+        model: "M10-B",
+        type: "Hex",
+        uom: "Box",
+        requiredQty: 50,
+        offeredQty: 45,
+        unitPrice: 500,
+        attachment: "No",
+        comments: "",
+        vendorRemarks: "Partial stock"
+      }
+    ],
+    commercial: {
+      paymentTerms: "Net 30",
+      warrantyTerms: "1 year",
+      incoterms: "FOB",
+      deliveryAddressConsidered: "Yes",
+      otherDetails: "None"
+    },
+    totals: {
+      grossValue: 10000,
+      taxRate: "18%",
+      tax: 1800,
+      shippingHandling: 200,
+      other: 0,
+      netValue: 12000
+    }
+  };
+  
+  
 
 export default function InspectionReport({ userAction, disabledDetailed }) {
     const [mainDetails, setMainDetails] = useState({
@@ -270,6 +361,10 @@ export default function InspectionReport({ userAction, disabledDetailed }) {
                 }
                 handleExcel();
                 break;
+            case "excel1":
+                
+                handleProject();
+                break;
             default:
                 break;
         }
@@ -279,6 +374,13 @@ export default function InspectionReport({ userAction, disabledDetailed }) {
     const handleclose = () => {
         window.history.back();
     };
+
+    const handleProject = async () =>{
+        await ExcelExport1({
+            reportName: `RDL Report`,
+            data,
+        });
+    }
 
     const handleExcel = async () => {
         const response = await getinspectionreport({
