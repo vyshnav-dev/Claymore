@@ -82,7 +82,7 @@ function BasicBreadcrumbs() {
                     aria-label="breadcrumb"
                 >
                     <Typography underline="hover" sx={style} key="1">
-                        Site Time Record Details
+                        Time Sheet
                     </Typography>
                 </Breadcrumbs>
             </Stack>

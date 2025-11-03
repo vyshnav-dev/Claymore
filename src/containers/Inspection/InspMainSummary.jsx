@@ -45,7 +45,7 @@ function BasicBreadcrumbs({mId}) {
           aria-label="breadcrumb"
         >
           <Typography underline="hover" sx={style} key="1">
-           { mId === 46 ? 'Pending Job Orders ': mId == 28 ? 'Inspection Job Orders ':'Authorize Job Orders'}
+           { mId === 46 ? 'Proof Reading ': mId == 28 ? 'Inspection  ':'Authorize '}
           </Typography>
         </Breadcrumbs>
       </Stack>

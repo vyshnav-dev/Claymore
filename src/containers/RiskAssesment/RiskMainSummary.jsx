@@ -45,7 +45,7 @@ function BasicBreadcrumbs() {
           aria-label="breadcrumb"
         >
           <Typography underline="hover" sx={style} key="1">
-            RiskAssessment Job Orders
+            RiskAssessment 
           </Typography>
         </Breadcrumbs>
       </Stack>
@@ -216,6 +216,7 @@ export default function RiskMainSummary({
         break;
       case "view":
         handleAdd("edit");
+        break;
       case "excel":
         handleExcelExport();
         break;

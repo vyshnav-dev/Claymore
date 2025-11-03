@@ -6,13 +6,13 @@ const DashboardBox = ({ title, subtitle}) => {
     <Box width="100%" mx="30px">
       <Box display="flex" justifyContent="space-between">
         <Box>
-          <Typography variant="h5" fontWeight="bold" color="white">
+          <Typography variant="h4" fontWeight="bold" color="white">
             {title}
           </Typography>
         </Box>
       </Box>
       <Box display="flex" justifyContent="space-between" mt="8px">
-        <Typography variant="h5" color="white">
+        <Typography variant="h6" color="white">
           {subtitle}
         </Typography>
     

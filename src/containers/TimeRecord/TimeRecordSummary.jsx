@@ -45,7 +45,7 @@ function BasicBreadcrumbs() {
           aria-label="breadcrumb"
         >
           <Typography underline="hover" sx={style} key="1">
-            Time sheet Job Orders
+            Time Sheet 
           </Typography>
         </Breadcrumbs>
       </Stack>

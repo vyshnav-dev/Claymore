@@ -124,14 +124,7 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
                     iconName={"excel"}
                 />
             )}
-            {userAction.some((action) => action.Action === "Excel") && (
-                <ActionButton
-                    iconsClick={iconsClick}
-                    icon={"fa-solid fa-file-excel"}
-                    caption={"prjct Excel"}
-                    iconName={"excel1"}
-                />
-            )}
+            
 
             <ActionButton
                 iconsClick={iconsClick}
@@ -361,10 +354,6 @@ export default function InspectionReport({ userAction, disabledDetailed }) {
                 }
                 handleExcel();
                 break;
-            case "excel1":
-                
-                handleProject();
-                break;
             default:
                 break;
         }
@@ -375,13 +364,7 @@ export default function InspectionReport({ userAction, disabledDetailed }) {
         window.history.back();
     };
 
-    const handleProject = async () =>{
-        await ExcelExport1({
-            reportName: `RDL Report`,
-            data,
-        });
-    }
-
+   
     const handleExcel = async () => {
         const response = await getinspectionreport({
             fromDate: mainDetails.fromDate,

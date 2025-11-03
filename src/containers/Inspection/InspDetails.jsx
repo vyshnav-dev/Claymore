@@ -56,7 +56,7 @@ CustomTabPanel.propTypes = {
     value: PropTypes.number.isRequired,
 };
 
-function BasicBreadcrumbs() {
+function BasicBreadcrumbs({mId}) {
     const style = {
         display: "flex",
         alignItems: "center",
@@ -90,7 +90,7 @@ function BasicBreadcrumbs() {
                     aria-label="breadcrumb"
                 >
                     <Typography underline="hover" sx={style} key="1">
-                        Inspection Details
+                        { mId === 46 ? 'Proof Reading ': mId == 28 ? 'Inspection  ':'Authorize '}
 
                     </Typography>
                 </Breadcrumbs>
@@ -1190,7 +1190,7 @@ export default function InspDetails({
                     backgroundColor: 'white'
                 }}
             >
-                <BasicBreadcrumbs />
+                <BasicBreadcrumbs mId={menuId} />
                 <DefaultIcons
                     detailPageId={detailPageId}
                     iconsClick={handleIconsClick}

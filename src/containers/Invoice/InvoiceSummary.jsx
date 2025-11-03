@@ -47,7 +47,7 @@ function BasicBreadcrumbs() {
           aria-label="breadcrumb"
         >
           <Typography underline="hover" sx={style} key="1">
-             Completed Job Orders
+             Invoice
           </Typography>
         </Breadcrumbs>
       </Stack>

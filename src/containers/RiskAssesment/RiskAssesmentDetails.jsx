@@ -83,7 +83,7 @@ function BasicBreadcrumbs() {
                     aria-label="breadcrumb"
                 >
                     <Typography underline="hover" sx={style} key="1">
-                        Risk Assessment Details
+                        Risk Assessment 
                     </Typography>
                 </Breadcrumbs>
             </Stack>
