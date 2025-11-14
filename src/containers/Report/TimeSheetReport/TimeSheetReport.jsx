@@ -23,6 +23,7 @@ import NormalButton from "../../../component/Buttons/NormalButton";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import UserAutoComplete from "../../../component/AutoComplete/UserAutoComplete";
 import { allocationApis } from "../../../service/Allocation/allocation";
+import { useNavigate } from "react-router-dom";
 const currentDate = new Date().toLocaleDateString("en-CA");
 
 function CustomTabPanel(props) {
@@ -150,6 +151,7 @@ const icon = (
 );
 
 export default function TimeSheetReport({ userAction, disabledDetailed }) {
+  const navigate = useNavigate();
   const [mainDetails, setMainDetails] = useState({
     fromDate: currentDate,
     toDate: currentDate,
@@ -275,7 +277,7 @@ export default function TimeSheetReport({ userAction, disabledDetailed }) {
   // Handlers for your icons
 
   const handleclose = () => {
-    window.history.back();
+    navigate('/home');
   };
 
   const handleExcel = async () => {

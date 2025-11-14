@@ -56,7 +56,7 @@ CustomTabPanel.propTypes = {
     value: PropTypes.number.isRequired,
 };
 
-function BasicBreadcrumbs({mId}) {
+function BasicBreadcrumbs({ mId }) {
     const style = {
         display: "flex",
         alignItems: "center",
@@ -90,7 +90,7 @@ function BasicBreadcrumbs({mId}) {
                     aria-label="breadcrumb"
                 >
                     <Typography underline="hover" sx={style} key="1">
-                        { mId === 46 ? 'Proof Reading ': mId == 28 ? 'Inspection  ':'Authorize '}
+                        {mId === 46 ? 'Proof Reading ' : mId == 31 ? 'Authorize ' : 'Inspection'}
 
                     </Typography>
                 </Breadcrumbs>
@@ -102,6 +102,7 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction, certify, isSave, m
 
 
 
+    console.log('ee', userAction);
 
     const hasAproove = userAction.some((action) => action.Action == "Authorize");
     const hasCertificate = userAction.some((action) => action.Action == "Certificate/Report");
@@ -138,6 +139,20 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction, certify, isSave, m
                         iconName="save"
                     />
                 )}
+            {userAction.some(a => a.Action === "Edit") &&
+                userAction.some(a => a.Action === "Draft") &&
+                detailPageId !== 0 &&
+                !hasAproove &&
+                !isSave &&
+                menuId === 28 && (
+                    <ActionButton
+                        iconsClick={iconsClick}
+                        icon="fa-solid fa-file"
+                        caption="Draft"
+                        iconName="draft"
+                    />
+                )}
+
             {/* {userAction.some((action) => action.Action == "Delete") || !hasAproove && (
                 <>
                     {detailPageId != 0 ? (
@@ -718,18 +733,11 @@ export default function InspDetails({
 
     const fetchDetail = async () => {
         try {
-
-
-
-
             const response = await getInspectionDetails({ id: detailPageId })
 
             if (response.status == "Success") {
-
-
+                
                 const result = JSON.parse(response?.result)
-
-
 
                 let updatedData = {
                     ...formData,
@@ -822,6 +830,11 @@ export default function InspDetails({
                     setConfirmAlert(true);
                 }
 
+                break;
+            case "draft":
+                setConfirmData({ message: "Draft", type: "success" });
+                setConfirmType("draft");
+                setConfirmAlert(true);
                 break;
             case "prev":
                 handlePrevNext(1);
@@ -950,7 +963,7 @@ export default function InspDetails({
     }
 
 
-    const handleSave = async () => {
+    const handleSave = async (saveType) => {
 
         try {
             const validFieldNames = new Set(viewFields.map(field => field.FieldName));
@@ -1002,7 +1015,8 @@ export default function InspDetails({
                 attachments: formData?.Attachment || [],
                 reject: formData?.Reject,
                 rejectRemarks: formData?.RejectRemarks,
-                pfStatus: menuId == 46 ? true : false
+                pfStatus: menuId == 46 ? true : false,
+                draft: saveType == 'draft' ? true : false
             };
 
 
@@ -1076,8 +1090,8 @@ export default function InspDetails({
     //confirmation
 
     const handleConfirmSubmit = () => {
-        if (confirmType == "save") {
-            handleSave();
+        if (confirmType == "save" || confirmType == "draft") {
+            handleSave(confirmType);
         }
         setConfirmAlert(false);
         setConfirmData({});

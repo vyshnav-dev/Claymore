@@ -357,7 +357,7 @@ const inspectionApis = () => {
     try {
       const response = await makeAuthorizedRequestBase(
         "post",
-        "inspection/upsertacknowledgement",
+        "inspection/upsertacknowledgementinspectionwise",
         payload,
         true
       );

@@ -9,6 +9,7 @@ import { primaryColor } from "../../config/config";
 import ConfirmationAlert from "../../component/Alerts/ConfirmationAlert";
 import ExcelExport from "../../component/Excel/Excel";
 import { allocationApis } from "../../service/Allocation/allocation";
+import { useNavigate } from "react-router-dom";
 
 function BasicBreadcrumbs() {
   const style = {
@@ -127,6 +128,8 @@ export default function TimeRecordSummary({
   const { GetAllocatedJobOrderSummary,deleteAllocatedJobOrder} =
     allocationApis();
 
+    const navigate = useNavigate();
+
   //Role Summary
   const fetchRoleSummary = async () => {
     setselectedDatas([]);
@@ -231,7 +234,7 @@ export default function TimeRecordSummary({
   };
 
   const handleclose = () => {
-    window.history.back();
+    navigate('/home');
   };
 
   

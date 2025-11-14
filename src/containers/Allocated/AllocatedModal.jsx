@@ -23,6 +23,7 @@ import {
     thirdColor,
 } from "../../config/config";
 import UserAutoComplete from "../../component/AutoComplete/UserAutoComplete";
+import Loader from "../../component/Loader/Loader";
 
 
 
@@ -53,7 +54,7 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
     const { GetTechnicianList } = allocationApis()
 
     const userData = JSON.parse(localStorage.getItem("ClaymoreUserData"))[0];
-
+    const [open, setOpen] = React.useState(false);
     const [formData, setFormData] = useState({
     })
     const [mainDetails, setMainDetails] = useState({});
@@ -66,6 +67,12 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
     const { showAlert } = useAlert();
     const { UpsertJobOrderAllocation, GetAllocatedJobOrderDetails, updateproductsuspend, upsertjobtransfer } = allocationApis()
 
+    const handleClose = () => {
+    setOpen(false);
+  };
+  const handleOpen = () => {
+    setOpen(true);
+  };
 
     React.useEffect(() => {
         const fetchData = async () => {
@@ -114,12 +121,15 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
     }
 
     const handleSave = async () => {
-        const emptyFields = [];
+
+        try {
+          const emptyFields = [];
         if (!formData?.details?.length) emptyFields.push("Technician");
         if (emptyFields.length > 0) {
             showAlert('info', `Please Allocate ${emptyFields[0]}`);
             return;
         }
+        handleOpen();
         const saveData = {
             Id: selected,
             jobOrderNo: mainDetails?.JobOrderNo,
@@ -134,7 +144,13 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
             hardRefresh();
             showAlert('success', response?.message);
             return;
-        }
+        }  
+        } catch (error) {
+            console.log('Technician Allocated error',error);
+            
+        }finally{
+            handleClose();
+        }  
 
     };
 
@@ -474,6 +490,7 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
 
                 </DialogActions>
             </Box>
+            <Loader loader={open} loaderClose={handleClose} />
         </>
     );
 }

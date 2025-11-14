@@ -292,13 +292,23 @@ export default function AckDetails({
 
     }
 
+    
+
+   
+    
+
     const handleSave = async () => {
+
+        const inspectionItems = rows.map((item) => ({
+      id: item?.Id,
+    }));
 
         try {
             const saveData = {
                 id: mainDetails?.Id,
                 allocation: mainDetails?.Allocation,
-                clientSign: mainDetails?.ClientSign
+                clientSign: mainDetails?.ClientSign,
+                idCollection:inspectionItems
             };
             const response = await upsertAcknowledgement(saveData);
             if (response.status === "Success") {

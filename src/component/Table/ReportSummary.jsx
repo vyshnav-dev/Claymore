@@ -191,6 +191,11 @@ export default function ReportSummary(props) {
 
     return `${day}-${month}-${year}`;
   };
+
+  console.log('rows',filteredRows);
+  console.log('colum',columns);
+  
+  
   
   return (
     <Box

@@ -25,6 +25,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { allocationApis } from "../../../service/Allocation/allocation";
 import UserAutoComplete from "../../../component/AutoComplete/UserAutoComplete";
 import AutoSelect from "../../../component/AutoComplete/AutoSelect";
+import { useNavigate } from "react-router-dom";
 const currentDate = new Date().toLocaleDateString("en-CA");
 
 function CustomTabPanel(props) {
@@ -235,6 +236,7 @@ const data = {
   
 
 export default function InspectionReport({ userAction, disabledDetailed }) {
+    const navigate = useNavigate();
     const [mainDetails, setMainDetails] = useState({
         fromDate: currentDate,
         toDate: currentDate,
@@ -361,8 +363,8 @@ export default function InspectionReport({ userAction, disabledDetailed }) {
     // Handlers for your icons
 
     const handleclose = () => {
-        window.history.back();
-    };
+    navigate('/home');
+  };
 
    
     const handleExcel = async () => {

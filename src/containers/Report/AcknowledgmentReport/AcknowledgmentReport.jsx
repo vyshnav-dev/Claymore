@@ -23,6 +23,7 @@ import NormalButton from "../../../component/Buttons/NormalButton";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { allocationApis } from "../../../service/Allocation/allocation";
 import UserAutoComplete from "../../../component/AutoComplete/UserAutoComplete";
+import { useNavigate } from "react-router-dom";
 const currentDate = new Date().toLocaleDateString("en-CA");
 const suggestionType = [
     { Id: 1, Name: "Reconciliation Date" },
@@ -153,6 +154,7 @@ const icon = (
 );
 
 export default function AcknowledgmentReport({ userAction, disabledDetailed }) {
+    const navigate = useNavigate();
     const [mainDetails, setMainDetails] = useState({
         fromDate: currentDate,
         toDate: currentDate,
@@ -278,8 +280,8 @@ export default function AcknowledgmentReport({ userAction, disabledDetailed }) {
     // Handlers for your icons
 
     const handleclose = () => {
-        window.history.back();
-    };
+    navigate('/home');
+  };
 
     const handleExcel = async () => {
         const response = await getacknowledgementreport({

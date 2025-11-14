@@ -8,6 +8,7 @@ import SummaryTable from "../../component/Table/SummaryTable";
 import { primaryColor } from "../../config/config";
 import ExcelExport from "../../component/Excel/Excel";;
 import { allocationApis } from "../../service/Allocation/allocation";
+import { useNavigate } from "react-router-dom";
 
 function BasicBreadcrumbs({mId}) {
   
@@ -125,7 +126,7 @@ export default function InspMainSummary({
   const { GetAllocatedJobOrderSummary,deleteAllocatedJobOrder} =
     allocationApis();
   
-
+    const navigate = useNavigate();
   
 
   //Role Summary
@@ -248,7 +249,7 @@ export default function InspMainSummary({
   };
 
   const handleclose = () => {
-    window.history.back();
+    navigate('/home');
   };
 
   

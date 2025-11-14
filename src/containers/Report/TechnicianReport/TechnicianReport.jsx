@@ -19,6 +19,7 @@ import { reportApis } from "../../../service/Report/report";
 import ExcelExport from "../../../component/Excel/Excel";
 import ReportSummary from "../../../component/Table/ReportSummary";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { useNavigate } from "react-router-dom";
 function CustomTabPanel(props) {
     const { children, value, index, ...other } = props;
 
@@ -144,6 +145,7 @@ const icon = (
 );
 
 export default function TechnicianReport({ userAction, disabledDetailed }) {
+    const navigate = useNavigate();
     const [confirmAlert, setConfirmAlert] = useState(false);
     const [confirmData, setConfirmData] = useState({});
     const [confirmType, setConfirmType] = useState(null);
@@ -250,9 +252,9 @@ export default function TechnicianReport({ userAction, disabledDetailed }) {
     };
     // Handlers for your icons
 
-    const handleclose = () => {
-        window.history.back();
-    };
+   const handleclose = () => {
+    navigate('/home');
+  };
 
     const handleExcel = async () => {
         const response = await getunallocatedtechnicianreport({

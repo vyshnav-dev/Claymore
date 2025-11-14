@@ -776,6 +776,7 @@ export default function RiskAssesmentDetails({
                     marginTop: '50px'
                 }}
             >
+                <Typography sx={{ fontWeight: 'bold',ml:2 }}>{mainDetails?.Product_Name}</Typography>
                 <Box
                     sx={{
                         width: "98%",
@@ -786,6 +787,7 @@ export default function RiskAssesmentDetails({
                         gap: '50px'
                     }}
                 >
+                    
 
                     <Box sx={{
                         display: "flex",
@@ -803,6 +805,8 @@ export default function RiskAssesmentDetails({
                             gap: "2px", // Reduced width for small screens
                         },
                     }} >
+
+                        
 
                         {/* <UserAutoComplete
                             apiKey={getAssignjoborderlist}

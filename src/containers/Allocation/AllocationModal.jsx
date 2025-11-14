@@ -20,11 +20,12 @@ import {
     selectedColor,
     thirdColor,
 } from "../../config/config";
+import Loader from "../../component/Loader/Loader";
 
 
 
 
-export default function AllocationModal({ handleCloseModal, selected, hardRefresh, userAction }) {
+export default function AllocationModal({ handleCloseModal, selected, hardRefresh, userAction}) {
 
     const headerCellStyle = {
         padding: "0px",
@@ -50,6 +51,7 @@ export default function AllocationModal({ handleCloseModal, selected, hardRefres
     const { GetTechnicianList } = allocationApis()
     const userData = JSON.parse(localStorage.getItem("ClaymoreUserData"))[0];
 
+    const [open, setOpen] = React.useState(false);
     const [formData, setFormData] = useState({})
     const [mainDetails, setMainDetails] = useState({
         JobOrderNo: '',
@@ -60,6 +62,13 @@ export default function AllocationModal({ handleCloseModal, selected, hardRefres
     const { showAlert } = useAlert();
     const { UpsertJobOrderAllocation, GetPendingJobOrderdetails } = allocationApis()
 
+
+    const handleClose = () => {
+    setOpen(false);
+  };
+  const handleOpen = () => {
+    setOpen(true);
+  };
 
     React.useEffect(() => {
         const fetchData = async () => {
@@ -85,28 +94,41 @@ export default function AllocationModal({ handleCloseModal, selected, hardRefres
 
     const handleSave = async (e) => {
         // e.preventDefault();
-        const emptyFields = [];
-        if (!formData?.details?.length) emptyFields.push("Technician");
-        if (emptyFields.length > 0) {
-            showAlert('info', `Please Allocate ${emptyFields[0]}`);
-            return;
-        }
-        const saveData = {
-            Id: 0,
-            jobOrderNo: selected,
-            client: mainDetails?.Client_Name,
-            date: mainDetails?.Date,
-            details: formData?.details,
-        }
 
 
-        const response = await UpsertJobOrderAllocation(saveData)
-        if (response?.status === "Success") {
-            handleCloseModal()
-            hardRefresh();
-            showAlert('success', `Technician Allocate Successfully`);
-            return;
+        try {
+            const emptyFields = [];
+            if (!formData?.details?.length) emptyFields.push("Technician");
+            if (emptyFields.length > 0) {
+                showAlert('info', `Please Allocate ${emptyFields[0]}`);
+                return;
+            }
+            handleOpen();
+
+            const saveData = {
+                Id: 0,
+                jobOrderNo: selected,
+                client: mainDetails?.Client_Name,
+                date: mainDetails?.Date,
+                details: formData?.details,
+            }
+
+
+            const response = await UpsertJobOrderAllocation(saveData)
+            if (response?.status === "Success") {
+                handleCloseModal()
+                hardRefresh();
+                showAlert('success', `Technician Allocate Successfully`);
+                return;
+            }
+
+        } catch (error) {
+            console.log('Technician Allocate error', error);
+
+        } finally {
+            handleClose();
         }
+
 
     };
     return (
@@ -209,6 +231,7 @@ export default function AllocationModal({ handleCloseModal, selected, hardRefres
                 )}
                 <NormalButton action={handleCloseModal} label="Cancel" />
             </DialogActions>
+            <Loader loader={open} loaderClose={handleClose} />
 
         </>
     );

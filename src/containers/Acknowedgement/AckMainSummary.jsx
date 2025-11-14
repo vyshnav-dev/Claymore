@@ -13,6 +13,7 @@ import ExcelExport from "../../component/Excel/Excel";
 import { identity } from "lodash";
 import { inspectionApis } from "../../service/Inspection/inspection";
 import { allocationApis } from "../../service/Allocation/allocation";
+import { useNavigate } from "react-router-dom";
 
 function BasicBreadcrumbs() {
   const style = {
@@ -131,6 +132,8 @@ export default function AckMainSummary({
   const { GetAllocatedJobOrderSummary,deleteAllocatedJobOrder} =
     allocationApis();
 
+    const navigate = useNavigate();
+
   //Role Summary
   const fetchRoleSummary = async () => {
     setselectedDatas([]);
@@ -238,7 +241,7 @@ export default function AckMainSummary({
   };
 
   const handleclose = () => {
-    window.history.back();
+    navigate('/home');
   };
 
   

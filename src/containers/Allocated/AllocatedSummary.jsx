@@ -11,6 +11,7 @@ import ExcelExport from "../../component/Excel/Excel";
 import NormalModal from "../../component/Modal/NormalModal";
 import { allocationApis } from "../../service/Allocation/allocation";
 import AllocatedModal from "./AllocatedModal";
+import { useNavigate } from "react-router-dom";
 
 function BasicBreadcrumbs() {
   const style = {
@@ -153,6 +154,8 @@ export default function AllocatedSummary({
   const { GetAllocatedJobOrderSummary,deleteAllocatedJobOrder  } =
     allocationApis();
 
+    const navigate = useNavigate();
+
   //Role Summary
   const fetchRoleSummary = async () => {
     setselectedDatas([]);
@@ -260,7 +263,7 @@ export default function AllocatedSummary({
   };
 
   const handleclose = () => {
-    window.history.back();
+    navigate('/home');
   };
 
   

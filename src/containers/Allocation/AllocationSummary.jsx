@@ -10,6 +10,8 @@ import ExcelExport from "../../component/Excel/Excel";
 import NormalModal from "../../component/Modal/NormalModal";
 import AllocationModal from "./AllocationModal";
 import { allocationApis } from "../../service/Allocation/allocation";
+import Loader from "../../component/Loader/Loader";
+import { useNavigate } from "react-router-dom";
 
 function BasicBreadcrumbs() {
   const style = {
@@ -67,7 +69,7 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
         scrollbarWidth: "thin",
       }}
     >
-      
+
       {userAction.some((action) => action.Action === "Allocate") && (
         <ActionButton
           iconsClick={iconsClick}
@@ -109,6 +111,7 @@ export default function AllocationSummary({
   userAction,
   Id
 }) {
+  const [open, setOpen] = React.useState(false);
   const [rows, setRows] = React.useState([]); //To Pass in Table
   const [displayLength, setdisplayLength] = React.useState(25); // Show Entries
   const [pageNumber, setpageNumber] = React.useState(1); //Table current page number
@@ -125,13 +128,20 @@ export default function AllocationSummary({
   const [addMenu, setAddMenu] = useState(false);
   const { GetJobOrderSummary } =
     allocationApis();
+  const navigate = useNavigate();
 
+  const handleClose = () => {
+    setOpen(false);
+  };
+  const handleOpen = () => {
+    setOpen(true);
+  };
 
   //Role Summary
   const fetchRoleSummary = async () => {
     setselectedDatas([]);
     const currentSearchKey = latestSearchKeyRef.current;
-    
+    handleOpen();
     try {
       const response = await GetJobOrderSummary({
         pageNo: pageNumber,
@@ -146,7 +156,7 @@ export default function AllocationSummary({
       ) {
         const myObject = JSON.parse(response?.result);
 
-        setRows(myObject?.Data );
+        setRows(myObject?.Data);
 
         const totalRows = myObject?.Metadata.TotalRows;
         const totalPages = myObject?.Metadata.TotalPages;
@@ -154,8 +164,8 @@ export default function AllocationSummary({
         settotalRows(totalRows);
         setTotalPages(totalPages);
       }
-      
-      
+
+
       else {
         setRows([]);
       }
@@ -164,9 +174,10 @@ export default function AllocationSummary({
         setRows([]);
         settotalRows(null);
         setTotalPages(null);
-    
+
       }
     } finally {
+      handleClose();
     }
   };
 
@@ -226,10 +237,10 @@ export default function AllocationSummary({
   };
 
   const handleclose = () => {
-    window.history.back();
+    navigate('/home');
   };
 
-  
+
   // Handlers for your icons
   const handleAdd = (value) => {
     if (value === "allocate") {
@@ -242,16 +253,16 @@ export default function AllocationSummary({
         );
         return;
       }
-     
+
       setId(selectedDatas[0]);
     } else {
       setId(0);
-      
+
     }
     setAddMenu(true);
   };
 
-  
+
 
   const handleExcelExport = async () => {
     try {
@@ -260,7 +271,7 @@ export default function AllocationSummary({
         pageSize: 0,
         search: "",
       });
-      const excludedFields = ["Id","ModifiedBy","ModifiedOn"];
+      const excludedFields = ["Id", "ModifiedBy", "ModifiedOn"];
       const filteredRows = JSON.parse(response?.result)?.Data;
 
       await ExcelExport({
@@ -268,13 +279,13 @@ export default function AllocationSummary({
         filteredRows,
         excludedFields,
       });
-    } catch (error) {}
+    } catch (error) { }
   };
 
-  
- 
-  
-  
+
+
+
+
   return (
     <>
       <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
@@ -311,19 +322,19 @@ export default function AllocationSummary({
             IdName={"JobOrderNo"}
           />
         </Box>
-        
 
-<NormalModal
-        isOpen={addMenu}
-        handleCloseModal={() => setAddMenu(false)}
-      >
-        <AllocationModal
+        <Loader loader={open} loaderClose={handleClose} />
+        <NormalModal
+          isOpen={addMenu}
           handleCloseModal={() => setAddMenu(false)}
-          selected={Id}
-          hardRefresh={hardRefresh}
-          userAction={userAction}
-        />
-      </NormalModal>
+        >
+          <AllocationModal
+            handleCloseModal={() => setAddMenu(false)}
+            selected={Id}
+            hardRefresh={hardRefresh}
+            userAction={userAction}
+          />
+        </NormalModal>
       </Box>
     </>
   );

@@ -9,6 +9,7 @@ import { primaryColor } from "../../../config/config";
 import { securityApis } from "../../../service/Security/security";
 import ConfirmationAlert from "../../../component/Alerts/ConfirmationAlert";
 import ExcelExport from "../../../component/Excel/Excel";
+import { useNavigate } from "react-router-dom";
 
 function BasicBreadcrumbs() {
   const style = {
@@ -134,6 +135,7 @@ export default function UserSummary({ setPageRender, setId, userAction }) {
   const { getSecuritysummary, deleteuser, deleterole } = securityApis();
   const theme = useTheme();
   //Role page Apis
+  const navigate = useNavigate();
 
   //Role Summary
   const fetchRoleSummary = async () => {
@@ -247,7 +249,7 @@ export default function UserSummary({ setPageRender, setId, userAction }) {
   };
 
   const handleclose = () => {
-    window.history.back();
+    navigate('/home');
   };
 
   // Handlers for your icons
