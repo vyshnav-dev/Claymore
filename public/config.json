@@ -6,12 +6,12 @@
     "thirdColor":"#d6f0ff",
     "selectedColor" :"#6e9ec2",
     "backgroundColor" :"#f2f0f0",
-    "profileDateFields":"Created Date,Stock Date,Doc Date,Reconciliation Date,Date Of Allocation,Date,Date Of Inspection,DateOfAllocation,Targetdate Of Closure,DateOfInspection,",
+    "profileDateFields":"Created Date,Stock Date,Doc Date,Reconciliation Date,Date Of Allocation,Date,Date Of Inspection,DateOfAllocation,Targetdate Of Closure,DateOfInspection,Modified On",
     "IMAGE_URL":"http://103.120.178.195/",
     "allowedExtensionsReceipt":["jpg", "jpeg", "png", "gif", "txt", "pdf", "xls", "xlsx", "doc", "docx"],
     "allowedExtensionsTagAttachments":["jpg", "jpeg", "png", "gif", "txt", "pdf", "xls", "xlsx", "doc", "docx"],
     "reportDateFields":"",
     "rowsPerSheet":10000,
     "allowedExtensionsUser":["jpg", "jpeg", "png", "gif"],
-    "transactionDateTimeFields":"Created On,Modified On,CreatedOn,ModifiedOn,Authorized On,AuthorizedOn,"
+    "transactionDateTimeFields":"Created On,CreatedOn,Authorized On,AuthorizedOn,"
 }

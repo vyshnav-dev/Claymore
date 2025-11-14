@@ -50,7 +50,7 @@ function BasicBreadcrumbs() {
           aria-label="breadcrumb"
         >
           <Typography underline="hover" sx={style} key="1">
-          Acknowledgement Job Orders
+          Acknowledgement 
           </Typography>
         </Breadcrumbs>
       </Stack>

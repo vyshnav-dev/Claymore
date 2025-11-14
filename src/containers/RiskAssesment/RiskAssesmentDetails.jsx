@@ -118,7 +118,7 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction }) => {
             
 
 
-            {userAction.some((action) => action.Action === "View" || action.Action === "Edit") && (
+            {/* {userAction.some((action) => action.Action === "View" || action.Action === "Edit") && (
                 <>
                     {detailPageId !== 0 && (
                         <ActionButton
@@ -141,7 +141,7 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction }) => {
                         />
                     ) : null}
                 </>
-            )}
+            )} */}
             {userAction.some((action) => action.Action === "Print") && (
                 <>
                     {detailPageId != 0 ? (

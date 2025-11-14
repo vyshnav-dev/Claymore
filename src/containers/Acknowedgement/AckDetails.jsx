@@ -81,7 +81,7 @@ function BasicBreadcrumbs() {
                     aria-label="breadcrumb"
                 >
                     <Typography underline="hover" sx={style} key="1">
-                        Acknowledgement Details
+                        Acknowledgement 
                     </Typography>
                 </Breadcrumbs>
             </Stack>
@@ -122,7 +122,7 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction }) => {
                         iconName={"save"}
                     />
                 )}
-            {userAction.some((action) => action.Action === "View" || action.Action === "Edit") && (
+            {/* {userAction.some((action) => action.Action === "View" || action.Action === "Edit") && (
                 <>
                     {detailPageId != 0 ? (
                         <ActionButton
@@ -145,7 +145,7 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction }) => {
                         />
                     ) : null}
                 </>
-            )}
+            )} */}
             
 
 

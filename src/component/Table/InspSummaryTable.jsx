@@ -72,7 +72,8 @@ export default function InspSummaryTable(props) {
     mainDetails,
     setMainDetails,
     id,
-    menuIdLocal
+    menuIdLocal,
+    hideColumn
   } = props;
   const [selected, setSelected] = React.useState([]);
   const [selectedPd, setSelectedPd] = React.useState([]);
@@ -94,7 +95,7 @@ export default function InspSummaryTable(props) {
     .split(",")
     .map((field) =>field.trim());
 
-  const excludedFields = ["Group", "GroupId", "TotalRows", "UserName","Id",statusName[0],statusName[1]];
+  const excludedFields = ["Group", "GroupId", "TotalRows", "UserName","Id","Product",statusName[0],statusName[1],...hideColumn];
 
   //To apply some filters on table rows
   const initialColumns =

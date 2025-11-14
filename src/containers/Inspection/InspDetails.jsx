@@ -139,7 +139,7 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction, certify, isSave, m
                         iconName="save"
                     />
                 )}
-            {userAction.some(a => a.Action === "Edit") &&
+            {/* {userAction.some(a => a.Action === "Edit") &&
                 userAction.some(a => a.Action === "Draft") &&
                 detailPageId !== 0 &&
                 !hasAproove &&
@@ -151,7 +151,7 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction, certify, isSave, m
                         caption="Draft"
                         iconName="draft"
                     />
-                )}
+                )} */}
 
             {/* {userAction.some((action) => action.Action == "Delete") || !hasAproove && (
                 <>
@@ -190,12 +190,12 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction, certify, isSave, m
                                 iconName={"correction"}
                             />
 
-                            <ActionButton
+                            {/* <ActionButton
                                 iconsClick={iconsClick}
                                 icon={"fa-regular fa-rectangle-xmark"}
                                 caption={"Suspend"}
                                 iconName={"suspend"}
-                            />
+                            /> */}
                         </>
                     ) : null}
 
@@ -223,7 +223,7 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction, certify, isSave, m
             }
 
 
-            {userAction.some((action) => action.Action === "View" || action.Action === "Edit") && (
+            {/* {userAction.some((action) => action.Action === "View" || action.Action === "Edit") && (
                 <>
                     {detailPageId != 0 ? (
                         <ActionButton
@@ -246,7 +246,7 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction, certify, isSave, m
                         />
                     ) : null}
                 </>
-            )}
+            )} */}
 
 
             <ActionButton

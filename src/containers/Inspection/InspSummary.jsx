@@ -45,7 +45,7 @@ function BasicBreadcrumbs({ mId }) {
           aria-label="breadcrumb"
         >
           <Typography underline="hover" sx={style} key="1">
-            {mId == 46 ? 'Proof Reading':mId == 28 ? 'Inspection' : 'Authorize'}
+            {mId == 46 ? 'Proof Reading' : mId == 28 ? 'Inspection' : 'Authorize'}
           </Typography>
         </Breadcrumbs>
       </Stack>
@@ -104,12 +104,12 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
             caption={"Correction"}
             iconName={"correction"}
           />
-          <ActionButton
+          {/* <ActionButton
                                 iconsClick={iconsClick}
                                 icon={"fa-regular fa-rectangle-xmark"}
                                 caption={"Suspend"}
                                 iconName={"suspend"}
-                            />
+                            /> */}
 
         </>}
 
@@ -121,7 +121,7 @@ const DefaultIcons = ({ iconsClick, userAction }) => {
           iconName={"excel"}
         />
       )}
-      
+
       {!hasEditAction &&
         userAction?.some((action) => action.Action === "View") && (
           <ActionButton
@@ -156,6 +156,7 @@ export default function InspSummary({
 
   const inspection = ["AuthorizedOn", "AuthorizedBy"]
   const authorize = ["ModifiedOn", "ModifiedBy"]
+  const proof = ["ModifiedOn", "ModifiedBy","CreatedOn","CreatedBy"]
 
   const [rows, setRows] = React.useState([]); //To Pass in Table
   const [displayLength, setdisplayLength] = React.useState(25); // Show Entries
@@ -217,15 +218,15 @@ export default function InspSummary({
       //   });
       // }
       // else {
-        // setNewId(false);
-        response = await getInspectionSummary({
-          allocation: Id,
-          pageNo: pageNumber,
-          pageSize: displayLength,
-          search: currentSearchKey,
-          type: Type,
-          status: mainDetails?.Status
-        });
+      // setNewId(false);
+      response = await getInspectionSummary({
+        allocation: Id,
+        pageNo: pageNumber,
+        pageSize: displayLength,
+        search: currentSearchKey,
+        type: Type,
+        status: mainDetails?.Status
+      });
       // }
       // setMainDetails({
       //   Allocation:Id
@@ -270,7 +271,7 @@ export default function InspSummary({
 
 
   const handleRowDoubleClick = (rowiId, row) => {
-    if (rowiId > 0  && userAction.some((action) => action.Action === "View" || action.Action === "Edit")) {
+    if (rowiId > 0 && userAction.some((action) => action.Action === "View" || action.Action === "Edit")) {
       // if(menuIdLocal == 29 && row.CreatedBy !== loginName){
       //   showAlert('info',"You can't edit")
       //     return;
@@ -409,11 +410,11 @@ export default function InspSummary({
         search: "",
         type: Type
       });
-      const excludedFields = ["Id","AuthorizedBy","AuthorizedOn","ModifiedBy","ModifiedOn"];
+      const excludedFields = ["Id", "AuthorizedBy", "AuthorizedOn", "ModifiedBy", "ModifiedOn"];
       const filteredRows = JSON.parse(response?.result)?.Data;
 
       await ExcelExport({
-        reportName: menuIdLocal == 46 ? 'Pending Product list' :menuIdLocal == 31 ? 'Authorize Product list' : 'Inspection Product list',
+        reportName: menuIdLocal == 46 ? 'Pending Product list' : menuIdLocal == 31 ? 'Authorize Product list' : 'Inspection Product list',
         filteredRows,
         excludedFields,
       });
@@ -427,7 +428,7 @@ export default function InspSummary({
         "info", "Please Select row ");
       return;
     }
-    const blockedStatuses = ["Approved", "Rejected", "Suspended","Correction"];
+    const blockedStatuses = ["Approved", "Rejected", "Suspended", "Correction"];
 
     // Get all items with blocked status
     const blockedItems = selectedStatus.filter(item => blockedStatuses.includes(item?.Status));
@@ -444,8 +445,8 @@ export default function InspSummary({
       header: value == 'correction' ? 'Correction' : value == 'suspend' ? 'Suspend' : "Authorization",
     });
     setProperty(true);
-    
-    
+
+
   };
 
   const handleAuthorize = async (status) => {
@@ -516,6 +517,7 @@ export default function InspSummary({
             hardRefresh={hardRefresh}
             IdName={"Id"}
             statusName={menuIdLocal == 31 ? authorize : inspection}
+            hideColumn={menuIdLocal == 46 ? proof : []}
             getAssignjoborderlist={getAssignjoborderlist}
             mainDetails={mainDetails}
             setMainDetails={setMainDetails}
