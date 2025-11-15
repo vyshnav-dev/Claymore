@@ -302,7 +302,7 @@ export default function InspMainSummary({
       const filteredRows = JSON.parse(response?.result)?.Data;
 
       await ExcelExport({
-        reportName: menuIdLocal == 46 ? 'Pending Job Orders' : menuIdLocal == 31 ? 'Authorize' :'Inspection Job Orders',
+        reportName: menuIdLocal == 46 ? 'Proof Reading Job Orders' : menuIdLocal == 31 ? 'Authorize' :'Inspection Job Orders',
         filteredRows,
         excludedFields,
       });

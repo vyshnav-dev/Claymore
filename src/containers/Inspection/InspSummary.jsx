@@ -414,7 +414,7 @@ export default function InspSummary({
       const filteredRows = JSON.parse(response?.result)?.Data;
 
       await ExcelExport({
-        reportName: menuIdLocal == 46 ? 'Pending Product list' : menuIdLocal == 31 ? 'Authorize Product list' : 'Inspection Product list',
+        reportName: menuIdLocal == 46 ? 'Proof Reading Product list' : menuIdLocal == 31 ? 'Authorize Product list' : 'Inspection Product list',
         filteredRows,
         excludedFields,
       });

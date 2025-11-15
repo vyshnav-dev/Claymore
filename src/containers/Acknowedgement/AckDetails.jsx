@@ -439,7 +439,7 @@ export default function AckDetails({
                         }}
                     >
 
-                        <AckTable rows={rows} excludedColumns={["Id","List"]} setInspId={setInspId} setProductId={setProductId} setPageRender={setPageRender} />
+                        <AckTable rows={rows} excludedColumns={["Id","List","Product"]} setInspId={setInspId} setProductId={setProductId} setPageRender={setPageRender} />
 
                         
                         <Box sx={{ width: '100%', display: "flex", flexDirection: "column", alignItems: "end", p: 3 }}>

@@ -219,6 +219,7 @@ export default function TimeRecordSubSummary({
         break;
       case "view":
         handleAdd("edit");
+        break;
       case "excel":
         handleExcelExport();
         break;

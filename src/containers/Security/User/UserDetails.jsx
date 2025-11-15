@@ -149,7 +149,7 @@ const DefaultIcons = ({ iconsClick, detailPageId, userAction }) => {
         </>
       )}
 
-      {(userAction.some((action) => action.Action === "Update Password") && detailPageId) ? (
+      {(userAction.some((action) => action.Action === "Reset Password") && detailPageId) ? (
         <ActionButton
           iconsClick={iconsClick}
           icon={"fa-solid fa-screwdriver-wrench"}
