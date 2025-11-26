@@ -57,7 +57,7 @@ export default function InspDetailsTab({formData,setFormData,disabledField}) {
             value={formData}
             setValue={setFormData}
             maxLength={100}
-            DonotAllowSpecialChar={true}
+            DonotAllowSpecialChar={false}
             
         />
         
@@ -91,7 +91,7 @@ export default function InspDetailsTab({formData,setFormData,disabledField}) {
             value={formData}
             setValue={setFormData}
             maxLength={100}
-            DonotAllowSpecialChar={true}
+            DonotAllowSpecialChar={false}
         />
         <UserInputField
             label={"Calibrated Test Equipment"}
@@ -102,7 +102,7 @@ export default function InspDetailsTab({formData,setFormData,disabledField}) {
             value={formData}
             setValue={setFormData}
             maxLength={100}
-            DonotAllowSpecialChar={true}
+            DonotAllowSpecialChar={false}
         />
         <UserInputField
             label={"Client Test Equipment"}
@@ -113,7 +113,7 @@ export default function InspDetailsTab({formData,setFormData,disabledField}) {
             value={formData}
             setValue={setFormData}
             maxLength={100}
-            DonotAllowSpecialChar={true}
+            DonotAllowSpecialChar={false}
         />
        
         

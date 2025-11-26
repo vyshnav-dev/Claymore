@@ -114,7 +114,7 @@ const TabFields = ({ formData,setFormData,fields, expanded, onChange,language,is
                         CharacterCasing={field?.CharacterCasing ?? 0}
                         RegularExpression={field?.RegularExpression}
                         dateType={field?.AllowDate}
-                        DonotAllowSpecialChar={field?.DonotAllowSpecialChar || true}
+                        DonotAllowSpecialChar={field?.DonotAllowSpecialChar || false}
 
                         // Add other necessary props here like value, onChange, etc.
                       />
@@ -144,7 +144,7 @@ const TabFields = ({ formData,setFormData,fields, expanded, onChange,language,is
                       CharacterCasing={field?.CharacterCasing ?? 0}
                       // RegularExpression={field?.RegularExpression}
                       dateType={field?.AllowDate}
-                      DonotAllowSpecialChar={field?.DonotAllowSpecialChar || true}
+                      DonotAllowSpecialChar={field?.DonotAllowSpecialChar || false}
                       RegularExpression={new RegExp(
                               `^-?[0-9]*\\.?[0-9]{0,${2}}$`
                             )

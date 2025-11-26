@@ -156,7 +156,7 @@ export default function InspSummary({
 
   const inspection = ["AuthorizedOn", "AuthorizedBy"]
   const authorize = ["ModifiedOn", "ModifiedBy"]
-  const proof = ["ModifiedOn", "ModifiedBy","CreatedOn","CreatedBy"]
+  const proof = ["ModifiedOn", "ModifiedBy", "CreatedOn", "CreatedBy"]
 
   const [rows, setRows] = React.useState([]); //To Pass in Table
   const [displayLength, setdisplayLength] = React.useState(25); // Show Entries
@@ -450,6 +450,13 @@ export default function InspSummary({
   };
 
   const handleAuthorize = async (status) => {
+
+    if (status == 1 || status == 3 || status == 4) {
+      if (!mainDetails1?.Remarks) {
+        showAlert("info", `Please Provide Remarks`);
+        return;
+      }
+    }
 
     const saveData = {
       status: status,
