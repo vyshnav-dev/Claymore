@@ -81,6 +81,7 @@ export default function ApproveConfirmation({
                 multiline={true}
                 width={400}
                 placeholder={"Add Remarks..."}
+                maxLength={500}
             />
               )}
               
@@ -115,3 +116,4 @@ export default function ApproveConfirmation({
     </>
   );
 }
+

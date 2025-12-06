@@ -97,6 +97,11 @@ export default function UserInputField({
   };
 
   const handleKeyDown = (event) => {
+    let inputValue = event.target.value;
+    
+    if (inputValue.length === maxLength) { 
+      showAlert("info", "Maximum length reached");
+    }
     if (event.key === "Tab") {
       setTabPressed(true);
     }

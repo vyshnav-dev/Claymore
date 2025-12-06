@@ -101,9 +101,6 @@ function BasicBreadcrumbs({ mId }) {
 const DefaultIcons = ({ iconsClick, detailPageId, userAction, certify, isSave, menuId, }) => {
 
 
-
-    console.log('ee', userAction);
-
     const hasAproove = userAction.some((action) => action.Action == "Authorize");
     const hasCertificate = userAction.some((action) => action.Action == "Certificate/Report");
     return (

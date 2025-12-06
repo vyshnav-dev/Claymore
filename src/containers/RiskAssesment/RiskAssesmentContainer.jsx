@@ -31,7 +31,6 @@ export default function RiskAssesmentContainer() {
           screenId: menuIdLocal,
         });
         const data = JSON.parse(response?.result);
-        console.log('d',data);
         
         setuserAction(data);
       } catch (error) {

@@ -421,7 +421,7 @@ export default function ApproveReport({ userAction, disabledDetailed }) {
                                     required={false}
                                     label={"Status"}
                                     ColumnSpan={0}
-                                    Menu={[{ "Id": 1, "Name": "Pending" }, { "Id": 2, "Name": "Approved" }, { "Id": 3, "Name": "Rejected" }, { "Id": 4, "Name": "Correction" }, { "Id": 5, "Name": "Suspend" }]}
+                                    Menu={[{ "Id": 1, "Name": "Pending" }, { "Id": 2, "Name": "Approved" }, { "Id": 3, "Name": "Rejected" }, { "Id": 4, "Name": "Correction" }]}
 
                                 />
 
