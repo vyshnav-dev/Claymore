@@ -13,5 +13,6 @@
     "reportDateFields":"",
     "rowsPerSheet":10000,
     "allowedExtensionsUser":["jpg", "jpeg", "png", "gif"],
-    "transactionDateTimeFields":"CreatedOn,AuthorizedOn,"
+    "transactionDateTimeFields":"CreatedOn,AuthorizedOn",
+    "FolderPath":"/Claymore"
 }

@@ -18,6 +18,7 @@ export let TransactionData = null
 export let FixedValues = null
 export let allowedExtensionsUser = null
 export let transactionDateTimeFields = null
+export let FolderPath = null
 
 
 export const getConfig = () => {
@@ -28,9 +29,9 @@ export const getConfig = () => {
   };
 
   export const loadConfig = async () => {
-    const response = await fetch('/config.json');
+    const response = await fetch(`./config.json?v=${Date.now()}`);
     config = await response.json();
-    const response1 = await fetch('/masterDocType.json');
+    const response1 = await fetch(`./masterDocType.json?v=${Date.now()}`);
     config1 = await response1.json();
     baseUrl = config.baseUrl;
     logoImage=config.logo
@@ -50,4 +51,5 @@ export const getConfig = () => {
     FixedValues = config1.FixedValues
     allowedExtensionsUser = config.allowedExtensionsUser
     transactionDateTimeFields = config.transactionDateTimeFields
+    FolderPath = config.FolderPath
 }
