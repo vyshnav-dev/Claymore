@@ -20,7 +20,7 @@ import {
 export default function TimeRecordTable({ rows,excludedColumns = [] }) {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(25);
-  const totalPages = Math.ceil(rows.length / rowsPerPage);
+  // const totalPages = Math?.ceil(rows.length / rowsPerPage);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage - 1);
@@ -31,12 +31,12 @@ export default function TimeRecordTable({ rows,excludedColumns = [] }) {
     setPage(0);
   };
 
-  const currentRows = rows.slice(page * rowsPerPage, (page + 1) * rowsPerPage);
+  const currentRows = rows?.slice(page * rowsPerPage, (page + 1) * rowsPerPage);
 
    // Filter out excluded columns
-   const filteredKeys = Object.keys(rows[0] || {})
-  .filter((key) => !excludedColumns.includes(key))
-  .map((key) => ({
+   const filteredKeys = Object?.keys(rows[0] || {})
+  ?.filter((key) => !excludedColumns?.includes(key))
+  ?.map((key) => ({
     label: key
       .replace(/([A-Z])/g, " $1") // Add space before capital letters
       .trim() // Remove extra spaces

@@ -40,6 +40,7 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
         color: "white",
         paddingTop: "3px",
         paddingBottom: "3px",
+        paddingRight:'2px'
     }
 
     const bodyCellStyle = {
@@ -68,11 +69,11 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
     const { UpsertJobOrderAllocation, GetAllocatedJobOrderDetails, updateproductsuspend, upsertjobtransfer } = allocationApis()
 
     const handleClose = () => {
-    setOpen(false);
-  };
-  const handleOpen = () => {
-    setOpen(true);
-  };
+        setOpen(false);
+    };
+    const handleOpen = () => {
+        setOpen(true);
+    };
 
     React.useEffect(() => {
         const fetchData = async () => {
@@ -123,34 +124,34 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
     const handleSave = async () => {
 
         try {
-          const emptyFields = [];
-        if (!formData?.details?.length) emptyFields.push("Technician");
-        if (emptyFields.length > 0) {
-            showAlert('info', `Please Allocate ${emptyFields[0]}`);
-            return;
-        }
-        handleOpen();
-        const saveData = {
-            Id: selected,
-            jobOrderNo: mainDetails?.JobOrderNo,
-            client: mainDetails?.Client_Name,
-            date: mainDetails?.Date,
-            details: formData?.details,
-        }
+            const emptyFields = [];
+            if (!formData?.details?.length) emptyFields.push("Technician");
+            if (emptyFields.length > 0) {
+                showAlert('info', `Please Allocate ${emptyFields[0]}`);
+                return;
+            }
+            handleOpen();
+            const saveData = {
+                Id: selected,
+                jobOrderNo: mainDetails?.JobOrderNo,
+                client: mainDetails?.Client_Name,
+                date: mainDetails?.Date,
+                details: formData?.details,
+            }
 
-        const response = await UpsertJobOrderAllocation(saveData)
-        if (response?.status === "Success") {
-            handleCloseModal()
-            hardRefresh();
-            showAlert('success', response?.message);
-            return;
-        }  
+            const response = await UpsertJobOrderAllocation(saveData)
+            if (response?.status === "Success") {
+                handleCloseModal()
+                hardRefresh();
+                showAlert('success', response?.message);
+                return;
+            }
         } catch (error) {
-            console.log('Technician Allocated error',error);
-            
-        }finally{
+            console.log('Technician Allocated error', error);
+
+        } finally {
             handleClose();
-        }  
+        }
 
     };
 
@@ -196,6 +197,7 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
                 return [
                     ...prev,
                     {
+                        productName: items?.Product_Name,
                         product: items?.Product,
                         quantity: fieldName === 'quantity' ? value : 0,
                         remarks: fieldName === 'remarks' ? value : ''
@@ -207,24 +209,33 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
 
     const handleSubmitSuspend = async () => {
 
-
         try {
             if (!suspend?.length) {
-                showAlert("info", "Please add Suspend Quantity");
+                showAlert("info", "Please add Edit Quantity");
             }
-            else {
-                const saveData = {
-                    allocation: selected,
-                    details: suspend
-                }
 
-                const response = await updateproductsuspend(saveData)
-                if (response?.status === "Success") {
-                    showAlert('success', response?.message);
-                    handleCloseModal()
-                    hardRefresh();
+            // Validate each row
+            for (let item of suspend) {
+                if (item.quantity === '' || item.quantity === null || item.quantity === undefined) {
+                    return showAlert("info", `Please provide Edit Quantity for ${item?.productName}`);
                 }
+                // if (!item.remarks || item.remarks.trim() === '') {
+                //     return showAlert("info", `Please provide Remarks for ${item?.productName}`);
+                // }
             }
+
+            const saveData = {
+                allocation: selected,
+                details: suspend
+            }
+
+            const response = await updateproductsuspend(saveData)
+            if (response?.status === "Success") {
+                showAlert('success', response?.message);
+                handleCloseModal()
+                hardRefresh();
+            }
+
 
 
         } catch (error) {
@@ -268,9 +279,9 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
             <Box >
                 <DialogContent >
 
-                    <Box sx={{ display: 'flex', flexDirection: 'column', flexWrap: 'wrap', minHeight: '350px' }} >
+                    <Box sx={{ display: 'flex', flexDirection: 'column', flexWrap: 'wrap', minHeight: '350px',width:'110vh' }} >
 
-                        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                        <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
                             <UserInputField
                                 label={"Job Order No"}
                                 name={"JobOrderNo"}
@@ -307,19 +318,19 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
 
                         </Box>
 
-                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, maxHeight: '200px', minHeight: '200px' }}>
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, maxHeight: '200px', minHeight: '200px',width:'100%' }}>
                             <TableContainer
                                 component={Paper}
-                                sx={{ maxHeight: "275px", minHeight: "275px", maxWidth: "60%", overflowY: "auto", mt: 2, scrollbarWidth: "thin" }}
+                                sx={{ maxHeight: "275px", minHeight: "275px", maxWidth: "69%", overflowY: "auto", mt: 2, scrollbarWidth: "thin" }}
                             >
-                                <Table stickyHeader size="small" sx={{ minWidth: "fit-Content" }}>
+                                <Table stickyHeader size="small" sx={{ minWidth: "fit-content", tableLayout: "auto" }}>
                                     <TableHead>
                                         <TableRow>
                                             <TableCell sx={{ ...headerCellStyle }}>Product</TableCell>
-                                            <TableCell sx={{ ...headerCellStyle }}>Quantity</TableCell>
+                                            <TableCell sx={{ ...headerCellStyle }}>Qty</TableCell>
                                             {userAction.some((action) => action.Action === "Suspend") && (
                                                 <>
-                                                    <TableCell sx={{ ...headerCellStyle }}>Suspended Quantity</TableCell>
+                                                    <TableCell sx={{ ...headerCellStyle }}>Edit Qty</TableCell>
                                                     <TableCell sx={{ ...headerCellStyle }}>Remarks</TableCell>
                                                 </>
                                             )}
@@ -332,7 +343,7 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
                                                 <TableCell
                                                     sx={{
                                                         ...bodyCellStyle,
-                                                        maxWidth: "150px", // Adjust width as needed
+                                                        minWidth: "250px", // Adjust width as needed
                                                         wordBreak: "break-word",
                                                         whiteSpace: "pre-wrap",
                                                         pl: 1
@@ -340,25 +351,35 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
                                                 >
                                                     {item.Product_Name}
                                                 </TableCell>
-                                                <TableCell sx={{ ...bodyCellStyle, pl: 1 }}>{item.Quantity}</TableCell>
+                                                <TableCell sx={{
+                                                    ...bodyCellStyle, width: "auto",
+                                                    minWidth: "50px",
+                                                    whiteSpace: "nowrap",
+                                                    paddingRight: "1px",
+                                                    pl: 1
+                                                }}>{item.Quantity}</TableCell>
                                                 {userAction.some((action) => action.Action === "Suspend") && (
                                                     <>
                                                         <TableCell sx={{               // remove extra padding so the cell doesn't force space
-                                                            ...bodyCellStyle
-
+                                                            ...bodyCellStyle,
+                                                             minWidth: "min-content",
                                                         }}>
                                                             <TextField
                                                                 multiline
-                                                                type="number"
+                                                                type="text"   // keep as text to allow "-"
                                                                 variant="outlined"
                                                                 onChange={(e) => {
-                                                                    const value = e.target.value.replace(/\D/g, ''); // Remove non-numeric characters
-                                                                    handleFieldChange({ target: { value } }, item, 'quantity');
+                                                                    const value = e.target.value;
+
+                                                                    // Allow: empty, "-", or valid negative/positive numbers
+                                                                    if (/^-?\d*$/.test(value)) {
+                                                                        handleFieldChange({ target: { value } }, item, 'quantity');
+                                                                    }
                                                                 }}
                                                                 value={suspend.find(p => p.product === item?.Product)?.quantity || ''}
-                                                                inputMode="numeric"  // Helps on mobile devices
-                                                                pattern="[0-9]*"     // Allows only numbers
-                                                                inputProps={{ min: 0 }}
+                                                                inputMode="numeric"
+                                                                pattern="-?[0-9]*"
+                                                                inputProps={{ min: -999999 }}   // optional
                                                                 sx={{
                                                                     width: '100%',
                                                                     '& .MuiOutlinedInput-root': {
@@ -372,11 +393,12 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
                                                                 }}
                                                             />
 
+
                                                         </TableCell>
 
                                                         <TableCell sx={{               // remove extra padding so the cell doesn't force space
-                                                            ...bodyCellStyle
-
+                                                            ...bodyCellStyle,
+                                                             minWidth: "min-content",
                                                         }}>
                                                             <Tooltip
                                                                 title={suspend.find(p => p.product === item?.Product)?.remarks || ''}
@@ -442,7 +464,7 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
                     <>
                         <Typography sx={{ pl: 2, fontWeight: 'bold', display: 'flex', flexWrap: 'wrap' }}>Transfer</Typography>
 
-                        <Box sx={{ display: 'flex', justifyContent: 'space-around', flexWrap: 'wrap', p: 1 }}>
+                        <Box sx={{ display: 'flex', gap:3, flexWrap: 'wrap', p: 1, ml:2 }}>
 
                             <UserAutoComplete
                                 apiKey={GetTechnicianList}
@@ -479,7 +501,7 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
                         <NormalButton action={handleSubmitTransfer} label="Trasfer" />
                     )}
                     {userAction.some((action) => action.Action === "Suspend") && (
-                        <NormalButton action={handleSubmitSuspend} label="Suspend" />
+                        <NormalButton action={handleSubmitSuspend} label="Update" />
                     )}
 
                     {userAction.some((action) => action.Action === "Save") && (

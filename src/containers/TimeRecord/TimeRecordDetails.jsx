@@ -198,7 +198,7 @@ export default function TimeRecordDetails({
     const [confirmType, setConfirmType] = useState(null);
     const [tableBody, setTableBody] = useState(bodyData);
     const [isImageModalOpenSign, setIsImageModalOpenSign] = useState(false);
-    const [rows, setRows] = useState([]);
+    const [rows,setRows] = useState([]);
 
 
     const { showAlert } = useAlert();
@@ -250,7 +250,7 @@ export default function TimeRecordDetails({
                         });
                     }
 
-                    setRows(myObject?.EquipmentDescription)
+                    setRows(myObject?.EquipmentDescription || [])
 
                     // Map the values from myObject to bodyData
                     const updatedBodyData = bodyData.map((item) => {

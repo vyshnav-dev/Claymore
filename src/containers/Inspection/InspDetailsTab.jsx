@@ -74,23 +74,23 @@ export default function InspDetailsTab({formData,setFormData,disabledField}) {
         <UserInputField
             label={"Expiry Date"}
             name={"ExpiryDate"}
-            type={"date"}
+            type={"text"}
             disabled={false}
             mandatory={true}
             value={formData}
             setValue={setFormData}
-            maxLength={100}
+            maxLength={20}
             min={currentDate}
         />
         <UserInputField
             label={"Last Proof Load Test"}
             name={"TestDate"}
-            type={"date"}
+            type={"text"}
             disabled={false}
             mandatory={true}
             value={formData}
             setValue={setFormData}
-            maxLength={100}
+            maxLength={20}
             DonotAllowSpecialChar={false}
         />
         <UserInputField
