@@ -6,7 +6,8 @@ import {
     Typography,
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper,
     TextField,
-    Tooltip
+    Tooltip,
+    IconButton
 } from "@mui/material";
 import React, { useState } from "react";
 import NormalButton from "../../component/Buttons/NormalButton";
@@ -24,7 +25,10 @@ import {
 } from "../../config/config";
 import UserAutoComplete from "../../component/AutoComplete/UserAutoComplete";
 import Loader from "../../component/Loader/Loader";
-
+import { masterApis } from "../../service/Master/master";
+import AutoComplete from "../../component/AutoComplete/AutoComplete";
+import ActionButton from "../../component/Buttons/ActionButton";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 
 
@@ -40,7 +44,7 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
         color: "white",
         paddingTop: "3px",
         paddingBottom: "3px",
-        paddingRight:'2px'
+        paddingRight: '2px'
     }
 
     const bodyCellStyle = {
@@ -53,6 +57,7 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
         textOverflow: "ellipsis",
     }
     const { GetTechnicianList } = allocationApis()
+    const { getproductlist } = masterApis();
 
     const userData = JSON.parse(localStorage.getItem("ClaymoreUserData"))[0];
     const [open, setOpen] = React.useState(false);
@@ -74,6 +79,8 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
     const handleOpen = () => {
         setOpen(true);
     };
+
+
 
     React.useEffect(() => {
         const fetchData = async () => {
@@ -121,6 +128,15 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
         })
     }
 
+    const [localRows, setLocalRows] = useState([]);
+
+    // Initialize localRows when products change
+    React.useEffect(() => {
+        if (products.length > 0) {
+            setLocalRows(products.map(p => ({ ...p, isNew: false })));
+        }
+    }, [products]);
+
     const handleSave = async () => {
 
         try {
@@ -147,7 +163,6 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
                 return;
             }
         } catch (error) {
-            console.log('Technician Allocated error', error);
 
         } finally {
             handleClose();
@@ -179,69 +194,169 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
     //     });
     // };
 
-    const handleFieldChange = (e, items, fieldName) => {
+    const validateRowsBeforeAdd = () => {
+        for (const row of localRows) {
+            const qty = Number(row.Quantity);
+
+            if (row?.isNew && !row?.Product) {
+                showAlert('info', 'Please select a product for  existing row before adding a new one.');
+                return false;
+            }
+
+            if (row?.isNew && !qty) {
+                showAlert('info', 'Please enter a valid quantity (greater than 0) for  existing row before adding a new one.');
+                return false;
+            }
+            if (row?.isNew && !row.Remarks) {
+                showAlert('info', 'Please add remarks for existing  row before adding a new one.');
+                return false;
+            }
+        }
+        return true;
+    };
+
+    // Function to add a new row
+    const handleAddRow = () => {
+        // Validate all existing rows first
+        if (!validateRowsBeforeAdd()) {
+            return;
+        }
+
+        const newRow = {
+            Id: Date.now(), // temporary unique ID
+            Product: 0,
+            Product_Name: '',
+            Quantity: 0,
+            Remarks: '',
+            isNew: true,
+        };
+        setLocalRows(prev => [...prev, newRow]);
+    };
+
+    const handleDeleteRow = (rowToDelete) => {
+        // Remove the row from localRows
+        setLocalRows(prev => prev.filter(row => row.Id !== rowToDelete.Id));
+
+        // If the deleted row had a product assigned, remove its suspend entry
+        if (rowToDelete.Product) {
+            setSuspend(prev => prev.filter(item => item.product !== rowToDelete.Product));
+        }
+    };
+
+    // Handler for product selection in new rows
+    const handleProductChange = (row, selectedProduct) => {
+        // If cleared (selectedProduct is null or product ID is falsy), reset the row
+        if (!selectedProduct || !selectedProduct.Product) {
+            setLocalRows(prev =>
+                prev.map(r => (r.Id === row.Id ? { ...r, Product: null, Product_Name: '' } : r))
+            );
+            setSuspend(prev => prev.filter(item => item.product !== row.Product));
+            return;
+        }
+
+        // Duplicate check: prevent selecting the same product in another row
+        const isUsed = localRows.some(r => r.Product === selectedProduct.Product && r.Id !== row.Id);
+        if (isUsed) {
+            showAlert('warning', 'This product is already allocated.');
+            return;
+        }
+
+        setLocalRows(prev =>
+            prev.map(r => (r.Id === row.Id ? { ...r, Product: selectedProduct.Product, Product_Name: selectedProduct.Product_Name } : r))
+        );
+
+        setSuspend(prev =>
+            prev.map(item =>
+                item.Id === row.Id ? { ...item, product: selectedProduct.Product, productName: selectedProduct.Product_Name } : item
+            )
+        );
+    };
+
+
+    // Modify handleFieldChange to also store tempId for new rows
+    const handleFieldChange = (e, row, fieldName) => {
+
+        if (!row?.Product) {
+            showAlert('info', `Please Provide Product`)
+            return;
+        }
         const value = e.target.value;
-
         setSuspend(prev => {
-            const existingIndex = prev.findIndex(p => p.product === items?.Product);
-
+            // Find existing entry by product ID or tempId for new rows
+            const existingIndex = prev.findIndex(p =>
+                (p.product === row?.Product && row.Product)
+            );
+            const newEntry = {
+                ...(existingIndex !== -1 ? prev[existingIndex] : {}),
+                [fieldName]: value,
+                product: row.Product, // might be null initially
+                productName: row.Product_Name,
+                Id: row.Id,  // store tempId to associate with row
+                IsOld: row?.IsOld
+            };
             if (existingIndex !== -1) {
-                // Update existing entry
-                return prev.map(item =>
-                    item.product === items?.Product
-                        ? { ...item, [fieldName]: value }
-                        : item
-                );
+                return prev.map((item, idx) => idx === existingIndex ? newEntry : item);
             } else {
-                // Create new entry with defaults
-                return [
-                    ...prev,
-                    {
-                        productName: items?.Product_Name,
-                        product: items?.Product,
-                        quantity: fieldName === 'quantity' ? value : 0,
-                        remarks: fieldName === 'remarks' ? value : ''
-                    }
-                ];
+                return [...prev, newEntry];
             }
         });
     };
 
+    // Update handleSubmitSuspend to filter valid entries and validate product
     const handleSubmitSuspend = async () => {
-
         try {
-            if (!suspend?.length) {
-                showAlert("info", "Please add Edit Quantity");
-            }
+            // Build a map of suspend entries keyed by product ID (only those with a product)
+            const suspendMap = new Map(
+                suspend.filter(item => item.product).map(item => [item.product, item])
+            );
 
-            // Validate each row
-            for (let item of suspend) {
-                if (item.quantity === '' || item.quantity === null || item.quantity === undefined) {
-                    return showAlert("info", `Please provide Edit Quantity for ${item?.productName}`);
+            const validSuspend = [];
+
+            for (let [product, entry] of suspendMap.entries()) {
+                const hasQuantity = entry.quantity !== '' && entry.quantity !== null && entry.quantity !== undefined;
+                const hasRemarks = entry.remarks && entry.remarks.trim() !== '';
+
+                const label = entry?.IsOld == 1 ? "Edit Qty": "Qty"
+                // If both are empty, skip this entry (user is not suspending this product)
+                if (!hasQuantity && !hasRemarks) {
+                    continue;
                 }
-                // if (!item.remarks || item.remarks.trim() === '') {
-                //     return showAlert("info", `Please provide Remarks for ${item?.productName}`);
-                // }
+
+                // If at least one is filled, both must be filled
+                if (!hasQuantity) {
+                    showAlert('info', `Please provide ${label} for product "${entry.productName || product}"`);
+                    return;
+                }
+                if (!hasRemarks) {
+                    showAlert('info', `Please provide remarks for product "${entry.productName || product}"`);
+                    return;
+                }
+
+                // Both are filled → add to valid list
+                validSuspend.push(entry);
             }
 
+            if (validSuspend.length === 0) {
+                showAlert('info', 'No data to update');
+                return;
+            }
+
+            // Prepare and send data
             const saveData = {
                 allocation: selected,
-                details: suspend
-            }
-
-            const response = await updateproductsuspend(saveData)
-            if (response?.status === "Success") {
+                details: validSuspend.map(({ product, quantity, remarks }) => ({ product, quantity, remarks }))
+            };
+            const response = await updateproductsuspend(saveData);
+            if (response?.status === 'Success') {
                 showAlert('success', response?.message);
-                handleCloseModal()
+                handleCloseModal();
                 hardRefresh();
             }
-
-
-
         } catch (error) {
-            throw error;
+            console.error(error);
         }
-    }
+    };
+
 
     const handleSubmitTransfer = async () => {
         try {
@@ -279,7 +394,7 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
             <Box >
                 <DialogContent >
 
-                    <Box sx={{ display: 'flex', flexDirection: 'column', flexWrap: 'wrap', minHeight: '350px',width:'110vh' }} >
+                    <Box sx={{ display: 'flex', flexDirection: 'column', flexWrap: 'wrap', minHeight: '350px', width: '110vh' }} >
 
                         <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
                             <UserInputField
@@ -318,127 +433,173 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
 
                         </Box>
 
-                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, maxHeight: '200px', minHeight: '200px',width:'100%' }}>
-                            <TableContainer
-                                component={Paper}
-                                sx={{ maxHeight: "275px", minHeight: "275px", maxWidth: "69%", overflowY: "auto", mt: 2, scrollbarWidth: "thin" }}
-                            >
-                                <Table stickyHeader size="small" sx={{ minWidth: "fit-content", tableLayout: "auto" }}>
-                                    <TableHead>
-                                        <TableRow>
-                                            <TableCell sx={{ ...headerCellStyle }}>Product</TableCell>
-                                            <TableCell sx={{ ...headerCellStyle }}>Qty</TableCell>
-                                            {userAction.some((action) => action.Action === "Suspend") && (
-                                                <>
-                                                    <TableCell sx={{ ...headerCellStyle }}>Edit Qty</TableCell>
-                                                    <TableCell sx={{ ...headerCellStyle }}>Remarks</TableCell>
-                                                </>
-                                            )}
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, maxHeight: '200px', minHeight: '200px', width: '100%', }}>
+                            <Box sx={{ display: 'flex', flexDirection: 'column', width: '560px', border: '1px solid #ddd', maxHeight: "277px", mt: 2 }}>
+                                <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, }}>
+                                    {userAction.some((action) => action.Action === "Suspend") && (
+                                        <ActionButton
+                                            iconsClick={handleSubmitSuspend}
+                                            icon={"save"}
+                                            caption={"Update"}
+                                            iconName={"edit"}
+                                        />
+                                    )}
+                                    <ActionButton
+                                        iconsClick={handleAddRow}
+                                        icon={"fa-solid fa-plus"}
+                                        caption={"Add"}
+                                        iconName={"new"}
+                                    />
+                                </Box>
 
-                                        </TableRow>
-                                    </TableHead>
-                                    <TableBody>
-                                        {products?.map((item, index) => (
-                                            <TableRow key={index}>
-                                                <TableCell
-                                                    sx={{
-                                                        ...bodyCellStyle,
-                                                        minWidth: "250px", // Adjust width as needed
-                                                        wordBreak: "break-word",
-                                                        whiteSpace: "pre-wrap",
-                                                        pl: 1
-                                                    }}
-                                                >
-                                                    {item.Product_Name}
-                                                </TableCell>
-                                                <TableCell sx={{
-                                                    ...bodyCellStyle, width: "auto",
-                                                    minWidth: "50px",
-                                                    whiteSpace: "nowrap",
-                                                    paddingRight: "1px",
-                                                    pl: 1
-                                                }}>{item.Quantity}</TableCell>
+                                <TableContainer
+                                    component={Paper}
+                                    sx={{ maxHeight: "275px", maxWidth: "100%", overflowY: "auto", scrollbarWidth: "thin", }}
+                                >
+                                    <Table stickyHeader size="small" sx={{ minWidth: "fit-content", tableLayout: "auto" }}>
+                                        <TableHead>
+                                            <TableRow>
+                                                <TableCell sx={{ ...headerCellStyle }}></TableCell>
+                                                <TableCell sx={{ ...headerCellStyle }}>Product</TableCell>
+                                                <TableCell sx={{ ...headerCellStyle }}>Qty</TableCell>
                                                 {userAction.some((action) => action.Action === "Suspend") && (
                                                     <>
-                                                        <TableCell sx={{               // remove extra padding so the cell doesn't force space
-                                                            ...bodyCellStyle,
-                                                             minWidth: "min-content",
-                                                        }}>
+                                                        <TableCell sx={{ ...headerCellStyle }}>Edit Qty</TableCell>
+                                                        <TableCell sx={{ ...headerCellStyle }}>Remarks</TableCell>
+                                                    </>
+                                                )}
+                                            </TableRow>
+                                        </TableHead>
+                                        <TableBody>
+                                            {localRows.map((row, index) => (
+                                                <TableRow key={row.id || index}>
+                                                    <TableCell sx={{ ...bodyCellStyle, minWidth: "30px", textAlign: "center" }}>
+                                                        <IconButton
+                                                            size="small"
+                                                            onClick={() => handleDeleteRow(row)}
+                                                            disabled={!row.isNew} // optional: allow deletion only for newly added rows
+                                                        >
+                                                            <DeleteIcon fontSize="small" />
+                                                        </IconButton>
+                                                    </TableCell>
+                                                    <TableCell sx={{ ...bodyCellStyle, minWidth: "250px" }}>
+                                                        <AutoComplete
+                                                            tableField
+                                                            formData={row}
+                                                            setFormData={(d) => handleProductChange(row, d)}
+                                                            autoId="Product"
+                                                            apiKey={getproductlist}
+                                                            params1="Search"
+                                                            params3="Type"
+                                                            params3Value={1}
+                                                            formDataName="Product_Name"
+                                                            formDataiId="Product"
+                                                            disabled={!row.isNew}
+                                                        />
+                                                    </TableCell>
+                                                    <TableCell sx={{ ...bodyCellStyle, minWidth: "50px" }}>
+                                                        {row.isNew ? (
                                                             <TextField
-                                                                multiline
-                                                                type="text"   // keep as text to allow "-"
+                                                                type="number"
                                                                 variant="outlined"
+                                                                value={row.Quantity}
                                                                 onChange={(e) => {
-                                                                    const value = e.target.value;
-
-                                                                    // Allow: empty, "-", or valid negative/positive numbers
-                                                                    if (/^-?\d*$/.test(value)) {
-                                                                        handleFieldChange({ target: { value } }, item, 'quantity');
-                                                                    }
+                                                                    const val = e.target.value;
+                                                                    setLocalRows(prev =>
+                                                                        prev.map(r => r.Id === row.Id ? { ...r, Quantity: val } : r)
+                                                                    );
+                                                                    handleFieldChange(e, row, 'quantity');
                                                                 }}
-                                                                value={suspend.find(p => p.product === item?.Product)?.quantity || ''}
                                                                 inputMode="numeric"
-                                                                pattern="-?[0-9]*"
-                                                                inputProps={{ min: -999999 }}   // optional
+                                                                inputProps={{ min: -999999 }}
                                                                 sx={{
                                                                     width: '100%',
+                                                                    height: 30,
                                                                     '& .MuiOutlinedInput-root': {
                                                                         display: 'flex',
                                                                         flex: 1,
                                                                         alignItems: 'stretch',
                                                                     },
                                                                     '& .MuiOutlinedInput-input': {
-                                                                        py: 0,
+                                                                        py: .5,
                                                                     },
                                                                 }}
                                                             />
-
-
-                                                        </TableCell>
-
-                                                        <TableCell sx={{               // remove extra padding so the cell doesn't force space
-                                                            ...bodyCellStyle,
-                                                             minWidth: "min-content",
-                                                        }}>
-                                                            <Tooltip
-                                                                title={suspend.find(p => p.product === item?.Product)?.remarks || ''}
-                                                                placement="top"
-                                                                arrow
-                                                            >
+                                                        ) : (
+                                                            <Typography sx={{ py: 0.5, pl: 1 }}>{row.Quantity}</Typography>
+                                                        )}
+                                                    </TableCell>
+                                                    {userAction.some((action) => action.Action === "Suspend") && (
+                                                        <>
+                                                            <TableCell sx={{ ...bodyCellStyle }}>
                                                                 <TextField
-                                                                    multiline
                                                                     type="text"
                                                                     variant="outlined"
-                                                                    onChange={(e) => handleFieldChange(e, item, 'remarks')}
-                                                                    value={suspend.find(p => p.product === item?.Product)?.remarks || ''}
+                                                                    onChange={(e) => {
+                                                                        const value = e.target.value;
+                                                                        if (/^-?\d*$/.test(value)) {
+                                                                            handleFieldChange(e, row, 'quantity');
+                                                                        }
+                                                                    }}
+                                                                    value={suspend.find(p => (p.product === row?.Product && row.Product && !row?.isNew))?.quantity || ''}
+                                                                    inputMode="numeric"
+                                                                    pattern="-?[0-9]*"
+                                                                    inputProps={{ min: -999999 }}
+                                                                    disabled={row?.isNew}
                                                                     sx={{
                                                                         width: '100%',
+                                                                        height: 30,
                                                                         '& .MuiOutlinedInput-root': {
                                                                             display: 'flex',
                                                                             flex: 1,
                                                                             alignItems: 'stretch',
-                                                                            maxHeight: '55px', // Fixed height
-                                                                            overflow: 'hidden', // Hide overflow
                                                                         },
                                                                         '& .MuiOutlinedInput-input': {
-                                                                            py: 0,
-                                                                            whiteSpace: 'nowrap', // Prevent line breaks
-                                                                            overflow: 'hidden',
-                                                                            textOverflow: 'ellipsis', // Show ellipsis for overflow
+                                                                            py: 0.5,
                                                                         },
                                                                     }}
                                                                 />
-                                                            </Tooltip>
-
-                                                        </TableCell>
-                                                    </>
-                                                )}
-
-                                            </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                            </TableContainer>
+                                                            </TableCell>
+                                                            <TableCell sx={{ ...bodyCellStyle }}>
+                                                                <Tooltip title={localRows.find(p => (p.Id === row?.Id ))?.Remarks || ''} arrow>
+                                                                    <TextField
+                                                                        type="text"
+                                                                        variant="outlined"
+                                                                        onChange={(e) => {
+                                                                            handleFieldChange(e, row, 'remarks')
+                                                                            setLocalRows(prev =>
+                                                                                prev.map(r => r.Id === row.Id ? { ...r, Remarks: e.target.value } : r)
+                                                                            );
+                                                                        }}
+                                                                        value={localRows.find(p => (p.Id === row?.Id ))?.Remarks || ''}
+                                                                        sx={{
+                                                                            width: '100%',
+                                                                            height: 30,
+                                                                            '& .MuiOutlinedInput-root': {
+                                                                                display: 'flex',
+                                                                                flex: 1,
+                                                                                alignItems: 'stretch',
+                                                                                maxHeight: '55px',
+                                                                                overflow: 'hidden',
+                                                                            },
+                                                                            '& .MuiOutlinedInput-input': {
+                                                                                py: 0.5,
+                                                                                whiteSpace: 'nowrap',
+                                                                                overflow: 'hidden',
+                                                                                textOverflow: 'ellipsis',
+                                                                            },
+                                                                        }}
+                                                                    />
+                                                                </Tooltip>
+                                                            </TableCell>
+                                                        </>
+                                                    )}
+                                                </TableRow>
+                                            ))}
+                                        </TableBody>
+                                    </Table>
+                                </TableContainer>
+                            </Box>
                             <MultiCheckBox
                                 key={'Technician'}
                                 sFieldName={'Inspector'}
@@ -464,7 +625,7 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
                     <>
                         <Typography sx={{ pl: 2, fontWeight: 'bold', display: 'flex', flexWrap: 'wrap' }}>Transfer</Typography>
 
-                        <Box sx={{ display: 'flex', gap:3, flexWrap: 'wrap', p: 1, ml:2 }}>
+                        <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap', p: 1, ml: 2 }}>
 
                             <UserAutoComplete
                                 apiKey={GetTechnicianList}
@@ -500,9 +661,7 @@ export default function AllocatedModal({ handleCloseModal, selected, hardRefresh
                     {userAction.some((action) => action.Action === "Transfer") && (
                         <NormalButton action={handleSubmitTransfer} label="Trasfer" />
                     )}
-                    {userAction.some((action) => action.Action === "Suspend") && (
-                        <NormalButton action={handleSubmitSuspend} label="Update" />
-                    )}
+
 
                     {userAction.some((action) => action.Action === "Save") && (
                         <NormalButton action={handleSave} label="Save" />

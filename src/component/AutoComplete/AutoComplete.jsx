@@ -9,11 +9,12 @@ import {
   IconButton,
   Stack,
   Box,
+  Tooltip,
 
 } from "@mui/material";
 import { debounce } from "lodash";
 import { useRef } from "react";
-import { secondaryColor, thirdColor } from "../../config/config";
+import { primaryColor, secondaryColor, thirdColor } from "../../config/config";
 
 const AutoComplete = ({
   apiKey,
@@ -40,13 +41,15 @@ const AutoComplete = ({
   screenTagId,
   LinkTagId,
   detailScreeniId,
-  width = (isSwitchable&&!disabled)?220:250
+  width = (isSwitchable&&!disabled)?220:250,
+  setManualChange = () => {}, // default empty function
 }) => {
   const [iTypeF2, setiTypeF2] = useState(1);
   const [searchkey, setsearchkey] = useState("");
   const [Menu, setMenu] = useState([]);
   const [loading, setLoading] = useState(false);
   const [autoCompleteKey, setAutoCompleteKey] = useState(0);
+  const [popupClosedByEscape, setPopupClosedByEscape] = useState(false);
 
 
    const [toggleFocus, settoggleFocus] = useState(false)
@@ -62,12 +65,19 @@ const AutoComplete = ({
   
     const focusedRef = useRef(false); // Use ref to track focus state
     const highlightRef = useRef(false); // Separate ref to track component focus state
-      
+    const clearedManually = useRef(false); // Add this ref
 
 
 
   const handleAutocompleteChange = (event, newValue) => {
     if (disabled) {
+      return;
+    }
+    if (
+    newValue &&
+    newValue.Id === formData[formDataiId] &&
+    newValue.Name === formData[formDataName]
+    ) {
       return;
     }
     const updatedFormData = {
@@ -77,6 +87,16 @@ const AutoComplete = ({
     };
     setFormData(updatedFormData); // This will now update the parent's state
     setiTypeF2(1);
+    highlightRef.current = false
+    setManualChange(true)
+    setMenu([])
+    // Set cleared flag if clearing manually
+  if (!newValue) {
+    clearedManually.current = true;
+    setTimeout(() => {
+      clearedManually.current = false; // Reset after a delay
+    }, 1000);
+  }
   };
 
   const lastRequestId = useRef(0);
@@ -143,10 +163,12 @@ const AutoComplete = ({
   const handleFocus = () => {
     focusedRef.current = true; // Set focused state to true in ref
     settoggleFocus(!toggleFocus)
+    setPopupClosedByEscape(false);
    
   };
 
   const handleBlur = () => {
+    highlightRef.current = false
     focusedRef.current = false; // Reset focus state when the component loses focus
     // Check for the existence in Menu or the existing formData value
     const existsInMenu = Menu.some((option) => option.Name === searchkey);
@@ -160,6 +182,7 @@ const AutoComplete = ({
       });
       setsearchkey("");
       setAutoCompleteKey(prevKey => prevKey + 1);
+      setMenu([])
     }
   };
 
@@ -171,13 +194,16 @@ const AutoComplete = ({
 
   const CustomListBox = React.forwardRef((props, ref) => {
     const { children, ...other } = props;
+
+     // Determine if any option has a `Code` property
+     const showCodeHeader = Menu.some((option) => option?.Code);
     return (
       <ul style={{ paddingTop: 0, scrollbarWidth: "thin", }} ref={ref} {...other}>
         <ListSubheader
           style={{
-            backgroundColor:secondaryColor,
+            backgroundColor:primaryColor,
             padding: "5px",
-            color:thirdColor
+            color:"#fff"
           }}
         >
           <div
@@ -188,7 +214,9 @@ const AutoComplete = ({
             }}
           >
             <Typography style={{ marginRight: "auto",fontSize:"0.8rem" }}>Name</Typography>
+            {showCodeHeader && (
             <Typography style={{ marginLeft: "auto", fontSize:"0.8rem"  }}>Code</Typography>
+          )}
           </div>
         </ListSubheader>
         {children}
@@ -244,7 +272,31 @@ const AutoComplete = ({
   const handleAddClick = (option) => {
    
   };
+  //auto select if only one item and mandatory
+//   useEffect(() => {
+//   if (focusedRef.current&&!searchkey && required && Menu.length === 1 && !formData[formDataiId] && !clearedManually.current) {
+//     // Automatically select the only option
+//     const singleOption = Menu[0];
 
+//      if (
+//     singleOption &&
+//     singleOption.Id === formData[formDataiId] &&
+//     singleOption.Name === formData[formDataName]
+//     ) {
+//       return;
+//     }
+//     const updatedFormData = {
+//       ...formData,
+//       [formDataName]: singleOption.Name,
+//       [formDataiId]: singleOption.Id,
+//     };
+    
+//     setFormData(updatedFormData);
+//     setsearchkey(singleOption.Name);
+//     setManualChange(true);
+//     setMenu([])
+//   }
+// }, [Menu, focusedRef.current, required]); // Run when Menu changes or focus state changes
 
   return (
     <Box
@@ -255,9 +307,24 @@ const AutoComplete = ({
       width: `${width+40}`,
     }}
   >
+    <Tooltip title={disabled ? formData[formDataName] || "" : ""} arrow placement="bottom" 
+  PopperProps={{
+    modifiers: [
+      {
+        name: 'offset',
+        options: {
+          offset: [0, -10], // [horizontal, vertical]; -10 moves it 10px up
+        },
+      },
+    ],
+  }}>
     <Autocomplete
+      autoHighlight
       key={`${label}_${autoCompleteKey}`}
       disabled={disabled}
+      loading={loading}
+      loadingText={<CircularProgress size={20} />} 
+      noOptionsText={""}
       size="small"
       PaperComponent={({ children }) => (
         <Paper style={{ minWidth: "150px", maxWidth: "300px" }}>
@@ -283,48 +350,26 @@ const AutoComplete = ({
           highlightRef.current = option; // Update ref without re-rendering
         }
       }}
-      renderOption={(props, option) =>
-        {
-          const { key, ...other } = props; // Extract key from props
-          return (
-        <li key={option.Id} {...other}>
-          <div
-            className=""
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              width: "100%",
-              flexDirection: direction === "rtl" ? "row-reverse" : "row", // Swap direction for RTL
-              textAlign: direction === "rtl" ? "right" : "left",
-            }}
-          >
-            <Typography
-              style={{
-                marginRight: direction === "rtl" ? 0 : "auto",
-                marginLeft: direction === "rtl" ? "auto" : 0,
-                textAlign: direction === "rtl" ? "right" : "left",
-                fontSize: "12px",
-                color:"inherit",
-              }}
-            >
-              {option?.Name}
-            </Typography>
-            {option?.Code && (
-              <Typography
-                style={{
-                  marginLeft: direction === "rtl" ? 0 : "auto",
-                  marginRight: direction === "rtl" ? "auto" : 0,
-                  textAlign: direction === "rtl" ? "left" : "right",
-                  fontSize: "12px",
-                  color:"inherit",
-                }}
-              >
-                {option?.Code}
-              </Typography>
-            )}
-          </div>
-        </li>
-      )}}
+   renderOption={(props, option) => (
+           <li {...props} key={option.Id}>
+             <div
+               style={{
+                 display: "flex",
+                 justifyContent: "space-between",
+                 alignItems: "center", // Align items vertically for better layout
+                 width: "100%",
+                 gap: 1, // Add gap between Name and Code
+               }}
+             >
+               <Typography style={{ fontSize: "12px", flex: 1, textAlign: "left" }}>
+                 {option?.Name}
+               </Typography>
+               <Typography style={{ fontSize: "12px", flex: 1, textAlign: "right" }}>
+                 {option?.Code}
+               </Typography>
+             </div>
+           </li>
+         )}
       renderInput={(params) => (
         <TextField
           required={required}
@@ -360,28 +405,51 @@ const AutoComplete = ({
                   [formDataiId]:0,
                 };
                 setFormData(updatedFormData);
-
+                setMenu([])
                 setsearchkey("");
-
+                highlightRef.current = false
                 setiTypeF2((prevType) => (prevType === 1 ? 2 : 1));
 
                 event.preventDefault();
               }
+              if (event.key === "Escape") {
+                setPopupClosedByEscape(true);
+                highlightRef.current = null;
+                return; // Allow the default behavior to close the popup
+              }
+              // if (
+              //   event.key === "Tab" &&
+              //   !popupClosedByEscape &&
+              //   !highlightRef.current &&
+              //   searchkey &&
+              //   Menu.length > 0
+              // ) {
+              //   highlightRef.current = Menu[0];
+              // }
               if (event.key === "Tab" || event.key === "Enter") {
                 // Select the currently highlighted option
                 if (highlightRef.current) {
                   const newValue = highlightRef.current;
 
-            
+                  if (
+                  newValue &&
+                  newValue.Id === formData[formDataiId] &&
+                  newValue.Name === formData[formDataName]
+                  ) {
+                    return;
+                  }
                   // Set the form data directly with the highlighted option
                   setFormData({
                     ...formData,
                     [formDataName]: newValue?.Name,
                     [formDataiId]: newValue?.Id,
                   });
+                  setMenu([])
             
                   // Update the value directly
                   setsearchkey(newValue?.Name || "");
+                  highlightRef.current = false
+                  setManualChange(true)
                 }
                 setTimeout(() => {
                   event.target.blur(); // Move focus to the next field
@@ -476,7 +544,7 @@ const AutoComplete = ({
       // }}
       ListboxComponent={CustomListBox}
     />
-
+    </Tooltip>
    
     </Box>
   );

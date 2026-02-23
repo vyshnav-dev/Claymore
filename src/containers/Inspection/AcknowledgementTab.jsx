@@ -39,7 +39,7 @@ export default function AcknowledgementTab({ formData, setFormData }) {
             <UserInputField
                 label={"Target Date of Closure"}
                 name={"TargetDateOfClosure"}
-                type={"date"}
+                type={"text"}
                 disabled={false}
                 mandatory={false}
                 value={formData}
@@ -59,7 +59,7 @@ export default function AcknowledgementTab({ formData, setFormData }) {
             <UserInputField
                 label={"Target Date of Closure"}
                 name={"TargetDateOfClosure1"}
-                type={"date"}
+                type={"text"}
                 disabled={false}
                 mandatory={false}
                 value={formData}
